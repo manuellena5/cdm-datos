@@ -1,0 +1,17 @@
+# Secretos: la service_role key de Supabase nunca va al repo
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Excel temporales / copias locales
+~$*.xlsx
+*.xlsx
+
+# Sistema
+.DS_Store
+Thumbs.db
