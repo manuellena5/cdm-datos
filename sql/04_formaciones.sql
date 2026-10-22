@@ -5,6 +5,7 @@
 -- - Agrega nro_lista: orden en el posteo (1 a 11 titulares, el resto convocados).
 --   camiseta queda para el número real, cuando se sepa.
 -- Qué se rompe: nada. La tabla estaba vacía y ninguna vista usa rol ni nro_lista.
+-- En una base nueva no hace falta: 01_esquema.sql ya crea la tabla así.
 -- =====================================================================
 
 alter table formaciones drop constraint if exists formaciones_rol_chk;

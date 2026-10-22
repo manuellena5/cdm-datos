@@ -69,7 +69,8 @@ create policy lectura on formaciones for select to anon, authenticated
 grant select on
   fuentes, torneos, equipos, jugadores, partidos, goles, incidencias,
   formaciones, sanciones, posiciones, goleadores_liga,
-  v_partidos, v_campanas, v_goleadores, v_historial_rival, v_faltantes, v_disciplina
+  v_partidos, v_campanas, v_goleadores, v_historial_rival, v_faltantes, v_disciplina,
+  v_goles, v_incidencias, v_formaciones
 to anon, authenticated;
 
 grant execute on function orden_fase(text) to anon, authenticated;

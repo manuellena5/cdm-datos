@@ -8,7 +8,8 @@
 -- así los borradores no se filtran por las vistas.
 -- =====================================================================
 
-drop view if exists v_disciplina, v_faltantes, v_historial_rival, v_goleadores, v_campanas, v_partidos cascade;
+drop view if exists v_formaciones, v_incidencias, v_goles,
+  v_disciplina, v_faltantes, v_historial_rival, v_goleadores, v_campanas, v_partidos cascade;
 drop function if exists orden_fase(text);
 
 -- Orden de las instancias, para saber hasta dónde llegó el equipo.
@@ -185,13 +186,45 @@ todos as (
   from v_partidos
   group by torneo_id, categoria
 ),
-en_contra as (
-  select pa.torneo_id, pa.categoria, count(*) as goles
+-- Goles propios que no van a la tabla de goleadores
+goles_extra as (
+  select
+    pa.torneo_id,
+    pa.categoria,
+    count(*) filter (where g.tipo = 'En contra')                         as en_contra,
+    count(*) filter (where g.tipo <> 'En contra' and g.jugador_id is null) as sin_autor
   from goles g
   join partidos pa on pa.partido_id = g.partido_id
   join equipos e on e.equipo_id = g.equipo_id and e.es_propio
-  where g.tipo = 'En contra'
   group by pa.torneo_id, pa.categoria
+),
+-- Zona en la que jugó la fase regular (sin contar los interzonales)
+zona as (
+  select torneo_id, categoria, mode() within group (order by zona) as zona
+  from v_partidos
+  where fase_orden = 0 and zona is not null and zona <> 'Interzonal'
+  group by torneo_id, categoria
+),
+-- Última llave de playoff: en ida y vuelta se suman los dos partidos.
+-- Los penales son los del partido que definió (solo uno los tiene).
+ultima_llave as (
+  select
+    v.torneo_id,
+    v.categoria,
+    max(v.rival)            as rival,
+    count(v.resultado)      as jugados,
+    sum(v.gf)               as gf,
+    sum(v.gc)               as gc,
+    max(v.penales_favor)    as penales_favor,
+    max(v.penales_contra)   as penales_contra
+  from v_partidos v
+  join (
+    select torneo_id, categoria, max(fase_orden) as fase_orden
+    from v_partidos
+    where fase_orden > 0
+    group by torneo_id, categoria
+  ) u on u.torneo_id = v.torneo_id and u.categoria = v.categoria and u.fase_orden = v.fase_orden
+  group by v.torneo_id, v.categoria
 ),
 ultima_posicion as (
   select distinct on (torneo_id, categoria)
@@ -218,19 +251,101 @@ select
   coalesce(tb.g, 0) * 3 + coalesce(tb.e, 0) as pts,
   x.programados,
   x.sin_dato,
-  coalesce(ec.goles, 0) as goles_en_contra_a_favor,
+  coalesce(ge.en_contra, 0) as goles_en_contra_a_favor,
+  coalesce(ge.sin_autor, 0) as goles_sin_autor,
+  z.zona,
   case x.playoff_orden
     when 1 then '32avos' when 2 then '16avos' when 3 then 'Octavos'
     when 4 then 'Cuartos' when 5 then 'Semifinal' when 6 then 'Final'
   end as llego_a,
   x.playoff_pj,
+  ul.rival as playoff_rival,
+  -- true: ganó la última llave (si es la final, campeón) · false: quedó eliminado · null: sin dato
+  case
+    when ul.jugados is null or ul.jugados = 0 then null
+    when ul.gf > ul.gc then true
+    when ul.gf < ul.gc then false
+    when ul.penales_favor is not null then ul.penales_favor > ul.penales_contra
+  end as playoff_gano,
+  case when ul.jugados > 0 then (ul.gf = ul.gc and ul.penales_favor is not null) end as playoff_por_penales,
   up.posicion   as ultima_posicion,
   up.tras_fecha as ultima_posicion_fecha
 from todos x
 join torneos t on t.torneo_id = x.torneo_id
 left join tabla tb on tb.torneo_id = x.torneo_id and tb.categoria = x.categoria
-left join en_contra ec on ec.torneo_id = x.torneo_id and ec.categoria = x.categoria
+left join goles_extra ge on ge.torneo_id = x.torneo_id and ge.categoria = x.categoria
+left join zona z on z.torneo_id = x.torneo_id and z.categoria = x.categoria
+left join ultima_llave ul on ul.torneo_id = x.torneo_id and ul.categoria = x.categoria
 left join ultima_posicion up on up.torneo_id = x.torneo_id and up.categoria = x.categoria;
+
+-- ---------------------------------------------------------------------
+-- v_goles: cada gol con su lado (propio / rival) y el autor para mostrar.
+-- ---------------------------------------------------------------------
+create view v_goles with (security_invoker = true) as
+select
+  g.gol_id,
+  g.partido_id,
+  v.categoria,
+  case when g.equipo_id = v.rival_id then 'rival' else 'propio' end as lado,
+  g.jugador_id,
+  case
+    when g.tipo = 'En contra' and coalesce(g.nombre_en_fuente, '') ilike 'en contra%' then g.nombre_en_fuente
+    when g.tipo = 'En contra' then 'En contra' || coalesce(' (' || nullif(trim(g.nombre_en_fuente), '') || ')', '')
+    when j.jugador_id is not null then j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '')
+    else coalesce(nullif(trim(g.nombre_en_fuente), ''), 'Sin dato')
+  end as autor,
+  g.minuto,
+  g.tiempo,
+  g.tipo,
+  (case g.tiempo when '2T' then 200 when 'Suplementario' then 400 else 0 end
+     + coalesce(g.minuto, 199)) as orden
+from goles g
+join v_partidos v on v.partido_id = g.partido_id
+left join jugadores j on j.jugador_id = g.jugador_id;
+
+-- ---------------------------------------------------------------------
+-- v_incidencias: rojas, penales, etc. con su lado y el nombre para mostrar.
+-- ---------------------------------------------------------------------
+create view v_incidencias with (security_invoker = true) as
+select
+  i.id,
+  i.partido_id,
+  v.categoria,
+  case
+    when i.equipo_id is null then 'partido'
+    when i.equipo_id = v.rival_id then 'rival'
+    else 'propio'
+  end as lado,
+  i.jugador_id,
+  coalesce(j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), ''), nullif(trim(i.nombre_en_fuente), '')) as quien,
+  i.tipo,
+  i.minuto,
+  i.tiempo,
+  i.descripcion,
+  (case i.tiempo when '2T' then 200 when 'Suplementario' then 400 else 0 end
+     + coalesce(i.minuto, 199)) as orden
+from incidencias i
+join v_partidos v on v.partido_id = i.partido_id
+left join jugadores j on j.jugador_id = i.jugador_id;
+
+-- ---------------------------------------------------------------------
+-- v_formaciones: formación con el nombre del jugador.
+-- ---------------------------------------------------------------------
+create view v_formaciones with (security_invoker = true) as
+select
+  f.partido_id,
+  v.categoria,
+  f.jugador_id,
+  j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '') as jugador,
+  f.rol,
+  f.nro_lista,
+  f.camiseta,
+  f.minuto_entra,
+  f.minuto_sale,
+  f.capitan
+from formaciones f
+join v_partidos v on v.partido_id = f.partido_id
+join jugadores j on j.jugador_id = f.jugador_id;
 
 -- ---------------------------------------------------------------------
 -- v_goleadores: goles por jugador, torneo y categoría (sin "En contra").

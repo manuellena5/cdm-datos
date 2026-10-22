@@ -37,19 +37,50 @@ CDM.router = (function () {
     });
   }
 
-  function mostrar() {
+  let turno = 0;
+  let ultimaRuta = null;
+
+  // Cada pantalla tiene render(params, query) → HTML (puede ser una promesa)
+  // y, opcional, montar(contenedor, params, query) para enganchar eventos.
+  // Si mientras carga se navega a otra pantalla, la respuesta vieja se descarta.
+  async function mostrar() {
     const { ruta, query } = leerHash();
     const destino = resolver(ruta);
     if (!destino) {
       location.replace(RUTA_INICIAL);
       return;
     }
+    const miTurno = ++turno;
     const pantalla = CDM.pantallas[destino.nombre];
     const contenedor = document.getElementById('contenido');
+    const mismaRuta = ruta === ultimaRuta;   // solo cambiaron los filtros
+    ultimaRuta = ruta;
     marcarNav(pantalla.seccion);
     document.title = pantalla.titulo + ' · Historial Mitre';
-    pantalla.render(contenedor, destino.params, query);
-    window.scrollTo(0, 0);
+    CDM.api.empezarPantalla();
+    if (!mismaRuta) contenedor.innerHTML = CDM.ui.cargando();
+
+    let html;
+    let fallo = false;
+    try {
+      html = await pantalla.render(destino.params, query);
+    } catch (e) {
+      html = CDM.ui.errorCarga(e);
+      fallo = true;
+    }
+    if (miTurno !== turno) return;
+    // Un contenedor nuevo por render: los eventos de la pantalla anterior se van con él.
+    const vista = document.createElement('div');
+    vista.className = 'vista';
+    vista.innerHTML = (CDM.api.usandoGuardados && !fallo ? CDM.ui.avisoGuardados() : '') + html;
+    contenedor.replaceChildren(vista);
+    if (pantalla.montar) pantalla.montar(vista, destino.params, query);
+    if (!mismaRuta) window.scrollTo(0, 0);
+  }
+
+  // Cambia filtros sin sumar una entrada al historial del navegador.
+  function cambiarFiltros(ruta, filtros) {
+    location.replace(armar(ruta, filtros));
   }
 
   // Arma un hash con filtros, sin valores vacíos: armar('/resultados', { anio: 2026, cat: 'P' })
@@ -67,5 +98,5 @@ CDM.router = (function () {
     mostrar();
   }
 
-  return { iniciar, armar };
+  return { iniciar, armar, cambiarFiltros };
 })();

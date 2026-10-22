@@ -153,7 +153,9 @@ create table if not exists formaciones (
   partido_id     text not null references partidos (partido_id) on update cascade on delete cascade,
   jugador_id     text not null references jugadores (jugador_id) on update cascade,
   rol            text not null
-                 constraint formaciones_rol_chk check (rol in ('Titular', 'Suplente que entró', 'Suplente sin jugar')),
+                 constraint formaciones_rol_chk check (rol in (
+                   'Titular', 'Suplente que entró', 'Suplente sin jugar', 'Convocado (suplente)')),
+  nro_lista      int  constraint formaciones_nro_lista_chk check (nro_lista > 0), -- orden en el posteo
   camiseta       int  check (camiseta between 0 and 99),
   minuto_entra   int  check (minuto_entra between 0 and 150),
   minuto_sale    int  check (minuto_sale between 0 and 150),
