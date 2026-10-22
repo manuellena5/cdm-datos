@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Resultados – Historial Mitre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#14284B}a:hover{color:#2D5BA3}
+select{font:inherit}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #14284B; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+        <div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: 0.5px; line-height: 1">DEPORTIVO MITRE</div>
+          <div style="font-size: 13px; color: #C9D4E8">Historial de partidos · Liga San Martín</div>
+        </div>
+      </div>
+      <nav aria-label="Secciones" style="display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto">
+        <a href="Main.dc.html" style="color: #14284B; background: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Resultados</a>
+        <a href="Goleadores.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Goleadores</a>
+        <a href="Historial.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Historial</a>
+        <span style="color: #9FB0CF; padding: 10px 16px; font-weight: 600; font-size: 15px">Planteles · pronto</span>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; display: flex; flex-direction: column; gap: 20px">
+    <section aria-label="Filtros" style="background: #FFFFFF; border-radius: 12px; padding: 16px 20px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="f-anio" style="font-size: 13px; font-weight: 600; color: #4A5468">Año</label>
+        <select id="f-anio" style="height: 44px; min-width: 120px; padding: 0 12px; border: 1px solid #C7CEDB; border-radius: 8px; background: #FFFFFF; color: #1A2233; font-size: 16px">
+          <option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option>
+        </select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="f-torneo" style="font-size: 13px; font-weight: 600; color: #4A5468">Torneo</label>
+        <select id="f-torneo" style="height: 44px; min-width: 170px; padding: 0 12px; border: 1px solid #C7CEDB; border-radius: 8px; background: #FFFFFF; color: #1A2233; font-size: 16px">
+          <option>Clausura</option><option>Apertura</option><option>Todo el año</option>
+        </select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; font-weight: 600; color: #4A5468">Categoría</span>
+        <div role="group" aria-label="Categoría" style="display: flex; background: #EEF1F6; border-radius: 10px; padding: 4px; gap: 4px">
+          <button type="button" onClick="{{ pickPrimera }}" aria-pressed="{{ isPrimera }}" style="{{ btnPrimera }}">Primera</button>
+          <button type="button" onClick="{{ pickReserva }}" aria-pressed="{{ isReserva }}" style="{{ btnReserva }}">Reserva</button>
+        </div>
+      </div>
+      <div style="margin-left: auto; font-size: 14px; color: #4A5468; padding-bottom: 12px">Fuente: placas del club y Liga San Martín</div>
+    </section>
+
+    <section aria-label="Resumen del torneo" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px">
+      <div style="background: #14284B; color: #FFFFFF; border-radius: 12px; padding: 14px 18px">
+        <div style="font-size: 13px; color: #C9D4E8; font-weight: 600">PUNTOS</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1">{{ s.pts }}</div>
+      </div>
+      <sc-for list="{{ s.tiles }}" as="t" hint-placeholder-count="6">
+        <div style="background: #FFFFFF; border-radius: 12px; padding: 14px 18px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+          <div style="font-size: 13px; color: #4A5468; font-weight: 600">{{ t.k }}</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; color: #14284B">{{ t.v }}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-label="Partidos" style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 8px 0 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; color: #14284B">Clausura 2026 · {{ catName }}</h2>
+      <sc-for list="{{ rows }}" as="m" hint-placeholder-count="12">
+        <article style="background: #FFFFFF; border-radius: 12px; padding: 14px 18px; display: grid; grid-template-columns: 72px minmax(0, 1fr) 96px minmax(0, 1fr) 150px; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+          <div>
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #14284B">F{{ m.f }}</div>
+            <div style="font-size: 13px; color: #4A5468">{{ m.d }}</div>
+          </div>
+          <div style="text-align: right; font-size: 17px; font-weight: {{ m.wl }}">{{ m.l }}</div>
+          <div style="text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #14284B; background: #F2F4F8; border-radius: 8px; padding: 2px 0">{{ m.sc }}</div>
+          <div style="font-size: 17px; font-weight: {{ m.wv }}">{{ m.v }}</div>
+          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 10px">
+            <span style="{{ m.chip }}">{{ m.r }}</span>
+            <a href="Detalle.dc.html" style="font-size: 14px; font-weight: 600; padding: 10px 4px">Detalle</a>
+          </div>
+          <sc-if value="{{ m.hasG }}" hint-placeholder-val="{{ true }}">
+            <div style="grid-column: 2 / 5; font-size: 14px; color: #4A5468; text-align: center; border-top: 1px solid #EEF1F6; padding-top: 8px">
+              <span style="font-weight: 600; color: #14284B">Goles Mitre:</span> {{ m.g }}
+            </div>
+          </sc-if>
+        </article>
+      </sc-for>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { cat: 'P' }; }
+  renderVals() {
+    const P = [
+      [1,'02/08','Dep. Mitre','La Emilia','3 - 4','P','Mendoza A., Ruiz Díaz G., en contra',1],
+      [2,'09/08','Susanense','Dep. Mitre','0 - 3','G','Tarquini J., Camargo A., Ruiz Díaz G.',0],
+      [3,'14/08','Dep. Mitre','Granaderos','3 - 0','G','Ruiz Díaz G. ×2, en contra',1],
+      [4,'23/08','Gral. San Martín','Dep. Mitre','1 - 0','P','',0],
+      [5,'30/08','Dep. Mitre','Americano','2 - 1','G','Ruiz Díaz G., Fossarelli A.',1],
+      [6,'06/09','El Expreso','Dep. Mitre','2 - 0','P','',0],
+      [7,'13/09','Dep. Mitre','Juv. Guadalupe','2 - 1','G','Ruiz Díaz G. ×2',1],
+      [8,'27/09','Piamonte','Dep. Mitre','0 - 1','G','Villarruel D.',0],
+      [9,'04/10','Dep. Mitre','Atl. Sastre','0 - 0','E','',1],
+      [10,'12/10','Juv. Unida','Dep. Mitre','6 - 0','P','',0],
+      [11,'16/10','Dep. Mitre','San Martín','0 - 1','P','',1],
+      [12,'25/10','Trebolense','Dep. Mitre','16:30','–','',0]
+    ];
+    const R = [
+      [1,'02/08','Dep. Mitre','La Emilia','1 - 1','E','Gamarino E.',1],
+      [2,'09/08','Susanense','Dep. Mitre','1 - 0','P','',0],
+      [3,'14/08','Dep. Mitre','Granaderos','2 - 0','G','González P., Mendoza O.',1],
+      [4,'23/08','Gral. San Martín','Dep. Mitre','2 - 5','G','Lencina N. ×4, Galarza B.',0],
+      [5,'30/08','Dep. Mitre','Americano','2 - 1','G','Gandolfo B., Gamarino E.',1],
+      [6,'06/09','El Expreso','Dep. Mitre','2 - 2','E','Gandolfo B. ×2',0],
+      [7,'13/09','Dep. Mitre','Juv. Guadalupe','2 - 0','G','Mansilla C., Fossarelli G.',1],
+      [8,'27/09','Piamonte','Dep. Mitre','0 - 4','G','Camargo A., Fossarelli G., Gandolfo B. ×2',0],
+      [9,'04/10','Dep. Mitre','Atl. Sastre','2 - 0','G','Gastaudo M. ×2',1],
+      [10,'12/10','Juv. Unida','Dep. Mitre','0 - 3','G','Gandolfo B., Cardona L., González P.',0],
+      [11,'16/10','Dep. Mitre','San Martín','1 - 0','G','Gandolfo B.',1],
+      [12,'25/10','Trebolense','Dep. Mitre','14:30','–','',0]
+    ];
+    const chipBase = 'display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;font-weight:700;font-size:15px;';
+    const chips = {
+      G: chipBase + 'background:#14284B;color:#FFFFFF;',
+      E: chipBase + 'background:#E3E7EE;color:#2F3A4D;',
+      P: chipBase + 'background:#FCE3D2;color:#8A3B0F;',
+      '–': chipBase + 'background:#FFFFFF;color:#4A5468;border:1px dashed #9AA4B5;'
+    };
+    const isP = this.state.cat === 'P';
+    const src = isP ? P : R;
+    const rows = src.map(([f,d,l,v,sc,r,g,home]) => ({
+      f, d, l, v, sc, r, g, hasG: g !== '',
+      wl: home ? 700 : 400, wv: home ? 400 : 700, chip: chips[r]
+    }));
+    const s = isP
+      ? { pts: 16, tiles: [{k:'JUGADOS',v:11},{k:'GANADOS',v:5},{k:'EMPATADOS',v:1},{k:'PERDIDOS',v:5},{k:'GOLES A FAVOR',v:14},{k:'GOLES EN CONTRA',v:16}] }
+      : { pts: 26, tiles: [{k:'JUGADOS',v:11},{k:'GANADOS',v:8},{k:'EMPATADOS',v:2},{k:'PERDIDOS',v:1},{k:'GOLES A FAVOR',v:24},{k:'GOLES EN CONTRA',v:7}] };
+    const on = 'height:40px;padding:0 18px;border:0;border-radius:8px;background:#14284B;color:#FFFFFF;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;';
+    const off = 'height:40px;padding:0 18px;border:0;border-radius:8px;background:transparent;color:#2F3A4D;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;';
+    return {
+      rows, s, catName: isP ? 'Primera' : 'Reserva',
+      isPrimera: isP ? 'true' : 'false', isReserva: isP ? 'false' : 'true',
+      btnPrimera: isP ? on : off, btnReserva: isP ? off : on,
+      pickPrimera: () => this.setState({ cat: 'P' }),
+      pickReserva: () => this.setState({ cat: 'R' })
+    };
+  }
+}
+</script>
+</body>
+</html>

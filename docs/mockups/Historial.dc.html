@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Historial y campañas – Historial Mitre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#14284B}a:hover{color:#2D5BA3}
+select{font:inherit}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #14284B; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+        <div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: 0.5px; line-height: 1">DEPORTIVO MITRE</div>
+          <div style="font-size: 13px; color: #C9D4E8">Historial de partidos · Liga San Martín</div>
+        </div>
+      </div>
+      <nav aria-label="Secciones" style="display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto">
+        <a href="Main.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Resultados</a>
+        <a href="Goleadores.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Goleadores</a>
+        <a href="Historial.dc.html" style="color: #14284B; background: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Historial</a>
+        <span style="color: #9FB0CF; padding: 10px 16px; font-weight: 600; font-size: 15px">Planteles · pronto</span>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; display: flex; flex-direction: column; gap: 20px">
+    <section aria-label="Campañas por torneo" style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; color: #14284B">Campañas · Primera</h2>
+        <div role="group" aria-label="Categoría" style="margin-left: auto; display: flex; background: #EEF1F6; border-radius: 10px; padding: 4px; gap: 4px">
+          <button type="button" aria-pressed="true" style="height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: #14284B; color: #FFFFFF; font-weight: 600; font-size: 15px; font-family: inherit">Primera</button>
+          <button type="button" aria-pressed="false" style="height: 40px; padding: 0 18px; border: 0; border-radius: 8px; background: transparent; color: #2F3A4D; font-weight: 600; font-size: 15px; font-family: inherit">Reserva</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto">
+        <div style="min-width: 760px">
+          <div style="display: grid; grid-template-columns: minmax(150px, 1.6fr) repeat(6, 60px) 70px minmax(140px, 1.2fr); gap: 8px; font-size: 13px; font-weight: 600; color: #4A5468; padding-bottom: 8px; border-bottom: 1px solid #DDE2EA">
+            <span>Torneo</span><span style="text-align: center">PJ</span><span style="text-align: center">G</span><span style="text-align: center">E</span><span style="text-align: center">P</span><span style="text-align: center">GF</span><span style="text-align: center">GC</span><span style="text-align: center">Pts</span><span>Cómo terminó</span>
+          </div>
+          <sc-for list="{{ camp }}" as="c" hint-placeholder-count="4">
+            <div style="display: grid; grid-template-columns: minmax(150px, 1.6fr) repeat(6, 60px) 70px minmax(140px, 1.2fr); gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #EEF1F6; font-size: 16px">
+              <a href="Main.dc.html" style="font-weight: 700; text-decoration: none; padding: 4px 0">{{ c.t }}</a>
+              <span style="text-align: center">{{ c.pj }}</span><span style="text-align: center">{{ c.g }}</span><span style="text-align: center">{{ c.e }}</span><span style="text-align: center">{{ c.p }}</span><span style="text-align: center">{{ c.gf }}</span><span style="text-align: center">{{ c.gc }}</span>
+              <span style="text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #14284B">{{ c.pts }}</span>
+              <span style="font-size: 14px; color: #2F3A4D">{{ c.fin }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 13px; color: #4A5468">Fase regular. 2025 tomado de El Gráfico de la San Martín (aún sin goleadores).</div>
+    </section>
+
+    <section aria-label="Datos destacados" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
+      <div style="background: #FFFFFF; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <div style="font-size: 13px; font-weight: 600; color: #4A5468">MAYOR GOLEADA A FAVOR · 2026</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; color: #14284B">3 - 0</div>
+        <div style="font-size: 15px">vs Granaderos (2 veces) y Susanense</div>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <div style="font-size: 13px; font-weight: 600; color: #4A5468">PEOR DERROTA · 2026</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; color: #8A3B0F">0 - 6</div>
+        <div style="font-size: 15px">vs Juv. Unida · Clausura F10</div>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <div style="font-size: 13px; font-weight: 600; color: #4A5468">SIN PERDER CONTRA · 2026</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; color: #14284B">7 rivales</div>
+        <div style="font-size: 15px">Susanense, Granaderos, Americano, Guadalupe, Piamonte, Sastre y Trebolense</div>
+      </div>
+    </section>
+
+    <section aria-label="Contra cada rival" style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 12px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; color: #14284B">Contra cada rival · Primera</h2>
+        <div style="margin-left: auto; display: flex; flex-direction: column; gap: 6px">
+          <label for="h-per" style="font-size: 13px; font-weight: 600; color: #4A5468">Período</label>
+          <select id="h-per" style="height: 44px; min-width: 160px; padding: 0 12px; border: 1px solid #C7CEDB; border-radius: 8px; background: #FFFFFF; font-size: 16px"><option>2026</option><option>Todo el historial</option></select>
+        </div>
+      </div>
+      <div style="overflow-x: auto">
+        <div style="min-width: 760px">
+          <div style="display: grid; grid-template-columns: minmax(160px, 1.5fr) repeat(6, 56px) 64px minmax(160px, 1.4fr); gap: 8px; font-size: 13px; font-weight: 600; color: #4A5468; padding-bottom: 8px; border-bottom: 1px solid #DDE2EA">
+            <span>Rival</span><span style="text-align: center">PJ</span><span style="text-align: center">G</span><span style="text-align: center">E</span><span style="text-align: center">P</span><span style="text-align: center">GF</span><span style="text-align: center">GC</span><span style="text-align: center">Pts</span><span>Rendimiento</span>
+          </div>
+          <sc-for list="{{ rivales }}" as="r" hint-placeholder-count="13">
+            <div style="display: grid; grid-template-columns: minmax(160px, 1.5fr) repeat(6, 56px) 64px minmax(160px, 1.4fr); gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #EEF1F6; font-size: 15px">
+              <span style="font-weight: 600">{{ r.n }}</span>
+              <span style="text-align: center">{{ r.pj }}</span><span style="text-align: center">{{ r.g }}</span><span style="text-align: center">{{ r.e }}</span><span style="text-align: center">{{ r.p }}</span><span style="text-align: center">{{ r.gf }}</span><span style="text-align: center">{{ r.gc }}</span>
+              <span style="text-align: center; font-weight: 700; color: #14284B">{{ r.pts }}</span>
+              <div style="display: flex; align-items: center; gap: 8px">
+                <div style="flex: 1; height: 8px; background: #EEF1F6; border-radius: 4px"><div style="{{ r.bar }}"></div></div>
+                <span style="font-size: 13px; color: #4A5468; width: 40px; text-align: right">{{ r.pct }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-top: 10px; font-size: 13px; color: #4A5468">Rendimiento = puntos obtenidos sobre puntos en juego.</div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const camp = [
+      { t: 'Clausura 2026', pj: 11, g: 5, e: 1, p: 5, gf: 14, gc: 16, pts: 16, fin: 'En curso · faltan 2 fechas' },
+      { t: 'Apertura 2026', pj: 13, g: 2, e: 7, p: 4, gf: 9, gc: 10, pts: 13, fin: '10° · eliminado en octavos (pen.)' },
+      { t: 'Clausura 2025', pj: 8, g: 4, e: 2, p: 2, gf: 13, gc: 8, pts: 14, fin: 'Zona B · eliminado en cuartos' },
+      { t: 'Apertura 2025', pj: 14, g: 2, e: 5, p: 7, gf: 12, gc: 22, pts: 11, fin: 'No clasificó' }
+    ];
+    const raw = [
+      ['Susanense',2,2,0,0,4,0],['Granaderos',2,2,0,0,6,0],['Americano',2,1,1,0,3,2],['Juv. Guadalupe',2,1,1,0,4,3],
+      ['Piamonte',2,1,1,0,1,0],['Atl. Sastre',2,0,2,0,0,0],['Trebolense',1,0,1,0,0,0],['La Emilia',2,0,1,1,3,4],
+      ['Juv. Unida',2,0,1,1,0,6],['Gral. San Martín',3,0,1,2,2,4],['El Expreso',2,0,0,2,1,5],['San Martín',2,0,0,2,0,2],['Atl. San Jorge',1,0,0,1,1,2]
+    ];
+    const rivales = raw.map(([n,pj,g,e,p,gf,gc]) => {
+      const pts = g * 3 + e; const pct = Math.round(pts / (pj * 3) * 100);
+      return { n, pj, g, e, p, gf, gc, pts, pct: pct + '%', bar: 'height:8px;border-radius:4px;background:#2D5BA3;width:' + pct + '%;' };
+    });
+    return { camp, rivales };
+  }
+}
+</script>
+</body>
+</html>

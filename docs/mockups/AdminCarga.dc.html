@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cargar partido – Modo administrador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#14284B}a:hover{color:#2D5BA3}
+input,select,textarea{font:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1720px; box-sizing: border-box; font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; display: flex; flex-direction: column">
+  <header style="background: #14284B; color: #FFFFFF; padding: 16px; display: flex; align-items: center; gap: 10px">
+    <a href="AdminPanel.dc.html" aria-label="Volver al panel" style="color: #FFFFFF; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="flex: 1">
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; line-height: 1">CARGAR PARTIDO</div>
+      <div style="font-size: 13px; color: #C9D4E8">Modo administrador · Manuel</div>
+    </div>
+    <span style="font-size: 12px; font-weight: 700; background: #FFFFFF; color: #14284B; border-radius: 999px; padding: 4px 10px">ADMIN</span>
+  </header>
+
+  <div style="padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 14px">
+    <section aria-label="Datos del partido" style="background: #FFFFFF; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: #14284B">1 · Partido</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Torneo
+          <select style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; background: #FFFFFF; color: #1A2233"><option>Clausura 2026</option><option>Apertura 2026</option></select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Fecha / instancia
+          <select style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; background: #FFFFFF; color: #1A2233"><option>Fecha 12</option><option>Fecha 13</option><option>Octavos</option><option>Cuartos</option></select>
+        </label>
+      </div>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Rival
+        <select style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; background: #FFFFFF; color: #1A2233"><option>Trebolense</option><option>Atl. San Jorge</option></select>
+      </label>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 13px; font-weight: 600; color: #4A5468">Mitre juega de</span>
+        <div role="group" aria-label="Condición" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #EEF1F6; border-radius: 10px; padding: 4px; gap: 4px">
+          <button type="button" aria-pressed="false" style="height: 40px; border: 0; border-radius: 8px; background: transparent; color: #2F3A4D; font-weight: 600; font-size: 15px; font-family: inherit">Local</button>
+          <button type="button" aria-pressed="true" style="height: 40px; border: 0; border-radius: 8px; background: #14284B; color: #FFFFFF; font-weight: 700; font-size: 15px; font-family: inherit">Visitante</button>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Día
+          <input type="date" value="2026-10-25" style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #1A2233">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Cancha
+          <input type="text" value="Centenario" style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #1A2233">
+        </label>
+      </div>
+      <div style="font-size: 13px; color: #4A5468">Rival, condición y cancha salen solos del fixture.</div>
+    </section>
+
+    <sc-for list="{{ cats }}" as="c" hint-placeholder-count="2">
+      <section style="background: #FFFFFF; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: #14284B">{{ c.titulo }}</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; background: #F2F4F8; border-radius: 12px; padding: 10px">
+            <span style="font-size: 14px; font-weight: 700; color: #14284B">Dep. Mitre</span>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <button type="button" onClick="{{ c.mMenos }}" aria-label="Restar gol a Mitre" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #C7CEDB; background: #FFFFFF; font-size: 22px; color: #14284B; cursor: pointer">−</button>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; color: #14284B; min-width: 30px; text-align: center">{{ c.m }}</span>
+              <button type="button" onClick="{{ c.mMas }}" aria-label="Sumar gol a Mitre" style="width: 44px; height: 44px; border-radius: 10px; border: 0; background: #14284B; font-size: 22px; color: #FFFFFF; cursor: pointer">+</button>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; background: #F2F4F8; border-radius: 12px; padding: 10px">
+            <span style="font-size: 14px; font-weight: 700; color: #2F3A4D">Trebolense</span>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <button type="button" onClick="{{ c.rMenos }}" aria-label="Restar gol al rival" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #C7CEDB; background: #FFFFFF; font-size: 22px; color: #14284B; cursor: pointer">−</button>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; color: #2F3A4D; min-width: 30px; text-align: center">{{ c.r }}</span>
+              <button type="button" onClick="{{ c.rMas }}" aria-label="Sumar gol al rival" style="width: 44px; height: 44px; border-radius: 10px; border: 0; background: #14284B; font-size: 22px; color: #FFFFFF; cursor: pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ c.hayGoles }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 600; color: #4A5468">Goles de Mitre ({{ c.m }})</span>
+            <sc-for list="{{ c.filas }}" as="f" hint-placeholder-count="2">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 8px; border: 1px solid #DDE2EA; border-radius: 10px; padding: 8px">
+                <label style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; font-weight: 600; color: #4A5468">Gol {{ f.n }} · Jugador
+                  <select style="height: 44px; border: 1px solid #C7CEDB; border-radius: 8px; padding: 0 8px; font-size: 15px; background: #FFFFFF; color: #1A2233">
+                    <sc-for list="{{ c.jugadores }}" as="j" hint-placeholder-count="4"><option>{{ j }}</option></sc-for>
+                  </select>
+                </label>
+                <label style="display: flex; flex-direction: column; gap: 2px; font-size: 12px; font-weight: 600; color: #4A5468">Min.
+                  <input type="number" inputmode="numeric" placeholder="–" style="height: 44px; border: 1px solid #C7CEDB; border-radius: 8px; padding: 0 8px; font-size: 15px; color: #1A2233">
+                </label>
+                <div role="group" aria-label="Tipo de gol" style="grid-column: 1 / 3; display: flex; flex-wrap: wrap; gap: 6px">
+                  <button type="button" aria-pressed="true" style="height: 34px; padding: 0 12px; border-radius: 999px; border: 0; background: #14284B; color: #FFFFFF; font-size: 13px; font-weight: 600; font-family: inherit">Jugada</button>
+                  <button type="button" aria-pressed="false" style="height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #2F3A4D; font-size: 13px; font-weight: 600; font-family: inherit">Penal</button>
+                  <button type="button" aria-pressed="false" style="height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #2F3A4D; font-size: 13px; font-weight: 600; font-family: inherit">Tiro libre</button>
+                  <button type="button" aria-pressed="false" style="height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #2F3A4D; font-size: 13px; font-weight: 600; font-family: inherit">En contra</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Goleadores del rival (opcional)
+          <input type="text" placeholder="Ej.: Masat, Santini" style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #1A2233">
+        </label>
+      </section>
+    </sc-for>
+
+    <section aria-label="Extras" style="background: #FFFFFF; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: #14284B">4 · Extras (opcional)</h2>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Árbitro
+        <input type="text" style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #1A2233">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Link de la fuente
+        <input type="url" placeholder="Posteo del club, crónica…" style="height: 46px; border: 1px solid #C7CEDB; border-radius: 10px; padding: 0 10px; font-size: 16px; color: #1A2233">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Observaciones
+        <textarea rows="2" style="border: 1px solid #C7CEDB; border-radius: 10px; padding: 10px; font-size: 16px; color: #1A2233; resize: vertical"></textarea>
+      </label>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <a href="AdminPanel.dc.html" style="height: 52px; border-radius: 12px; border: 1px solid #14284B; color: #14284B; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px">Guardar borrador</a>
+      <a href="AdminPanel.dc.html" style="height: 52px; border-radius: 12px; background: #14284B; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px">Publicar</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1720}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { pm: 2, pr: 1, rm: 1, rr: 1 }; }
+  renderVals() {
+    const s = this.state;
+    const set = (k, d) => () => this.setState({ [k]: Math.max(0, Math.min(15, s[k] + d)) });
+    const filas = (n) => Array.from({ length: n }, (_, i) => ({ n: i + 1 }));
+    const cats = [
+      { titulo: '2 · Primera', m: s.pm, r: s.pr, hayGoles: s.pm > 0, filas: filas(s.pm),
+        jugadores: ['Ruiz Díaz, Gabriel', 'Villarruel, Daniel', 'Mendoza, Alexis', 'Camargo, Alexis', 'Tarquini, Jonatan', '+ Jugador nuevo…'],
+        mMas: set('pm', 1), mMenos: set('pm', -1), rMas: set('pr', 1), rMenos: set('pr', -1) },
+      { titulo: '3 · Reserva', m: s.rm, r: s.rr, hayGoles: s.rm > 0, filas: filas(s.rm),
+        jugadores: ['Brisuela Gandolfo, Benjamín', 'Lencina, Nicolás', 'González, Pablo', 'Gastaudo, Máximo', '+ Jugador nuevo…'],
+        mMas: set('rm', 1), mMenos: set('rm', -1), rMas: set('rr', 1), rMenos: set('rr', -1) }
+    ];
+    return { cats };
+  }
+}
+</script>
+</body>
+</html>

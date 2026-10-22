@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Panel de carga – Modo administrador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#14284B}a:hover{color:#2D5BA3}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #14284B; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+      <div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1">PANEL DE CARGA</div>
+        <div style="font-size: 13px; color: #C9D4E8">Modo administrador · Manuel</div>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; background: #FFFFFF; color: #14284B; border-radius: 999px; padding: 4px 10px">ADMIN</span>
+      <div style="margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap">
+        <a href="Main.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; font-weight: 600; font-size: 15px">Ver sitio público</a>
+        <a href="AdminIngreso.dc.html" style="color: #14284B; background: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Salir</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <div style="flex: 999 1 600px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+      <section aria-label="Para cargar" style="display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; color: #14284B">Para cargar</h2>
+        <article style="background: #FFFFFF; border-radius: 12px; padding: 16px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; border: 2px solid #14284B">
+          <div style="flex: 1 1 240px">
+            <div style="font-size: 13px; font-weight: 600; color: #4A5468">CLAUSURA 2026 · FECHA 12 · DOM 25/10</div>
+            <div style="font-size: 19px; font-weight: 700">Trebolense vs Dep. Mitre</div>
+            <div style="font-size: 14px; color: #4A5468">Centenario · Reserva 14:30 · Primera 16:30</div>
+          </div>
+          <a href="AdminCarga.dc.html" style="height: 48px; padding: 0 22px; border-radius: 10px; background: #14284B; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; font-weight: 700; font-size: 16px">Cargar resultado</a>
+        </article>
+        <article style="background: #FFFFFF; border-radius: 12px; padding: 16px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+          <div style="flex: 1 1 240px">
+            <div style="font-size: 13px; font-weight: 600; color: #4A5468">CLAUSURA 2026 · FECHA 13 · A CONFIRMAR</div>
+            <div style="font-size: 19px; font-weight: 700">Dep. Mitre vs Atl. San Jorge</div>
+            <div style="font-size: 14px; color: #4A5468">Oscar Amado Giordana</div>
+          </div>
+          <a href="AdminCarga.dc.html" style="height: 48px; padding: 0 22px; border-radius: 10px; border: 1px solid #14284B; color: #14284B; text-decoration: none; display: flex; align-items: center; font-weight: 700; font-size: 16px">Editar programación</a>
+        </article>
+      </section>
+
+      <section aria-label="Últimos cargados" style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px">
+          <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: #14284B">Últimos cargados</h2>
+          <a href="AdminCarga.dc.html" style="margin-left: auto; font-weight: 600; font-size: 15px; padding: 8px 0">+ Partido fuera del fixture</a>
+        </div>
+        <div style="overflow-x: auto">
+          <div style="min-width: 620px">
+            <div style="display: grid; grid-template-columns: 70px minmax(0, 1.6fr) 70px 70px minmax(0, 1fr) 110px 70px; gap: 8px; font-size: 13px; font-weight: 600; color: #4A5468; padding-bottom: 8px; border-bottom: 1px solid #DDE2EA">
+              <span>Fecha</span><span>Partido</span><span style="text-align: center">Primera</span><span style="text-align: center">Reserva</span><span>Datos</span><span>Estado</span><span></span>
+            </div>
+            <sc-for list="{{ filas }}" as="f" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: 70px minmax(0, 1.6fr) 70px 70px minmax(0, 1fr) 110px 70px; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #EEF1F6; font-size: 15px">
+                <span style="font-weight: 700; color: #14284B">F{{ f.f }}</span>
+                <span>{{ f.p }}</span>
+                <span style="text-align: center; font-weight: 700">{{ f.pr }}</span>
+                <span style="text-align: center; font-weight: 700">{{ f.rs }}</span>
+                <span style="font-size: 13px; color: #4A5468">{{ f.d }}</span>
+                <span style="{{ f.est }}">{{ f.e }}</span>
+                <a href="AdminCarga.dc.html" style="font-weight: 600; font-size: 14px; padding: 8px 0">Editar</a>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+      <section aria-label="Datos que faltan" style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <h2 style="margin: 0 0 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #14284B">Datos que faltan</h2>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px">
+          <li style="display: flex; justify-content: space-between; gap: 8px"><span>Partidos 2026 sin árbitro</span><span style="font-weight: 700">48 de 49</span></li>
+          <li style="display: flex; justify-content: space-between; gap: 8px"><span>Partidos 2026 sin formación</span><span style="font-weight: 700">49 de 49</span></li>
+                    <li style="display: flex; justify-content: space-between; gap: 8px"><span>Temporadas 2022–2025</span><span style="font-weight: 700">Sin cargar</span></li>
+        </ul>
+      </section>
+      <section aria-label="Registro de cambios" style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <h2 style="margin: 0 0 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #14284B">Registro de cambios</h2>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+          <li><span style="font-weight: 700">Manuel</span> publicó F11 vs San Martín<div style="color: #4A5468">17/10 · 00:40</div></li>
+          <li><span style="font-weight: 700">Manuel</span> corrigió cancha de F8<div style="color: #4A5468">22/10 · 10:55</div></li>
+          <li><span style="font-weight: 700">Manuel</span> importó planilla 2026<div style="color: #4A5468">22/10 · 10:20</div></li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:4px 10px;';
+    const est = { Publicado: base + 'background:#14284B;color:#FFFFFF;', Borrador: base + 'background:#FCE3D2;color:#8A3B0F;' };
+    const filas = [
+      [11, 'Dep. Mitre vs San Martín', '0-1', '1-0', 'Con goles', 'Publicado'],
+      [10, 'Juv. Unida vs Dep. Mitre', '6-0', '0-3', 'Con goles', 'Publicado'],
+      [9, 'Dep. Mitre vs Atl. Sastre', '0-0', '2-0', 'Con goles', 'Publicado'],
+      [8, 'Piamonte vs Dep. Mitre', '0-1', '0-4', 'Falta árbitro', 'Borrador'],
+      [7, 'Dep. Mitre vs Juv. Guadalupe', '2-1', '2-0', 'Completo sin formación', 'Publicado']
+    ].map(([f, p, pr, rs, d, e]) => ({ f, p, pr, rs, d, e, est: est[e] }));
+    return { filas };
+  }
+}
+</script>
+</body>
+</html>

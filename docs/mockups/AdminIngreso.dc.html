@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ingreso administrador – Historial Mitre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#14284B}a:hover{color:#2D5BA3}
+input{font:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #14284B; display: flex; flex-direction: column; justify-content: center; padding: 24px">
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; color: #FFFFFF; margin-bottom: 28px">
+    <div style="width: 72px; height: 72px; border-radius: 50%; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px">CDM</div>
+    <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 28px">MODO ADMINISTRADOR</div>
+    <div style="font-size: 15px; color: #C9D4E8; text-align: center">Para cargar y corregir partidos.<br>Mirar el historial no necesita clave.</div>
+  </div>
+
+  <form style="background: #FFFFFF; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="a-user" style="font-size: 14px; font-weight: 600; color: #4A5468">Usuario</label>
+      <input id="a-user" type="email" autocomplete="username" placeholder="tu correo" style="height: 48px; padding: 0 14px; border: 1px solid #C7CEDB; border-radius: 10px; font-size: 16px; color: #1A2233">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="a-pass" style="font-size: 14px; font-weight: 600; color: #4A5468">Clave</label>
+      <div style="display: flex; gap: 8px">
+        <input id="a-pass" type="{{ passType }}" autocomplete="current-password" placeholder="••••••••" style="flex: 1; min-width: 0; height: 48px; padding: 0 14px; border: 1px solid #C7CEDB; border-radius: 10px; font-size: 16px; color: #1A2233">
+        <button type="button" onClick="{{ toggle }}" aria-label="{{ toggleLabel }}" style="width: 48px; height: 48px; border: 1px solid #C7CEDB; border-radius: 10px; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
+      </div>
+    </div>
+    <a href="AdminPanel.dc.html" style="height: 52px; border-radius: 10px; background: #14284B; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px">Ingresar</a>
+    <div style="font-size: 13px; color: #4A5468; text-align: center">Cada cambio queda registrado con tu nombre.</div>
+  </form>
+
+  <a href="Movil.dc.html" style="color: #FFFFFF; text-align: center; margin-top: 20px; font-weight: 600; font-size: 15px; padding: 10px">Volver al historial</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { show: false }; }
+  renderVals() {
+    const s = this.state.show;
+    return {
+      passType: s ? 'text' : 'password',
+      toggleLabel: s ? 'Ocultar clave' : 'Mostrar clave',
+      toggle: () => this.setState({ show: !s })
+    };
+  }
+}
+</script>
+</body>
+</html>

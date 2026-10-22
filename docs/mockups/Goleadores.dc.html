@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Goleadores – Historial Mitre</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#14284B}a:hover{color:#2D5BA3}
+select{font:inherit}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #14284B; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #14284B; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+        <div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: 0.5px; line-height: 1">DEPORTIVO MITRE</div>
+          <div style="font-size: 13px; color: #C9D4E8">Historial de partidos · Liga San Martín</div>
+        </div>
+      </div>
+      <nav aria-label="Secciones" style="display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto">
+        <a href="Main.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Resultados</a>
+        <a href="Goleadores.dc.html" style="color: #14284B; background: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Goleadores</a>
+        <a href="Historial.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 15px">Historial</a>
+        <span style="color: #9FB0CF; padding: 10px 16px; font-weight: 600; font-size: 15px">Planteles · pronto</span>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 28px 24px 56px; display: flex; flex-direction: column; gap: 20px">
+    <section aria-label="Filtros" style="background: #FFFFFF; border-radius: 12px; padding: 16px 20px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="g-anio" style="font-size: 13px; font-weight: 600; color: #4A5468">Año</label>
+        <select id="g-anio" style="height: 44px; min-width: 120px; padding: 0 12px; border: 1px solid #C7CEDB; border-radius: 8px; background: #FFFFFF; font-size: 16px"><option>2026</option><option>2025</option><option>Todos</option></select>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="g-torneo" style="font-size: 13px; font-weight: 600; color: #4A5468">Torneo</label>
+        <select id="g-torneo" style="height: 44px; min-width: 170px; padding: 0 12px; border: 1px solid #C7CEDB; border-radius: 8px; background: #FFFFFF; font-size: 16px"><option>Todo el año</option><option>Apertura</option><option>Clausura</option></select>
+      </div>
+      <div style="margin-left: auto; font-size: 14px; color: #4A5468; padding-bottom: 12px">Incluye playoffs · no cuenta goles en contra</div>
+    </section>
+
+    <section aria-label="Máximos goleadores" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+      <div style="background: #14284B; color: #FFFFFF; border-radius: 14px; padding: 20px 22px; display: flex; align-items: center; gap: 18px">
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 700; line-height: 1">7</div>
+        <div>
+          <div style="font-size: 13px; color: #C9D4E8; font-weight: 600">GOLEADOR PRIMERA 2026</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700">Gabriel Ruiz Díaz</div>
+          <div style="font-size: 14px; color: #C9D4E8">Todos en el Clausura · 3° de la Liga</div>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 14px; padding: 20px 22px; display: flex; align-items: center; gap: 18px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 64px; font-weight: 700; line-height: 1; color: #14284B">10</div>
+        <div>
+          <div style="font-size: 13px; color: #4A5468; font-weight: 600">GOLEADOR RESERVA 2026</div>
+          <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: #14284B">Benjamín Brisuela Gandolfo</div>
+          <div style="font-size: 14px; color: #4A5468">3 en Apertura · 7 en Clausura</div>
+        </div>
+      </div>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; align-items: start">
+      <sc-for list="{{ tablas }}" as="t" hint-placeholder-count="2">
+        <section style="background: #FFFFFF; border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 2px rgba(20,40,75,0.08)">
+          <h2 style="margin: 0 0 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: #14284B">{{ t.nombre }}</h2>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 44px 44px 52px; gap: 8px; font-size: 13px; font-weight: 600; color: #4A5468; padding-bottom: 6px; border-bottom: 1px solid #DDE2EA">
+            <span>#</span><span>Jugador</span><span style="text-align: center">Ap.</span><span style="text-align: center">Cl.</span><span style="text-align: right">Total</span>
+          </div>
+          <sc-for list="{{ t.filas }}" as="j" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) 44px 44px 52px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #EEF1F6; font-size: 15px">
+              <span style="color: #4A5468; font-weight: 600">{{ j.pos }}</span>
+              <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+                <span style="font-weight: 600">{{ j.n }}</span>
+                <div style="height: 6px; background: #EEF1F6; border-radius: 3px"><div style="{{ j.bar }}"></div></div>
+              </div>
+              <span style="text-align: center; color: #4A5468">{{ j.a }}</span>
+              <span style="text-align: center; color: #4A5468">{{ j.c }}</span>
+              <span style="text-align: right; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: #14284B">{{ j.t }}</span>
+            </div>
+          </sc-for>
+          <div style="margin-top: 10px; font-size: 13px; color: #4A5468">{{ t.pie }}</div>
+        </section>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const mk = (rows, max) => rows.map(([n, a, c], i) => ({
+      pos: i + 1, n, a: a || '–', c: c || '–', t: a + c,
+      bar: 'height:6px;border-radius:3px;background:#2D5BA3;width:' + Math.round((a + c) / max * 100) + '%;'
+    }));
+    const P = [['Ruiz Díaz, Gabriel',0,7],['Díaz, J.',3,0],['Mendoza, Alexis',2,1],['Villarruel, Daniel',2,1],['Camargo, Alexis',0,1],['Tarquini, Jonatan',0,1],['Fossarelli, Antonio',0,1],['Pairetti, F.',1,0],['Gómez, J. P.',1,0],['Lazaneo, J.',1,0],['Del Valle, J.',1,0]];
+    const R = [['Brisuela Gandolfo, Benjamín',3,7],['Lencina, Nicolás',3,4],['González, Pablo',5,2],['Mansilla, A.',4,0],['Fossarelli, Genaro',0,2],['Gamarino, Emiliano',0,2],['Gastaudo, Máximo',0,2],['Camargo, Alexis',0,1],['Cardona, Luca',0,1],['Galarza, Benjamín',0,1]];
+    return {
+      tablas: [
+        { nombre: 'Primera · 25 goles', filas: mk(P, 7), pie: '+ 2 goles en contra de rivales' },
+        { nombre: 'Reserva · 43 goles', filas: mk(R, 10), pie: '+ 5 jugadores con 1 gol y 1 gol en contra · Ver todos' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
