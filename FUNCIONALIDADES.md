@@ -2,6 +2,11 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.3.0 — Fase 2 (importación del Excel)
+- **Importador** (`scripts/importar_excel.py`): lleva el Excel a Supabase. Valida antes de escribir, tiene modo `--dry-run`, escribe solo lo que cambió y se puede correr varias veces sin duplicar. Al final verifica las cifras de control. Frena si la base tiene datos cargados desde la app (`--forzar` para pasar por encima). Ver `scripts/README.md`.
+- **Formaciones** (`sql/04_formaciones.sql`): rol "Convocado (suplente)" (estuvo en la lista, no se sabe si entró) y orden en la lista del posteo (`nro_lista`).
+- **Datos cargados:** 248 partidos (2021–2026), 288 goles, 26 incidencias, 296 filas de formación (Clausura 2023), 89 jugadores, 16 equipos, 11 torneos, 18 posiciones, 17 goleadores de la Liga y 132 fuentes.
+
 ## v0.2.0 — Fase 1 (esquema de la base)
 - **App conectada a Supabase:** el pie muestra "Conectado".
 - **Tablas** (`sql/01_esquema.sql`): fuentes, torneos, equipos, jugadores, partidos, goles (de los dos equipos), incidencias, formaciones, sanciones, posiciones y goleadores de la Liga. IDs iguales a los del Excel. Listas controladas (fase, estado, completitud, tipo de gol, tipo de incidencia…). Un solo club propio (`equipos.es_propio`). Cada tabla guarda sus fuentes como lista (`fuente_ids`).
