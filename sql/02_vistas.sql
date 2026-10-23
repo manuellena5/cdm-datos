@@ -9,7 +9,7 @@
 -- =====================================================================
 
 drop view if exists v_formaciones, v_incidencias, v_goles,
-  v_disciplina, v_faltantes, v_historial_rival, v_goleadores, v_campanas, v_partidos cascade;
+  v_disciplina, v_faltantes, v_historial_rival, v_goleadores, v_campanas, v_partidos_publicados, v_partidos cascade;
 drop function if exists orden_fase(text);
 
 -- Orden de las instancias, para saber hasta dónde llegó el equipo.
@@ -21,6 +21,7 @@ set search_path = ''
 as $$
   select case fase
     when 'Regular' then 0 when 'Zona' then 0 when 'Interzonal' then 0 when 'Grupos' then 0
+    when 'Playoff' then 1   -- playoff de instancia desconocida: la más baja
     when '32avos' then 1 when '16avos' then 2 when 'Octavos' then 3
     when 'Cuartos' then 4 when 'Semifinal' then 5 when 'Final' then 6
   end
@@ -151,13 +152,20 @@ left join lateral (
 ) inc on true;
 
 -- ---------------------------------------------------------------------
+-- v_partidos_publicados: lo que cuenta en campañas, goleadores, historial y
+-- disciplina. Los borradores no suman nunca, ni siquiera con sesión iniciada.
+-- ---------------------------------------------------------------------
+create view v_partidos_publicados with (security_invoker = true) as
+select * from v_partidos where publicado;
+
+-- ---------------------------------------------------------------------
 -- v_campanas: por torneo y categoría. La tabla suma solo la fase regular
 -- (incluye zonas e interzonales). El playoff va aparte: hasta dónde llegó.
 -- ---------------------------------------------------------------------
 create view v_campanas with (security_invoker = true) as
 with regular as (
   select *
-  from v_partidos
+  from v_partidos_publicados
   where fase_orden = 0
     and estado in ('Jugado', 'Ganado por mesa')
     and resultado is not null
@@ -181,9 +189,9 @@ todos as (
     categoria,
     count(*) filter (where fase_orden = 0 and estado = 'Programado')                    as programados,
     count(*) filter (where fase_orden = 0 and estado <> 'Programado' and resultado is null) as sin_dato,
-    max(fase_orden) filter (where fase_orden > 0)                                        as playoff_orden,
+    (array_agg(fase order by fase_orden desc) filter (where fase_orden > 0))[1]          as llego_a,
     count(*) filter (where fase_orden > 0 and resultado is not null)                     as playoff_pj
-  from v_partidos
+  from v_partidos_publicados
   group by torneo_id, categoria
 ),
 -- Goles propios que no van a la tabla de goleadores
@@ -194,14 +202,14 @@ goles_extra as (
     count(*) filter (where g.tipo = 'En contra')                         as en_contra,
     count(*) filter (where g.tipo <> 'En contra' and g.jugador_id is null) as sin_autor
   from goles g
-  join partidos pa on pa.partido_id = g.partido_id
+  join partidos pa on pa.partido_id = g.partido_id and pa.publicado
   join equipos e on e.equipo_id = g.equipo_id and e.es_propio
   group by pa.torneo_id, pa.categoria
 ),
 -- Zona en la que jugó la fase regular (sin contar los interzonales)
 zona as (
   select torneo_id, categoria, mode() within group (order by zona) as zona
-  from v_partidos
+  from v_partidos_publicados
   where fase_orden = 0 and zona is not null and zona <> 'Interzonal'
   group by torneo_id, categoria
 ),
@@ -217,10 +225,10 @@ ultima_llave as (
     sum(v.gc)               as gc,
     max(v.penales_favor)    as penales_favor,
     max(v.penales_contra)   as penales_contra
-  from v_partidos v
+  from v_partidos_publicados v
   join (
     select torneo_id, categoria, max(fase_orden) as fase_orden
-    from v_partidos
+    from v_partidos_publicados
     where fase_orden > 0
     group by torneo_id, categoria
   ) u on u.torneo_id = v.torneo_id and u.categoria = v.categoria and u.fase_orden = v.fase_orden
@@ -254,10 +262,7 @@ select
   coalesce(ge.en_contra, 0) as goles_en_contra_a_favor,
   coalesce(ge.sin_autor, 0) as goles_sin_autor,
   z.zona,
-  case x.playoff_orden
-    when 1 then '32avos' when 2 then '16avos' when 3 then 'Octavos'
-    when 4 then 'Cuartos' when 5 then 'Semifinal' when 6 then 'Final'
-  end as llego_a,
+  x.llego_a,
   x.playoff_pj,
   ul.rival as playoff_rival,
   -- true: ganó la última llave (si es la final, campeón) · false: quedó eliminado · null: sin dato
@@ -365,7 +370,7 @@ select
   v.categoria,
   count(*) as goles
 from goles g
-join v_partidos v on v.partido_id = g.partido_id
+join v_partidos_publicados v on v.partido_id = g.partido_id
 join equipos e on e.equipo_id = g.equipo_id and e.es_propio
 join jugadores j on j.jugador_id = g.jugador_id
 where g.tipo <> 'En contra'
@@ -390,7 +395,7 @@ select
   count(*) filter (where resultado = 'G') * 3 + count(*) filter (where resultado = 'E') as pts,
   round(100.0 * (count(*) filter (where resultado = 'G') * 3 + count(*) filter (where resultado = 'E'))
         / (3 * count(*)), 1) as porcentaje_puntos
-from v_partidos v
+from v_partidos_publicados v
 where v.resultado is not null
 group by grouping sets ((v.rival_id, v.categoria, v.anio), (v.rival_id, v.categoria));
 
@@ -453,7 +458,7 @@ select
   count(*) filter (where i.tipo = 'Expulsión del DT') as expulsiones_dt,
   count(*)                                            as total
 from incidencias i
-join v_partidos v on v.partido_id = i.partido_id
+join v_partidos_publicados v on v.partido_id = i.partido_id
 join equipos e on e.equipo_id = i.equipo_id and e.es_propio
 left join jugadores j on j.jugador_id = i.jugador_id
 where i.tipo in ('Roja', 'Doble amarilla', 'Expulsión del DT')

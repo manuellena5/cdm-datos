@@ -62,7 +62,7 @@ create table if not exists partidos (
   fase                 text not null default 'Regular'
                        constraint partidos_fase_chk check (fase in (
                          'Regular', 'Zona', 'Interzonal', 'Grupos', '32avos', '16avos',
-                         'Octavos', 'Cuartos', 'Semifinal', 'Final')),
+                         'Octavos', 'Cuartos', 'Semifinal', 'Final', 'Playoff')),  -- Playoff: instancia desconocida
   zona                 text,                            -- 'B', 'Interzonal'…
   serie                text constraint partidos_serie_chk check (serie in ('Ida', 'Vuelta')),
   fecha_nro            int  check (fecha_nro > 0),

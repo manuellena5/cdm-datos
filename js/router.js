@@ -8,7 +8,8 @@ CDM.router = (function () {
     { patron: /^\/partido\/([^/]+)$/, pantalla: 'detalle', claves: ['id'] },
     { patron: /^\/goleadores$/, pantalla: 'goleadores' },
     { patron: /^\/historial$/, pantalla: 'historial' },
-    { patron: /^\/admin$/, pantalla: 'admin' }
+    { patron: /^\/admin$/, pantalla: 'admin' },
+    { patron: /^\/admin\/partido\/([^/]+)$/, pantalla: 'adminPartido', claves: ['id'] }
   ];
   const RUTA_INICIAL = '#/resultados';
 
@@ -98,5 +99,11 @@ CDM.router = (function () {
     mostrar();
   }
 
-  return { iniciar, armar, cambiarFiltros };
+  // Vuelve a dibujar la pantalla actual (por ejemplo, después de ingresar).
+  function recargar() {
+    ultimaRuta = null;
+    return mostrar();
+  }
+
+  return { iniciar, armar, cambiarFiltros, recargar };
 })();

@@ -98,6 +98,34 @@ CDM.api = (function () {
 
   const lista = (ids) => [...new Set(ids)].sort();
 
+  // Después de guardar (o al entrar o salir) la consulta tiene que volver a pedir todo.
+  function olvidarCache() {
+    memoria.clear();
+    try {
+      Object.keys(localStorage).filter((k) => k.startsWith(PREFIJO)).forEach((k) => localStorage.removeItem(k));
+    } catch (e) { /* bloqueado: nada que borrar */ }
+    sinRedHasta = 0;
+  }
+
+  // Llama a una función de la base. Los errores salen con un mensaje para el usuario.
+  async function llamar(funcion, parametros) {
+    let res;
+    try {
+      res = await cliente.rpc(funcion, parametros).abortSignal(AbortSignal.timeout(20000));
+    } catch (e) {
+      throw new Error('Sin conexión. No se guardó; probá de nuevo.');
+    }
+    if (res.error) {
+      const e = res.error;
+      if (!e.code) throw new Error('Sin conexión. No se guardó; probá de nuevo.');
+      if (e.code === '42501' || /permiso|permission/i.test(e.message)) throw new Error('Tu usuario no tiene permiso para cargar datos.');
+      if (e.code === 'PGRST301' || /JWT/i.test(e.message)) throw new Error('Se cerró la sesión. Volvé a ingresar.');
+      throw new Error('No se pudo guardar. Revisá los datos y probá de nuevo.');
+    }
+    olvidarCache();
+    return res.data;
+  }
+
   const COLUMNAS_PARTIDO = [
     'partido_id', 'torneo_id', 'anio', 'torneo', 'torneo_tipo', 'torneo_orden', 'fase', 'fase_orden',
     'zona', 'serie', 'fecha_nro', 'fecha', 'hora', 'categoria', 'local', 'visitante',
@@ -119,8 +147,9 @@ CDM.api = (function () {
       cliente.from('equipos').select('nombre,nombre_corto').eq('es_propio', true))
       .then((filas) => filas[0] || { nombre: '', nombre_corto: '' }),
 
+    // La consulta pública muestra solo lo publicado, aunque haya sesión iniciada.
     partidos: () => consultar('partidos', () =>
-      cliente.from('v_partidos').select(COLUMNAS_PARTIDO).order('partido_id')),
+      cliente.from('v_partidos').select(COLUMNAS_PARTIDO).eq('publicado', true).order('partido_id')),
 
     campanas: () => consultar('campanas', () =>
       cliente.from('v_campanas').select('*').order('torneo_orden').order('categoria')),
@@ -147,6 +176,51 @@ CDM.api = (function () {
       cliente.from('posiciones').select('categoria,tras_fecha,posicion,pts').eq('torneo_id', torneoId).order('id')),
 
     fuentes: (ids) => consultar('fuentes:' + lista(ids), () =>
-      cliente.from('fuentes').select('fuente_id,medio,que_cubre,url').in('fuente_id', lista(ids)).order('fuente_id'))
+      cliente.from('fuentes').select('fuente_id,medio,que_cubre,url').in('fuente_id', lista(ids)).order('fuente_id')),
+
+    // ---------- Modo administrador ----------
+    // Sin caché: siempre lo último de la base.
+    olvidarCache,
+    sesion: async () => (cliente ? (await cliente.auth.getSession()).data.session : null),
+    ingresar: async (email, clave) => {
+      const { error } = await cliente.auth.signInWithPassword({ email, password: clave });
+      olvidarCache();
+      if (error) throw error;
+    },
+    salir: async () => {
+      await cliente.auth.signOut({ scope: 'local' });
+      olvidarCache();
+    },
+    administrador: async () => {
+      const { data, error } = await cliente.from('administradores').select('nombre').limit(1);
+      if (error) throw error;
+      return data[0] || null;
+    },
+    admin: {
+      partidos: () => todas(() => cliente.from('v_partidos')
+        .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en').order('partido_id')),
+      equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre_corto,cancha,es_propio').order('nombre_corto')),
+      torneos: () => todas(() => cliente.from('torneos').select('torneo_id,anio,nombre,tipo,orden').order('orden', { ascending: false })),
+      jugadores: () => todas(() => cliente.from('jugadores').select('jugador_id,apellido,nombre,division').order('apellido').order('nombre')),
+      // Quién jugó (goles o formación) por categoría y año, para ordenar la lista de jugadores
+      goleadoresRecientes: () => todas(() => cliente.from('v_goleadores').select('jugador_id,categoria,anio,goles')),
+      golesDe: (ids) => todas(() => cliente.from('v_goles').select('*').in('partido_id', ids).order('orden').order('gol_id')),
+      incidenciasDe: (ids) => todas(() => cliente.from('v_incidencias').select('*').in('partido_id', ids).order('orden').order('id')),
+      // Nombres ya usados para los goleadores de un equipo rival (sugerencias)
+      nombresRival: (equipoId) => todas(() => cliente.from('goles').select('nombre_en_fuente')
+        .eq('equipo_id', equipoId).not('nombre_en_fuente', 'is', null)),
+      fuentesDe: (ids) => (ids.length ? todas(() => cliente.from('fuentes').select('fuente_id,url').in('fuente_id', ids)) : Promise.resolve([])),
+      faltantes: () => todas(() => cliente.from('v_faltantes').select('*')).then((f) => f[0] || {}),
+      cambios: async () => {
+        const { data, error } = await cliente.from('v_cambios').select('*').order('fecha', { ascending: false }).limit(10)
+          .abortSignal(AbortSignal.timeout(ESPERA_MS));
+        if (error) throw error;
+        return data;
+      },
+      guardarPartido: (payload) => llamar('guardar_partido', { payload }),
+      crearJugador: (apellido, nombre, division) =>
+        llamar('crear_jugador', { p_apellido: apellido, p_nombre: nombre || null, p_division: division || null }),
+      borrarBorrador: (ids, prueba) => llamar('borrar_borrador', { p_partido_ids: ids, p_prueba: !!prueba })
+    }
   };
 })();

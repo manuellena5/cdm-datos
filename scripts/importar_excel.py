@@ -31,7 +31,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 
 # Mismas listas que los check de sql/01_esquema.sql y sql/04_formaciones.sql
 CATEGORIAS = {'Primera', 'Reserva'}
-FASES = {'Regular', 'Zona', 'Interzonal', 'Grupos', '32avos', '16avos', 'Octavos', 'Cuartos', 'Semifinal', 'Final'}
+FASES = {'Regular', 'Zona', 'Interzonal', 'Grupos', '32avos', '16avos', 'Octavos', 'Cuartos', 'Semifinal', 'Final',
+         'Playoff'}  # Playoff: instancia desconocida
 SERIES = {'Ida', 'Vuelta'}
 ESTADOS = {'Jugado', 'Programado', 'Suspendido', 'Postergado', 'Ganado por mesa', 'Sin dato'}
 COMPLETITUDES = {'Sin dato', 'Inferido', 'Resultado', 'Con goles', 'Completo'}

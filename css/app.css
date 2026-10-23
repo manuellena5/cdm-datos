@@ -398,6 +398,116 @@ h1, h2, h3 { font-family: var(--f-titulo); font-weight: 700; color: var(--azul);
 .destacado__v--derrota { color: var(--p-texto); }
 .destacado__t { font-size: 15px; }
 
+/* ---------- Administración ---------- */
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.centro { text-align: center; }
+.boton:disabled { opacity: 0.6; cursor: default; }
+.boton--grande { min-height: 52px; font-size: 16px; font-weight: 700; border-radius: 12px; }
+.boton--borde { background: #FFFFFF; color: var(--azul); border: 1px solid var(--azul); }
+.boton--borde:hover { background: var(--fondo-suave); color: var(--azul); }
+.boton--claro { background: #FFFFFF; color: var(--azul); }
+.boton--claro:hover { background: var(--azul-claro); color: var(--azul); }
+.boton--ancho { grid-column: 1 / -1; }
+.boton-icono { width: 48px; min-height: 48px; border: 1px solid var(--borde); border-radius: 10px; background: #FFFFFF; color: var(--azul); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex: none; }
+.boton-icono[aria-pressed="true"] { background: var(--fondo-suave); }
+.enlace-boton { background: none; border: 0; padding: 0; min-height: var(--alto-control); font: 600 14px var(--f-texto); color: var(--azul); text-decoration: underline; cursor: pointer; text-align: left; }
+.enlace-boton--peligro { color: var(--p-texto); }
+.form-error { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--p-fondo); color: var(--p-texto); font-weight: 600; }
+.aviso--ok { background: #E3F2E8; color: #1E5A35; border-color: #B9DDC6; }
+.aviso-suave { margin: 0; font-size: 14px; color: #6B4E00; }
+
+.campo input, .campo textarea {
+  min-height: var(--alto-control);
+  padding: 0 12px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: var(--texto);
+  font: 16px var(--f-texto);
+  width: 100%;
+  min-width: 0;
+}
+.campo textarea { padding: 10px 12px; resize: vertical; }
+.campo select { width: 100%; }
+.campo input:disabled, .campo select:disabled { background: var(--fondo-suave); }
+
+/* Ingreso */
+.ingreso { background: var(--azul); border-radius: var(--radio); padding: 32px 24px; max-width: 460px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+.ingreso__marca { color: #FFFFFF; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 24px; }
+.ingreso__marca h1 { color: #FFFFFF; margin: 0; font-size: 28px; }
+.ingreso__marca p { margin: 0; color: var(--azul-claro); font-size: 15px; }
+.ingreso__form { background: #FFFFFF; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+.ingreso__form .campo label { font-size: 14px; }
+.clave { display: flex; gap: 8px; }
+.ingreso__volver { color: #FFFFFF; text-align: center; margin-top: 16px; font-weight: 600; padding: 12px; }
+.ingreso__volver:hover { color: var(--azul-claro); }
+
+/* Barra del modo administrador */
+.barra-admin { background: var(--azul); color: #FFFFFF; border-radius: var(--radio); padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.barra-admin__volver { color: #FFFFFF; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; margin-left: -10px; }
+.barra-admin__volver:hover { color: var(--azul-claro); }
+.barra-admin__titulo h1 { color: #FFFFFF; margin: 0; font-size: 24px; text-transform: uppercase; }
+.barra-admin__titulo p { margin: 0; font-size: 13px; color: var(--azul-claro); }
+.pildora-admin { font-size: 12px; font-weight: 700; background: #FFFFFF; color: var(--azul); border-radius: 999px; padding: 4px 10px; }
+.barra-admin__acciones { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.barra-admin__acciones a { color: #FFFFFF; font-weight: 600; font-size: 15px; padding: 10px 8px; }
+
+/* Panel */
+.tarjeta__cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 10px; }
+.tarjeta__cabeza .tarjeta__titulo { margin: 0; }
+.tarjeta__cabeza > :last-child:not(:first-child) { margin-left: auto; margin-top: 0; }
+.por-cargar-lista { display: flex; flex-direction: column; gap: 10px; }
+.por-cargar-lista .subtitulo { margin: 0; font-size: 26px; }
+.por-cargar { background: var(--tarjeta); border-radius: var(--radio); padding: 16px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; box-shadow: var(--sombra); }
+.por-cargar--proximo { box-shadow: 0 0 0 2px var(--azul); }
+.por-cargar__texto { flex: 1 1 240px; }
+.por-cargar__k { font-size: 13px; font-weight: 600; color: var(--texto-2); }
+.por-cargar__partido { font-size: 19px; font-weight: 700; }
+.por-cargar__linea { font-size: 14px; color: var(--texto-2); }
+.por-cargar .boton { min-height: 48px; font-weight: 700; font-size: 16px; border-radius: 10px; }
+.tabla--admin { min-width: 680px; }
+.ultimos__inst { display: block; color: var(--azul); font-weight: 700; }
+.ultimos__torneo { display: block; font-size: 12px; font-weight: 400; color: var(--texto-2); }
+.enlace-tabla { display: inline-flex; align-items: center; min-height: var(--alto-control); font-weight: 600; font-size: 14px; }
+.estado { display: inline-block; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+.estado--publicado { background: var(--azul); color: #FFFFFF; }
+.estado--borrador { background: var(--p-fondo); color: var(--p-texto); }
+.lista-datos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
+.lista-datos li { display: flex; justify-content: space-between; gap: 8px; }
+.cambios { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+
+/* Carga de partido */
+.carga-form { display: flex; flex-direction: column; gap: 14px; max-width: 760px; width: 100%; margin: 0 auto; }
+.carga { display: flex; flex-direction: column; gap: 12px; }
+.carga .tarjeta__titulo { margin: 0; font-size: 20px; }
+.carga .tarjeta__cabeza { margin: 0; }
+.fila-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.campo--min { max-width: 90px; }
+.check { display: inline-flex; align-items: center; gap: 8px; min-height: var(--alto-control); font-size: 14px; color: var(--texto-2); cursor: pointer; }
+.check input { width: 20px; height: 20px; }
+.carga .segmentado { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.marcador-carga { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.marcador-carga__caja { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--fondo); border-radius: 12px; padding: 10px; min-width: 0; }
+.marcador-carga__nombre { font-size: 14px; font-weight: 700; color: #2F3A4D; text-align: center; overflow-wrap: anywhere; }
+.marcador-carga__nombre.es-propio { color: var(--azul); }
+.marcador-carga__botones { display: flex; align-items: center; gap: 8px; }
+.marcador-carga__valor { font-family: var(--f-titulo); font-size: 40px; font-weight: 700; color: var(--azul); min-width: 30px; text-align: center; }
+.paso { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--borde); background: #FFFFFF; font-size: 22px; color: var(--azul); cursor: pointer; }
+.paso--mas { border: 0; background: var(--azul); color: #FFFFFF; }
+.carga__grupo { display: flex; flex-direction: column; gap: 8px; }
+.gol-carga { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.gol-carga__fila, .gol-carga--rival { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: 8px; }
+.gol-carga--rival { border-style: dashed; }
+.gol-carga .campo label { font-size: 12px; }
+.gol-carga__contra { min-height: var(--alto-control); display: flex; align-items: center; color: var(--texto-2); font-size: 15px; }
+.pildoras { display: flex; flex-wrap: wrap; gap: 6px; }
+.pildora { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--borde); background: #FFFFFF; color: #2F3A4D; font: 600 13px var(--f-texto); cursor: pointer; }
+.pildora[aria-pressed="true"] { background: var(--azul); border-color: var(--azul); color: #FFFFFF; }
+.nuevo-jugador { background: var(--fondo); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.botones-chicos { display: flex; flex-wrap: wrap; gap: 8px; }
+.incidencia-carga { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.botones-carga { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
 /* ---------- Pie ---------- */
 .pie {
   max-width: var(--ancho);
@@ -517,6 +627,12 @@ h1, h2, h3 { font-family: var(--f-titulo); font-weight: 700; color: var(--azul);
   .lider__n { font-size: 52px; }
   .lider__nombre { font-size: 24px; }
   .tarjeta { padding: 16px; }
+
+  .ingreso { margin: -20px -16px 0; width: auto; max-width: none; border-radius: 0; padding: 28px 24px; }
+  .barra-admin { margin: -20px -16px 0; border-radius: 0; padding: 12px 16px; }
+  .barra-admin__titulo h1 { font-size: 22px; }
+  .barra-admin__titulo { flex: 1; }
+  .barra-admin__acciones { margin-left: 0; width: 100%; justify-content: space-between; }
   .pie { padding: 12px 16px calc(var(--alto-nav-inf) + 16px + env(safe-area-inset-bottom)); }
 
   .nav-inf {
