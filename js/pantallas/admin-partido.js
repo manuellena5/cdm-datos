@@ -10,6 +10,7 @@ CDM.pantallas.adminPartido = (function () {
   const CATEGORIAS = ['Primera', 'Reserva'];
   const PLAYOFF = ['32avos', '16avos', 'Octavos', 'Cuartos', 'Semifinal', 'Final'];
   const TIPOS_GOL = ['Jugada', 'Penal', 'Tiro libre', 'En contra'];
+  const ESTADOS = ['Jugado', 'Programado', 'Suspendido', 'Postergado', 'Ganado por mesa', 'Sin dato'];
   const TIPOS_INC = ['Roja', 'Doble amarilla', 'Amarilla', 'Penal errado', 'Penal atajado', 'Expulsión del DT', 'Lesión', 'Partido suspendido', 'Otra'];
   const PREFIJO_FORM = 'cdm:form:';
 
@@ -71,6 +72,9 @@ CDM.pantallas.adminPartido = (function () {
         partido_id: p ? p.partido_id : '',
         hora: p && p.hora ? ui.hora(p.hora) : '',
         arbitro: p && p.arbitro ? p.arbitro : '',
+        estado: p ? p.estado : 'Programado',
+        // sin marcador pero con resultado conocido (G/E/P): completitud "Inferido"
+        inf: p && p.gf == null && p.resultado ? p.resultado : '',
         gf: p ? p.gf : null, gc: p ? p.gc : null,
         pf: p ? p.penales_favor : null, pc: p ? p.penales_contra : null,
         goles: p && p.gf != null ? ajustar(propios, Math.max(p.gf, propios.length), golVacio) : [],
@@ -123,7 +127,8 @@ CDM.pantallas.adminPartido = (function () {
   function opcionesInstancia(s) {
     const deTorneo = ctx.partidos.filter((p) => p.torneo_id === s.torneo_id);
     const regulares = deTorneo.filter((p) => p.fase === 'Regular');
-    const max = Math.max(0, ...regulares.map((p) => p.fecha_nro || 0));
+    const max = Math.max(0, ...regulares.map((p) => p.fecha_nro || 0),
+      (torneoDe(s.torneo_id) || {}).fechas_regular || 0, fechaNroDe(s.instancia) || 0);
     let html = '';
     for (let n = 1; n <= max + 1; n++) {
       const p = regulares.find((x) => x.fecha_nro === n && x.categoria === 'Primera') || regulares.find((x) => x.fecha_nro === n);
@@ -164,6 +169,7 @@ CDM.pantallas.adminPartido = (function () {
 
   function marcador(ci, c, rivalNombre) {
     const caja = (lado, nombre, valor, clase) => '<div class="marcador-carga__caja">' +
+      ui.escudo(lado === 'gf' ? propio() : equipoDe(ctx.s.rival_id), 28) +
       '<span class="marcador-carga__nombre ' + clase + '">' + e(nombre) + '</span><div class="marcador-carga__botones">' +
       '<button type="button" class="paso" data-accion="menos" data-cat="' + ci + '" data-lado="' + lado + '" aria-label="Restar gol a ' + e(nombre) + '">−</button>' +
       '<span class="marcador-carga__valor" aria-live="polite">' + (valor == null ? '–' : valor) + '</span>' +
@@ -212,6 +218,12 @@ CDM.pantallas.adminPartido = (function () {
       (c.goles.length ? '<div class="carga__grupo"><span class="campo__etiqueta">Goles de ' + e(propio().nombre_corto) + ' (' + c.goles.length + ')</span>' + golesPropios +
         (faltan ? '<p class="aviso-suave">' + (faltan === 1 ? 'Falta elegir 1 goleador.' : 'Faltan elegir ' + faltan + ' goleadores.') + ' Se puede guardar igual.</p>' : '') + '</div>' : '') +
       (c.rivales.length ? '<div class="carga__grupo">' + golesRival + '</div>' : '') +
+      '<div class="fila-2"><div class="campo"><label for="est-' + ci + '">Estado</label><select id="est-' + ci + '" data-k="cats.' + ci + '.estado" data-repinta="1">' +
+      ESTADOS.map((x) => opcion(x, x, c.estado)).join('') + '</select></div>' +
+      (c.gf == null && c.estado !== 'Programado'
+        ? '<div class="campo"><label for="inf-' + ci + '">Resultado sin marcador</label><select id="inf-' + ci + '" data-k="cats.' + ci + '.inf">' +
+          opcion('', 'No se sabe', c.inf) + opcion('G', 'Ganó', c.inf) + opcion('E', 'Empató', c.inf) + opcion('P', 'Perdió', c.inf) + '</select></div>'
+        : '') + '</div>' +
       '<div class="fila-2"><div class="campo"><label for="hora-' + ci + '">Hora</label><input id="hora-' + ci + '" type="time" data-k="cats.' + ci + '.hora" value="' + e(c.hora) + '"></div>' +
       '<div class="campo"><label for="arb-' + ci + '">Árbitro</label><input id="arb-' + ci + '" data-k="cats.' + ci + '.arbitro" value="' + e(c.arbitro) + '" autocomplete="off"></div></div>' +
       '</section>';
@@ -243,7 +255,7 @@ CDM.pantallas.adminPartido = (function () {
   function formulario() {
     const s = ctx.s;
     const esPlayoff = faseDe(s.instancia) !== 'Regular';
-    const hayResultado = s.cats.some((c) => c.incluida && c.gf != null);
+    const hayResultado = s.cats.some((c) => c.incluida && (c.gf != null || (c.estado && c.estado !== 'Programado')));
     const sugerencias = '<datalist id="sug-' + e(s.rival_id) + '">' + (ctx.nombresRival[s.rival_id] || []).map((n) => '<option value="' + e(n) + '">').join('') + '</datalist>';
     let numero = 2;
     const cats = s.cats.map((c, ci) => seccionCategoria(ci, c, numero++)).join('');
@@ -257,8 +269,9 @@ CDM.pantallas.adminPartido = (function () {
       '<div class="campo"><label for="c-inst">Fecha / instancia</label><select id="c-inst" data-k="instancia" data-estructura="1">' + opcionesInstancia(s) + '</select></div></div>' +
       (esPlayoff ? '<div class="campo"><label for="c-serie">Serie</label><select id="c-serie" data-k="serie" data-estructura="1">' +
         opcion('', 'Partido único', s.serie) + opcion('Ida', 'Ida', s.serie) + opcion('Vuelta', 'Vuelta', s.serie) + '</select></div>' : '') +
-      '<div class="campo"><label for="c-rival">Rival</label><select id="c-rival" data-k="rival_id" data-repinta="1" data-cancha="1">' + opcion('', 'Elegí rival…', s.rival_id) +
-      ctx.equipos.filter((x) => !x.es_propio).map((x) => opcion(x.equipo_id, x.nombre_corto, s.rival_id)).join('') + '</select></div>' +
+      '<div class="campo"><label for="c-rival">Rival</label><div class="selector-escudo">' + ui.escudo(equipoDe(s.rival_id), 36) +
+      '<select id="c-rival" data-k="rival_id" data-repinta="1" data-cancha="1">' + opcion('', 'Elegí rival…', s.rival_id) +
+      ctx.equipos.filter((x) => !x.es_propio).map((x) => opcion(x.equipo_id, x.nombre_corto, s.rival_id)).join('') + '</select></div></div>' +
       ui.segmentado('condicion', propio().nombre_corto + ' juega de', [{ valor: 'L', texto: 'Local' }, { valor: 'V', texto: 'Visitante' }], s.condicion) +
       '<div class="fila-2"><div class="campo"><label for="c-dia">Día</label><input id="c-dia" type="date" data-k="fecha" value="' + e(s.fecha) + '"></div>' +
       '<div class="campo"><label for="c-cancha">Cancha</label><input id="c-cancha" data-k="cancha" value="' + e(s.cancha) + '" autocomplete="off"></div></div>' +
@@ -309,7 +322,12 @@ CDM.pantallas.adminPartido = (function () {
 
   function sumar(ci, lado, delta) {
     const c = ctx.s.cats[ci];
-    if (c.gf == null) { c.gf = 0; c.gc = 0; }
+    if (c.gf == null) {
+      c.gf = 0;
+      c.gc = 0;
+      c.inf = '';
+      if (!c.estado || c.estado === 'Programado' || c.estado === 'Sin dato') c.estado = 'Jugado';
+    }
     c[lado] = Math.max(0, Math.min(30, c[lado] + delta));
     c.goles = ajustar(c.goles, c.gf, golVacio);
     c.rivales = ajustar(c.rivales, c.gc, rivalVacio);
@@ -327,6 +345,7 @@ CDM.pantallas.adminPartido = (function () {
       publicado: publicar, prueba: !!ctx.prueba,
       categorias: cats.map((c) => ({
         categoria: c.categoria, partido_id: c.partido_id || null, hora: c.hora || null, arbitro: c.arbitro.trim() || null,
+        estado: c.estado || null, resultado_informado: c.gf == null ? (c.inf || null) : null,
         gf: c.gf, gc: c.gc,
         penales_favor: c.gf != null && c.gf === c.gc ? c.pf : null, penales_contra: c.gf != null && c.gf === c.gc ? c.pc : null,
         goles: c.goles.map((g) => ({ lado: 'propio', jugador_id: g.jugador_id || null, nombre: g.nombre || null, minuto: g.minuto, tiempo: g.tiempo, tipo: g.tipo || 'Sin dato' }))
@@ -357,7 +376,7 @@ CDM.pantallas.adminPartido = (function () {
     const s = ctx.s;
     if (!s.rival_id) return mostrarError('Elegí el rival.');
     if (!s.cats.some((c) => c.incluida)) return mostrarError('Cargá al menos una categoría.');
-    const hayResultado = s.cats.some((c) => c.incluida && c.gf != null);
+    const hayResultado = s.cats.some((c) => c.incluida && (c.gf != null || (c.estado && c.estado !== 'Programado')));
     mostrarError('');
     const botones = vistaActual.querySelectorAll('[data-accion="guardar"]');
     botones.forEach((b) => { b.disabled = true; });
@@ -415,7 +434,7 @@ CDM.pantallas.adminPartido = (function () {
       case 'mas': sumar(ci, b.dataset.lado, 1); break;
       case 'menos': sumar(ci, b.dataset.lado, -1); break;
       case 'sin-resultado':
-        Object.assign(s.cats[ci], { gf: null, gc: null, pf: null, pc: null, goles: [], rivales: [] });
+        Object.assign(s.cats[ci], { gf: null, gc: null, pf: null, pc: null, goles: [], rivales: [], estado: 'Programado', inf: '' });
         break;
       case 'tipo-gol': {
         const g = s.cats[ci].goles[Number(b.dataset.gol)];
@@ -507,12 +526,17 @@ CDM.pantallas.adminPartido = (function () {
       instancia = p.fase === 'Regular' ? 'F' + p.fecha_nro : p.fase;
       serie = p.serie || '';
     } else {
-      torneoId = query.get('torneo') || torneos[0].torneo_id;
+      torneoId = torneos.some((t) => t.torneo_id === query.get('torneo')) ? query.get('torneo') : torneos[0].torneo_id;
       const regulares = partidos.filter((x) => x.torneo_id === torneoId && x.fase === 'Regular');
       const pend = regulares.filter((x) => x.estado === 'Programado').sort((a, b) => a.fecha_nro - b.fecha_nro)[0];
-      instancia = 'F' + (pend ? pend.fecha_nro : Math.max(0, ...regulares.map((x) => x.fecha_nro || 0)) + 1);
+      // Desde "Pendientes de carga" llega la fecha que falta (?instancia=F3)
+      instancia = /^F\d+$/.test(query.get('instancia') || '') ? query.get('instancia')
+        : 'F' + (pend ? pend.fecha_nro : Math.max(0, ...regulares.map((x) => x.fecha_nro || 0)) + 1);
     }
     await cargarEstado(torneoId, instancia, serie);
+    // Desde "Pendientes de carga": sumar la categoría que falta en un partido que ya existe (?incluir=Reserva)
+    const incluir = ctx.s.cats.find((c) => c.categoria === query.get('incluir'));
+    if (incluir) incluir.incluida = true;
     const titulo = ctx.s.existe && ctx.s.cats.some((c) => c.gf != null) ? 'Editar partido' : 'Cargar partido';
     return CDM.admin.barra(titulo, acceso.admin, '#/admin') + '<form id="carga" class="carga-form" novalidate>' + formulario() + '</form>';
   }

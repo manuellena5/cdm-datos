@@ -15,7 +15,7 @@ CDM.pantallas.detalle = (function () {
       (p.fase_orden === 0 ? (p.fecha_nro != null && x.fecha_nro === p.fecha_nro) : x.rival_id === p.rival_id));
   }
 
-  function encabezado(p) {
+  function encabezado(p, equipos) {
     const local = p.condicion === 'L';
     const pen = ui.penales(p);
     const volver = CDM.router.armar('/resultados', {
@@ -26,10 +26,12 @@ CDM.pantallas.detalle = (function () {
       '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' +
       'Volver a resultados</a><span>' + e(p.torneo + ' · ' + ui.instanciaLarga(p) + ' · ' + p.categoria) + '</span></div>' +
       '<div class="marcador-grande__cuerpo">' +
-      '<div class="marcador-grande__eq marcador-grande__eq--local"><div class="marcador-grande__nombre' + (local ? ' es-propio' : '') + '">' +
+      '<div class="marcador-grande__eq marcador-grande__eq--local">' + ui.escudo(equipos[p.local_id], 48) +
+      '<div class="marcador-grande__nombre' + (local ? ' es-propio' : '') + '">' +
       e(p.local) + '</div><div class="marcador-grande__cond">Local</div></div>' +
       '<div class="marcador-grande__score">' + e(ui.marcador(p)) + (pen ? '<small>' + e(pen) + '</small>' : '') + '</div>' +
-      '<div class="marcador-grande__eq"><div class="marcador-grande__nombre' + (!local ? ' es-propio' : '') + '">' +
+      '<div class="marcador-grande__eq">' + ui.escudo(equipos[p.visitante_id], 48) +
+      '<div class="marcador-grande__nombre' + (!local ? ' es-propio' : '') + '">' +
       e(p.visitante) + '</div><div class="marcador-grande__cond">Visitante</div></div>' +
       '</div></section>';
   }
@@ -137,9 +139,11 @@ CDM.pantallas.detalle = (function () {
   }
 
   async function render(params) {
-    const [partidos, historial, propio] = await Promise.all([
-      CDM.api.partidos(), CDM.api.historialRival(), CDM.api.clubPropio()
+    const [partidos, historial, listaEquipos] = await Promise.all([
+      CDM.api.partidos(), CDM.api.historialRival(), CDM.api.equipos()
     ]);
+    const propio = listaEquipos.find((x) => x.es_propio) || { nombre_corto: '' };
+    const equipos = Object.fromEntries(listaEquipos.map((x) => [x.equipo_id, x]));
     const p = partidos.find((x) => x.partido_id === params.id);
     if (!p) {
       return '<section class="tarjeta vacio"><h2 class="vacio__titulo">No encontramos este partido</h2>' +
@@ -155,7 +159,7 @@ CDM.pantallas.detalle = (function () {
       idsFuentes.length ? CDM.api.fuentes(idsFuentes) : Promise.resolve([])
     ]);
 
-    return encabezado(p) +
+    return encabezado(p, equipos) +
       '<div class="detalle">' +
       '<div class="detalle__principal">' + datos(p, posiciones) +
       ambos.map((x) => goles(x, listaGoles)).join('') +

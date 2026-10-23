@@ -76,11 +76,11 @@ CDM.pantallas.historial = (function () {
       '</section>';
   }
 
-  function tablaRivales(rivales, cat, etiquetaPeriodo) {
+  function tablaRivales(rivales, cat, etiquetaPeriodo, equipos) {
     const filas = rivales.slice().sort((a, b) => Number(b.porcentaje_puntos) - Number(a.porcentaje_puntos) || b.pj - a.pj ||
       a.rival.localeCompare(b.rival, 'es')).map((r) => {
       const pct = Math.round(Number(r.porcentaje_puntos));
-      return '<tr><th scope="row">' + e(r.rival) + '</th>' +
+      return '<tr><th scope="row"><span class="con-escudo">' + ui.escudo(equipos[r.rival_id], 24) + e(r.rival) + '</span></th>' +
         ['pj', 'g', 'e', 'p', 'gf', 'gc'].map((k) => '<td class="centro">' + r[k] + '</td>').join('') +
         '<td class="total centro">' + r.pts + '</td><td><div class="rendimiento"><div class="barra"><div style="width:' + pct +
         '%"></div></div><span>' + pct + '%</span></div></td></tr>';
@@ -96,9 +96,10 @@ CDM.pantallas.historial = (function () {
   }
 
   async function render(params, query) {
-    const [listaCampanas, partidos, historial] = await Promise.all([
-      CDM.api.campanas(), CDM.api.partidos(), CDM.api.historialRival()
+    const [listaCampanas, partidos, historial, listaEquipos] = await Promise.all([
+      CDM.api.campanas(), CDM.api.partidos(), CDM.api.historialRival(), CDM.api.equipos()
     ]);
+    const equipos = Object.fromEntries(listaEquipos.map((x) => [x.equipo_id, x]));
     const cat = filtros.categoria(query);
     const categoria = filtros.nombreCategoria(cat);
     const anios = filtros.anios(listaCampanas);
@@ -118,7 +119,7 @@ CDM.pantallas.historial = (function () {
       '<p class="filtros__nota">El período aplica a los datos destacados y a la tabla de rivales</p></section>';
 
     return controles + campanas(listaCampanas.filter((c) => c.categoria === categoria), cat) +
-      destacados(jugados, rivales, etiquetaPeriodo) + tablaRivales(rivales, cat, etiquetaPeriodo);
+      destacados(jugados, rivales, etiquetaPeriodo) + tablaRivales(rivales, cat, etiquetaPeriodo, equipos);
   }
 
   function montar(vista) {

@@ -632,6 +632,7 @@ def verificar(base):
 # ---------------------------------------------------------------------
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
     ap = argparse.ArgumentParser(description='Importa el Excel del historial a Supabase.')
     ap.add_argument('--dry-run', action='store_true', help='valida y muestra qué cambiaría, sin escribir')
     ap.add_argument('--verificar', action='store_true', help='solo verifica las cifras de control')
@@ -639,6 +640,8 @@ def main():
     ap.add_argument('--club-propio', default='MIT', help='equipo_id del club propio (por defecto MIT)')
     ap.add_argument('--forzar', action='store_true',
                     help='importar aunque la base tenga partidos que no están en el Excel o borradores')
+    ap.add_argument('--pisar-la-base', action='store_true',
+                    help='escribir de verdad. Desde la Fase 4.5.2 la base es el dato maestro: pisa lo corregido en la app')
     args = ap.parse_args()
 
     env = leer_env()
@@ -685,6 +688,9 @@ def main():
     if args.dry_run:
         print('\nDry-run: no se escribió nada.')
         return
+    if not args.pisar_la_base:
+        raise SystemExit('\nNo se importa: la base es el dato maestro y el Excel está congelado. '
+                         'Usá --dry-run para comparar. Para escribir igual: --pisar-la-base (ver scripts/README.md).')
 
     print('\nImportando…')
     aplicar(plan, base)

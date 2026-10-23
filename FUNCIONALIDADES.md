@@ -2,6 +2,15 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.6.0 — Fase 4.5 (cierre de la 4, histórico completo, jugadores y escudos)
+- **Histórico completo 2010–2026** en la base (631 partidos): Copa Federación 2010 (tipo Copa, fase de grupos con zona) y Liga San Martín 2011–2026. **La base es el único dato maestro:** el importador escribe solo con `--pisar-la-base` y se usa para `--dry-run`.
+- **Carga de partidos, completa:** selector de **Estado** por categoría (Jugado, Programado, Suspendido, Postergado, Ganado por mesa, Sin dato) y **Resultado sin marcador** (Ganó / Empató / Perdió → completitud "Inferido"). Editar un partido suspendido o inferido ya no lo pisa.
+- **Registro de cambios** más claro: nombra el partido aunque se haya borrado ("borró F14 vs Trebolense"), y muestra correcciones y uniones de jugadores y cambios de escudo.
+- **Jugadores** (`#/admin/jugadores`, desde el panel): buscador; por jugador, años en que aparece, goles y partidos. Editar apellido, nombre, apodo y notas (el ID no se toca). **Unir jugadores:** se eligen dos (o "Elegir estos" en los posibles duplicados, que se arman por apellido) y cuál queda; goles, incidencias, formaciones, sanciones y goleadores de la Liga pasan al que queda, se completan sus datos vacíos, se juntan las notas y se borra el sobrante. Si los dos están en la misma formación, no se unen.
+- **Escudos:** en las tarjetas de Resultados (24 px), el Detalle del partido (48 px), la tabla de rivales del Historial y la pantalla de carga. Sin escudo, un círculo gris con las iniciales del mismo tamaño. El club propio usa el escudo del repo si no tiene otro.
+- **Equipos** (`#/admin/equipos`, desde el panel): subir, cambiar o quitar el escudo de cada equipo (Supabase Storage, bucket público `escudos`), sin depender de un commit.
+- La auditoría registra también jugadores y equipos.
+
 ## v0.5.0 — Fase 4 (modo administrador)
 - **Ingreso** (`#/admin`, link "Administrar" del pie): usuario y clave, con mostrar/ocultar y "Volver al historial". La sesión queda recordada en el dispositivo. El registro de usuarios está cerrado: los usuarios se crean a mano en Supabase.
 - **Quién puede escribir:** solo los usuarios de la tabla `administradores`. Sin sesión, o con sesión sin ser administrador, no se puede insertar, cambiar ni borrar nada (ni llamando directo a la base con la anon key).

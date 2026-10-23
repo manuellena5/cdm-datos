@@ -3,6 +3,13 @@
 Herramientas que corren en la PC, fuera de la web.
 
 ## importar_excel.py
+
+> **⚠ La base es el único dato maestro (desde el 23/10/2026, Fase 4.5.2).**
+> El Excel quedó congelado (`Historial_Partidos_Mitre_congelado.xlsx`) con 2010–2026: 631 partidos y 652 goles.
+> Todo lo nuevo y toda corrección se cargan desde la app (`#/admin`).
+> El importador queda **solo para `--dry-run`** (comparar el Excel contra la base). Si se vuelve a correr en serio,
+> **pisa las correcciones hechas en la base** (jugadores unidos, goles corregidos, partidos editados).
+
 Importa `Historial_Partidos_Mitre.xlsx` a Supabase.
 
 **Preparación (una vez):**
@@ -12,7 +19,7 @@ Importa `Historial_Partidos_Mitre.xlsx` a Supabase.
 **Uso (desde la raíz del repo):**
 ```
 python scripts/importar_excel.py --dry-run     # valida y muestra qué cambiaría, sin escribir
-python scripts/importar_excel.py               # importa y verifica las cifras de control
+python scripts/importar_excel.py --pisar-la-base   # importa de verdad (ver el aviso de arriba)
 python scripts/importar_excel.py --verificar   # solo verifica las cifras de control
 ```
 

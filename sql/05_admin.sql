@@ -40,7 +40,8 @@ do $$
 declare
   t text;
 begin
-  foreach t in array array['partidos', 'goles', 'incidencias', 'jugadores', 'fuentes'] loop
+  foreach t in array array['partidos', 'goles', 'incidencias', 'jugadores', 'fuentes',
+                           'equipos', 'formaciones', 'sanciones', 'goleadores_liga'] loop
     execute format('drop policy if exists escritura_admin on %I', t);
     execute format('create policy escritura_admin on %I for all to authenticated using (es_admin()) with check (es_admin())', t);
     execute format('revoke insert, update, delete, truncate on %I from anon', t);
@@ -96,7 +97,7 @@ begin
     auth.uid(),
     coalesce(v_usuario, 'Importación'),
     tg_table_name,
-    coalesce(v_fila ->> 'gol_id', v_fila ->> 'id', v_fila ->> 'partido_id'),
+    coalesce(v_fila ->> 'gol_id', v_fila ->> 'id', v_fila ->> 'partido_id', v_fila ->> 'jugador_id', v_fila ->> 'equipo_id'),
     v_fila ->> 'partido_id',
     case tg_op when 'INSERT' then 'alta' when 'UPDATE' then 'cambio' else 'baja' end,
     v_antes,
@@ -116,6 +117,12 @@ create trigger goles_auditoria after insert or update or delete on goles
 drop trigger if exists incidencias_auditoria on incidencias;
 create trigger incidencias_auditoria after insert or update or delete on incidencias
   for each row execute function registrar_cambio();
+drop trigger if exists jugadores_auditoria on jugadores;
+create trigger jugadores_auditoria after insert or update or delete on jugadores
+  for each row execute function registrar_cambio();
+drop trigger if exists equipos_auditoria on equipos;
+create trigger equipos_auditoria after insert or update or delete on equipos
+  for each row execute function registrar_cambio();
 
 -- Registro de cambios en lenguaje simple: una fila por guardado.
 drop view if exists v_cambios;
@@ -128,12 +135,30 @@ select
   count(distinct a.partido_id) as partidos,
   -- el partido de Primera si está, si no el primero
   coalesce(min(a.partido_id) filter (where a.partido_id like '%-P'), min(a.partido_id)) as partido_id,
+  -- datos del partido tal como quedaron en la auditoría (sirve aunque después se haya borrado)
+  (array_agg(jsonb_build_object(
+      'fase', coalesce(a.despues, a.antes) ->> 'fase', 'fecha_nro', coalesce(a.despues, a.antes) ->> 'fecha_nro',
+      'serie', coalesce(a.despues, a.antes) ->> 'serie', 'local_id', coalesce(a.despues, a.antes) ->> 'local_id',
+      'visitante_id', coalesce(a.despues, a.antes) ->> 'visitante_id')
+    order by (a.partido_id like '%-P') desc, a.id) filter (where a.tabla = 'partidos'))[1] as partido,
+  -- jugadores tocados (alta, cambio o unión), con el nombre como quedó
+  coalesce(jsonb_agg(jsonb_build_object(
+      'accion', a.accion,
+      'apellido', coalesce(a.despues, a.antes) ->> 'apellido',
+      'nombre', coalesce(a.despues, a.antes) ->> 'nombre')
+    order by a.accion, a.id) filter (where a.tabla = 'jugadores'), '[]'::jsonb) as jugadores,
+  (array_agg(coalesce(a.despues, a.antes) ->> 'nombre_corto') filter (where a.tabla = 'equipos'))[1] as equipo,
   case
     when max(a.usuario) = 'Importación' then 'importó'
     when bool_or(a.tabla = 'partidos' and a.accion = 'baja') then 'borró'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean
                  and coalesce((a.antes ->> 'publicado')::boolean, false) = false) then 'publicó'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean = false) then 'guardó como borrador'
+    when bool_or(a.tabla = 'jugadores' and a.accion = 'baja') then 'unió jugadores'
+    when bool_or(a.tabla in ('partidos', 'goles', 'incidencias')) then 'editó'
+    when bool_or(a.tabla = 'jugadores' and a.accion = 'alta') then 'agregó al jugador'
+    when bool_or(a.tabla = 'jugadores') then 'corrigió al jugador'
+    when bool_or(a.tabla = 'equipos') then 'cambió el escudo de'
     else 'editó'
   end as accion
 from auditoria a
@@ -219,6 +244,7 @@ declare
   v_nuevos   jsonb;
   v_actuales jsonb;
   v_propios_cargados int;
+  v_inf      text;
 begin
   if not public.es_admin() then
     raise exception 'sin permiso' using errcode = '42501';
@@ -268,10 +294,12 @@ begin
       raise exception 'marcador incompleto' using errcode = '22023';
     end if;
     v_estado := coalesce(nullif(v_cat ->> 'estado', ''), case when v_gf is null then 'Programado' else 'Jugado' end);
+    -- Resultado sin marcador (G/E/P), solo si no hay marcador
+    v_inf := case when v_gf is null then nullif(v_cat ->> 'resultado_informado', '') end;
 
     insert into public.partidos as p (
       partido_id, torneo_id, fase, zona, serie, fecha_nro, fecha, hora, categoria, local_id, visitante_id,
-      goles_local, goles_visitante, penales_local, penales_visitante, cancha, arbitro, estado, completitud,
+      goles_local, goles_visitante, penales_local, penales_visitante, resultado_informado, cancha, arbitro, estado, completitud,
       fuente_ids, observaciones, publicado)
     values (
       v_id, v_torneo, v_fase, nullif(payload ->> 'zona', ''), v_serie, v_fecha_nro,
@@ -280,6 +308,7 @@ begin
       case when v_local then v_gf else v_gc end, case when v_local then v_gc else v_gf end,
       case when v_local then (v_cat ->> 'penales_favor')::int else (v_cat ->> 'penales_contra')::int end,
       case when v_local then (v_cat ->> 'penales_contra')::int else (v_cat ->> 'penales_favor')::int end,
+      v_inf,
       nullif(payload ->> 'cancha', ''), nullif(v_cat ->> 'arbitro', ''), v_estado, 'Sin dato',
       case when v_fuente is null then '{}' else array[v_fuente] end,
       nullif(payload ->> 'observaciones', ''), v_publicado)
@@ -289,7 +318,7 @@ begin
       categoria = excluded.categoria, local_id = excluded.local_id, visitante_id = excluded.visitante_id,
       goles_local = excluded.goles_local, goles_visitante = excluded.goles_visitante,
       penales_local = excluded.penales_local, penales_visitante = excluded.penales_visitante,
-      cancha = excluded.cancha, arbitro = excluded.arbitro, estado = excluded.estado,
+      resultado_informado = excluded.resultado_informado, cancha = excluded.cancha, arbitro = excluded.arbitro, estado = excluded.estado,
       fuente_ids = case when v_fuente is null or v_fuente = any(p.fuente_ids) then p.fuente_ids
                         else p.fuente_ids || v_fuente end,
       observaciones = excluded.observaciones, publicado = excluded.publicado;
@@ -347,6 +376,7 @@ begin
     select count(*) into v_propios_cargados from public.goles
       where partido_id = v_id and equipo_id = v_propio and (jugador_id is not null or tipo = 'En contra');
     v_completitud := case
+      when v_gf is null and v_inf is not null then 'Inferido'
       when v_gf is null then 'Sin dato'
       when v_propios_cargados < v_gf then 'Resultado'
       when exists (select 1 from public.formaciones where partido_id = v_id) then 'Completo'

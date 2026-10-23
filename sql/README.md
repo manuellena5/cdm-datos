@@ -8,6 +8,7 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 4. `04_formaciones.sql` — rol "Convocado (suplente)" y columna `nro_lista` en formaciones.
 5. `05_admin.sql` — modo administrador: tabla `administradores`, escritura solo para administradores, auditoría (`auditoria` y `v_cambios`) y funciones `guardar_partido`, `crear_jugador` y `borrar_borrador`.
 6. `06_fase_playoff.sql` — fase "Playoff" (instancia desconocida). Después, volver a correr `02` y `03`.
+7. `07_jugadores_escudos.sql` — escudos (`equipos.escudo` y bucket público `escudos` en Storage), `v_jugadores_resumen` y `unir_jugadores`.
 
 En una base nueva, `01` ya incluye lo de `04` y `06`.
 

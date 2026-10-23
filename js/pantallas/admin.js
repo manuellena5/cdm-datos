@@ -57,7 +57,8 @@ CDM.admin = (function () {
         '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></a>' : '') +
       '<div class="barra-admin__titulo"><h1>' + e(titulo) + '</h1><p>Modo administrador · ' + e(admin.nombre) + '</p></div>' +
       '<span class="pildora-admin">ADMIN</span>' +
-      (volver ? '' : '<div class="barra-admin__acciones"><a href="#/resultados">Ver sitio público</a>' +
+      (volver ? '' : '<div class="barra-admin__acciones"><a href="#/admin/jugadores">Jugadores</a><a href="#/admin/equipos">Equipos</a>' +
+        '<a href="#/resultados">Ver sitio público</a>' +
         '<button type="button" class="boton boton--claro" data-accion="salir">Salir</button></div>') +
       '</header>';
   }
@@ -198,13 +199,86 @@ CDM.pantallas.admin = (function () {
       '<tbody>' + filas + '</tbody></table></div>';
   }
 
+  // Todo lo que falta cargar, agrupado por torneo (el más reciente primero):
+  // fechas sin partido, partidos sin resultado y partidos con goleadores sin cargar.
+  function pendientes(faltan, partidos, torneos, libres) {
+    const porTorneo = new Map();
+    const de = (tid) => {
+      if (!porTorneo.has(tid)) porTorneo.set(tid, { fechas: new Map(), sinResultado: [], sinGoles: [] });
+      return porTorneo.get(tid);
+    };
+    faltan.forEach((f) => {
+      const t = de(f.torneo_id);
+      if (!t.fechas.has(f.fecha_nro)) t.fechas.set(f.fecha_nro, []);
+      t.fechas.get(f.fecha_nro).push(f.categoria);
+    });
+    partidos.forEach((p) => {
+      if (p.estado !== 'Programado' && !p.resultado) de(p.torneo_id).sinResultado.push(p);
+      else if (p.completitud === 'Resultado' && (p.gf || 0) > 0) de(p.torneo_id).sinGoles.push(p);
+    });
+    const lista = torneos.filter((t) => porTorneo.has(t.torneo_id)).sort((a, b) => b.orden - a.orden);
+    if (!lista.length) return '<p class="nota">No falta cargar nada.</p>';
+
+    const cat1 = (c) => (c === 'Primera' ? 'P' : 'R');
+    const ordenar = (ps) => ps.sort((a, b) => a.fase_orden - b.fase_orden || (a.fecha_nro || 0) - (b.fecha_nro || 0) || a.categoria.localeCompare(b.categoria));
+    const chipPartido = (p) => '<a class="chip-pend" href="#/admin/partido/' + encodeURIComponent(p.partido_id) + '">' +
+      e(ui.instancia(p) + ' ' + cat1(p.categoria)) + '</a>';
+
+    return lista.map((t, i) => {
+      const d = porTorneo.get(t.torneo_id);
+      const fechas = [...d.fechas.entries()].sort((a, b) => a[0] - b[0]);
+      const delTorneo = partidos.filter((p) => p.torneo_id === t.torneo_id && p.fase === 'Regular');
+      const chipsFechas = fechas.map(([n, cats]) => {
+        // Si falta una sola categoría, se abre el partido de la otra para sumarla
+        const otra = cats.length === 1 && delTorneo.find((p) => p.fecha_nro === n && p.categoria !== cats[0]);
+        const href = otra
+          ? '#/admin/partido/' + encodeURIComponent(otra.partido_id) + '?incluir=' + cats[0]
+          : CDM.router.armar('/admin/partido/nuevo', { torneo: t.torneo_id, instancia: 'F' + n });
+        const texto = 'F' + n + (otra ? ' ' + cats[0] : '');
+        return '<span class="chip-pend__grupo"><a class="chip-pend" href="' + href + '">' + e(texto) + '</a>' +
+          (otra ? '' : '<button type="button" class="chip-pend__libre" data-libre="' + e(t.torneo_id + '|' + n) + '" title="Mitre quedó libre en la fecha ' + n + '">libre</button>') +
+          '</span>';
+      }).join('');
+      const libresT = libres.filter((l) => l.torneo_id === t.torneo_id);
+      const resumen = [
+        fechas.length ? ui.plural(fechas.length, 'fecha sin cargar', 'fechas sin cargar') : '',
+        d.sinResultado.length ? ui.plural(d.sinResultado.length, 'sin resultado', 'sin resultado') : '',
+        d.sinGoles.length ? ui.plural(d.sinGoles.length, 'sin goleadores', 'sin goleadores') : ''
+      ].filter(Boolean).join(' · ');
+      return '<details class="pendiente"' + (i < 3 ? ' open' : '') + '><summary><span class="pendiente__torneo">' + e(t.nombre) + '</span>' +
+        '<span class="texto-2">' + e(resumen) + '</span></summary><div class="pendiente__cuerpo">' +
+        (fechas.length ? '<div class="pendiente__fila"><span class="pendiente__k">Fechas sin cargar</span><div class="chips">' + chipsFechas + '</div></div>' : '') +
+        (d.sinResultado.length ? '<div class="pendiente__fila"><span class="pendiente__k">Sin resultado</span><div class="chips">' + ordenar(d.sinResultado).map(chipPartido).join('') + '</div></div>' : '') +
+        (d.sinGoles.length ? '<div class="pendiente__fila"><span class="pendiente__k">Sin goleadores</span><div class="chips">' + ordenar(d.sinGoles).map(chipPartido).join('') + '</div></div>' : '') +
+        (libresT.length ? '<div class="pendiente__fila"><span class="pendiente__k">Libre</span><div class="chips">' + libresT.map((l) =>
+          '<span class="chip-pend__grupo"><span class="chip-pend chip-pend--libre">F' + l.fecha_nro + '</span><button type="button" class="chip-pend__libre" data-quitar-libre="' +
+          e(t.torneo_id + '|' + l.fecha_nro) + '" title="Ya no está libre">quitar</button></span>').join('') + '</div></div>' : '') +
+        '<form class="pendiente__fechas" data-form="fechas" data-torneo="' + e(t.torneo_id) + '"><label for="fr-' + e(t.torneo_id) + '">Fechas de la fase regular</label>' +
+        '<input id="fr-' + e(t.torneo_id) + '" name="n" type="number" inputmode="numeric" min="1" max="60" value="' + (t.fechas_regular || '') + '" placeholder="Sin dato">' +
+        '<button type="submit" class="boton boton--borde">Guardar</button></form>' +
+        '</div></details>';
+    }).join('');
+  }
+
   function faltantes(f) {
     const items = FALTANTES.filter(([k]) => f[k] > 0)
       .map(([k, texto]) => '<li><span>' + e(texto) + '</span><strong>' + f[k] + '</strong></li>').join('');
     return items ? '<ul class="lista-datos">' + items + '</ul>' : '<p class="nota">No falta nada.</p>';
   }
 
-  function cambios(lista, porId) {
+  // "F12 vs Trebolense" desde la fila del partido o, si ya no existe, desde lo guardado en la auditoría.
+  function nombrePartido(c, porId, equipos) {
+    const p = porId[c.partido_id];
+    if (p) return ui.instancia(p) + ' vs ' + p.rival;
+    const a = c.partido;
+    if (!a) return 'un partido';
+    const propio = (equipos.find((x) => x.es_propio) || {}).equipo_id;
+    const rival = equipos.find((x) => x.equipo_id === (a.local_id === propio ? a.visitante_id : a.local_id));
+    const inst = a.fase === 'Regular' ? 'F' + a.fecha_nro : a.fase + (a.serie ? ' (' + a.serie.toLowerCase() + ')' : '');
+    return inst + (rival ? ' vs ' + rival.nombre_corto : '');
+  }
+
+  function cambios(lista, porId, equipos) {
     if (!lista.length) return '<p class="nota">Todavía no hay cambios.</p>';
     const fecha = (f) => {
       const d = new Date(f);
@@ -213,11 +287,19 @@ CDM.pantallas.admin = (function () {
     };
     return '<ul class="cambios">' + lista.map((c) => {
       let que;
+      const jugadores = (c.jugadores || []).map((j) => Object.assign({}, j, { texto: j.apellido + (j.nombre ? ', ' + j.nombre : '') }));
       if (c.accion === 'importó') {
         que = 'importó ' + ui.plural(c.partidos, 'partido', 'partidos') + ' del Excel';
+      } else if (c.accion === 'unió jugadores') {
+        const baja = jugadores.find((j) => j.accion === 'baja');
+        const queda = jugadores.find((j) => j.accion === 'cambio');
+        que = 'unió a ' + (baja ? baja.texto : 'un jugador') + (queda ? ' con ' + queda.texto : '');
+      } else if (c.accion === 'agregó al jugador' || c.accion === 'corrigió al jugador') {
+        que = c.accion + ' ' + (jugadores[0] ? jugadores[0].texto : '');
+      } else if (c.accion === 'cambió el escudo de') {
+        que = c.accion + ' ' + (c.equipo || 'un equipo');
       } else {
-        const p = porId[c.partido_id];
-        que = c.accion + ' ' + (p ? ui.instancia(p) + ' vs ' + p.rival : 'un partido');
+        que = c.accion + ' ' + nombrePartido(c, porId, equipos);
       }
       return '<li><strong>' + e(c.usuario) + '</strong> ' + e(que) + (c.es_prueba ? ' <span class="texto-2">(prueba)</span>' : '') +
         '<div class="texto-2">' + e(fecha(c.fecha)) + '</div></li>';
@@ -227,8 +309,9 @@ CDM.pantallas.admin = (function () {
   async function render() {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) return acceso.html;
-    const [partidos, falt, listaCambios] = await Promise.all([
-      CDM.api.admin.partidos(), CDM.api.admin.faltantes(), CDM.api.admin.cambios()
+    const [partidos, falt, listaCambios, equipos, fechasFaltan, torneos, libres] = await Promise.all([
+      CDM.api.admin.partidos(), CDM.api.admin.faltantes(), CDM.api.admin.cambios(), CDM.api.admin.equipos(),
+      CDM.api.admin.fechasFaltantes(), CDM.api.admin.torneos(), CDM.api.admin.fechasLibres()
     ]);
     const grupos = CDM.admin.agrupar(partidos);
     const porId = Object.fromEntries(partidos.map((p) => [p.partido_id, p]));
@@ -237,13 +320,65 @@ CDM.pantallas.admin = (function () {
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<div class="detalle"><div class="detalle__principal">' +
       '<section class="por-cargar-lista" aria-label="Para cargar"><h2 class="subtitulo">Para cargar</h2>' + paraCargar(grupos) + '</section>' +
+      '<section class="tarjeta" aria-label="Pendientes de carga"><div class="tarjeta__cabeza"><h2 class="tarjeta__titulo">Pendientes de carga</h2>' +
+      '<a href="#/admin/partido/nuevo" class="enlace">+ Partido fuera del fixture</a></div>' +
+      '<p class="nota">Tocá una fecha para cargarla. Si Mitre no jugó esa fecha, marcala como "libre". Las fechas que faltan al final de un torneo aparecen cuando se completa cuántas fechas tiene la fase regular.</p>' +
+      '<p class="form-error" role="alert" hidden></p>' +
+      pendientes(fechasFaltan, partidos, torneos, libres) + '</section>' +
       '<section class="tarjeta" aria-label="Últimos cargados"><div class="tarjeta__cabeza"><h2 class="tarjeta__titulo">Últimos cargados</h2>' +
       '<a href="#/admin/partido/nuevo" class="enlace">+ Partido fuera del fixture</a></div>' + ultimos(grupos) + '</section></div>' +
       '<aside class="detalle__lateral">' +
       '<section class="tarjeta" aria-label="Datos que faltan"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Datos que faltan</h2>' + faltantes(falt) + '</section>' +
-      '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId) + '</section>' +
+      '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId, equipos) + '</section>' +
       '</aside></div>';
   }
 
-  return { titulo: 'Administrar', seccion: 'admin', render, montar: CDM.admin.montarAcceso };
+  function montar(vista) {
+    CDM.admin.montarAcceso(vista);
+    const error = (texto) => {
+      const p = vista.querySelector('section[aria-label="Pendientes de carga"] .form-error');
+      if (!p) return;
+      p.textContent = texto;
+      p.hidden = !texto;
+    };
+    const nombreTorneo = (tid) => {
+      const campo = vista.querySelector('#fr-' + CSS.escape(tid));
+      return campo ? campo.closest('details').querySelector('.pendiente__torneo').textContent : '';
+    };
+    vista.addEventListener('click', async (ev) => {
+      const b = ev.target.closest('[data-libre], [data-quitar-libre]');
+      if (!b) return;
+      const [tid, n] = (b.dataset.libre || b.dataset.quitarLibre).split('|');
+      b.disabled = true;
+      try {
+        if (b.dataset.libre) {
+          await CDM.api.admin.marcarLibre(tid, Number(n));
+          CDM.admin.avisar('Fecha ' + n + ' del ' + nombreTorneo(tid) + ': Mitre quedó libre.');
+        } else {
+          await CDM.api.admin.quitarLibre(tid, Number(n));
+          CDM.admin.avisar('Fecha ' + n + ' del ' + nombreTorneo(tid) + ': vuelve a pendientes.');
+        }
+        CDM.router.recargar();
+      } catch (err) {
+        b.disabled = false;
+        error(err.message);
+      }
+    });
+    vista.addEventListener('submit', async (ev) => {
+      const form = ev.target.closest('[data-form="fechas"]');
+      if (!form) return;
+      ev.preventDefault();
+      const n = form.n.value === '' ? null : parseInt(form.n.value, 10);
+      if (n !== null && !(n > 0)) return error('La cantidad de fechas tiene que ser un número mayor que cero.');
+      try {
+        await CDM.api.admin.guardarFechasRegular(form.dataset.torneo, n);
+        CDM.admin.avisar(nombreTorneo(form.dataset.torneo) + ': ' + (n ? ui.plural(n, 'fecha', 'fechas') + ' en la fase regular.' : 'sin cantidad de fechas.'));
+        CDM.router.recargar();
+      } catch (err) {
+        error(err.message);
+      }
+    });
+  }
+
+  return { titulo: 'Administrar', seccion: 'admin', render, montar };
 })();

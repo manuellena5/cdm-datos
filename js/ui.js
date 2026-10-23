@@ -149,6 +149,26 @@ CDM.ui = (function () {
     return '<div class="vacio vacio--chico">' + e(texto) + '</div>';
   }
 
+  // ---------- Escudos ----------
+  // 'Juv. Unida' → 'JU', 'San Martín (CP)' → 'SM', 'Trebolense' → 'TR'
+  function iniciales(nombre) {
+    const palabras = String(nombre || '').replace(/\(.*?\)/g, ' ').split(/[\s.]+/).filter(Boolean);
+    if (palabras.length === 1) return palabras[0].slice(0, 2).toUpperCase();
+    return palabras.slice(0, 2).map((p) => p.charAt(0)).join('').toUpperCase();
+  }
+
+  // Escudo del equipo a `px` píxeles. Sin imagen: círculo gris con las iniciales, del mismo tamaño.
+  // El club propio, si no tiene escudo cargado, usa el del repo.
+  function escudo(equipo, px) {
+    const tam = 'width:' + px + 'px;height:' + px + 'px';
+    const src = equipo && (equipo.escudo || (equipo.es_propio ? 'assets/escudo-192.png' : ''));
+    if (src) {
+      return '<img class="escudo" src="' + e(src) + '" alt="" width="' + px + '" height="' + px + '" loading="lazy" style="' + tam + '">';
+    }
+    return '<span class="escudo escudo--iniciales" aria-hidden="true" style="' + tam + ';font-size:' + Math.max(9, Math.round(px * 0.4)) + 'px">' +
+      e(iniciales(equipo ? equipo.nombre_corto : '')) + '</span>';
+  }
+
   // Une nombres: ['A', 'B', 'C'] → 'A, B y C'
   function unir(nombres) {
     if (nombres.length <= 1) return nombres.join('');
@@ -158,6 +178,6 @@ CDM.ui = (function () {
   return {
     plural, fechaCorta, fechaLarga, hora, escaparHtml, chipResultado, torneoSinAnio, instancia, instanciaLarga,
     marcador, penales, tituloChip, icono, rojas, selector, segmentado, cargando, errorCarga, avisoGuardados,
-    vacio, unir
+    vacio, unir, escudo, iniciales
   };
 })();

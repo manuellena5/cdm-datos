@@ -22,7 +22,9 @@ CDM.pantallas.resultados = (function () {
       '</div></section>';
   }
 
-  function tarjeta(p, propio) {
+  function tarjeta(p, propio, equipos) {
+    const nombre = (id, texto) => '<span class="partido__nombre con-escudo">' + ui.escudo(equipos[id], 24) +
+      '<span class="partido__texto">' + e(texto) + '</span></span>';
     const local = p.condicion === 'L';
     const goles = (n) => (n == null ? '' : n);
     const pen = ui.penales(p);
@@ -33,12 +35,12 @@ CDM.pantallas.resultados = (function () {
       e(etiqueta + ', ' + ui.instanciaLarga(p)) + '">' +
       '<div class="partido__fecha"><span class="partido__nro">' + e(ui.instancia(p)) + '</span>' +
       '<span class="partido__dia">' + e(ui.fechaCorta(p.fecha) || 'Sin fecha') + '</span></div>' +
-      '<div class="partido__eq partido__eq--local' + (local ? ' es-propio' : '') + '"><span class="partido__nombre">' +
-      e(p.local) + '</span><span class="partido__goles">' + goles(p.goles_local) + '</span></div>' +
+      '<div class="partido__eq partido__eq--local' + (local ? ' es-propio' : '') + '">' + nombre(p.local_id, p.local) +
+      '<span class="partido__goles">' + goles(p.goles_local) + '</span></div>' +
       '<div class="partido__marcador' + (p.goles_local == null ? ' partido__marcador--sin' : '') + '">' +
       e(ui.marcador(p)) + (pen ? '<small>' + e(pen) + '</small>' : '') + '</div>' +
-      '<div class="partido__eq partido__eq--visitante' + (!local ? ' es-propio' : '') + '"><span class="partido__nombre">' +
-      e(p.visitante) + '</span><span class="partido__goles">' + goles(p.goles_visitante) + '</span></div>' +
+      '<div class="partido__eq partido__eq--visitante' + (!local ? ' es-propio' : '') + '">' + nombre(p.visitante_id, p.visitante) +
+      '<span class="partido__goles">' + goles(p.goles_visitante) + '</span></div>' +
       '<div class="partido__lado">' + ui.rojas(p.rojas) + ui.chipResultado(p.resultado, ui.tituloChip(p)) +
       '<span class="partido__detalle">Detalle</span></div>' +
       (p.goles_mitre_texto ? '<div class="partido__goleadores"><strong>' + e(propio.nombre_corto) + ':</strong> ' +
@@ -48,9 +50,11 @@ CDM.pantallas.resultados = (function () {
   }
 
   async function render(params, query) {
-    const [partidos, campanas, propio] = await Promise.all([
-      CDM.api.partidos(), CDM.api.campanas(), CDM.api.clubPropio()
+    const [partidos, campanas, listaEquipos] = await Promise.all([
+      CDM.api.partidos(), CDM.api.campanas(), CDM.api.equipos()
     ]);
+    const propio = listaEquipos.find((x) => x.es_propio) || { nombre_corto: '' };
+    const equipos = Object.fromEntries(listaEquipos.map((x) => [x.equipo_id, x]));
     const sel = filtros.elegirTorneo(campanas, query);
     const cat = filtros.categoria(query);
     const categoria = filtros.nombreCategoria(cat);
@@ -75,9 +79,9 @@ CDM.pantallas.resultados = (function () {
       const grupos = new Map();
       lista.forEach((p) => { if (!grupos.has(p.torneo)) grupos.set(p.torneo, []); grupos.get(p.torneo).push(p); });
       cuerpo = [...grupos].map(([nombre, ps]) => '<h2 class="subtitulo">' + e(nombre) + '</h2>' +
-        ps.map((p) => tarjeta(p, propio)).join('')).join('');
+        ps.map((p) => tarjeta(p, propio, equipos)).join('')).join('');
     } else {
-      cuerpo = lista.map((p) => tarjeta(p, propio)).join('');
+      cuerpo = lista.map((p) => tarjeta(p, propio, equipos)).join('');
     }
 
     return controles + resumen(filasResumen) +

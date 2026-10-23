@@ -23,7 +23,7 @@ Plan de desarrollo por fases para trabajar con Claude Code.
 
 **Por qué Supabase:** las pantallas son casi todas sumarizaciones (goleadores, campañas, historial contra rivales). Eso en SQL son vistas simples y rápidas. Además deja el camino listo para usuarios (Fase 7), para el sistema del club y para el datawarehouse que está en carpeta.
 
-**Datos de partida:** `C:\Users\manuel.ellena\Documents\Drive\Club - Futbol Mayor\Gestion Club\Historial_Partidos_Mitre.xlsx`. Hojas: Partidos, Goles, Jugadores, Equipos, Torneos, Posiciones, Goleadores_Liga, Fuentes, Formaciones, Tarjetas, Sanciones (las tres últimas vacías). 2026 completo hasta Clausura F11. 2024 y 2025 con algunos partidos sueltos.
+**Datos de partida:** `C:\Users\manuel.ellena\Documents\Drive\Club - Futbol Mayor\Gestion Club\Historial_Partidos_Mitre.xlsx`. Hojas: Partidos, Goles, Jugadores, Equipos, Torneos, Posiciones, Goleadores_Liga, Fuentes, Formaciones, Tarjetas, Sanciones (las tres últimas vacías). 2026 completo hasta Clausura F11. 2024 y 2025 con algunos partidos sueltos. **Actualización oct-2026:** el Excel ya tiene 2010–2026 y se importa por última vez en la Fase 4.5.2; desde ahí la base es el único dato maestro.
 
 ---
 
@@ -226,16 +226,53 @@ Tabla `auditoria` (fecha, usuario, tabla, registro, accion, antes jsonb, despues
 
 ---
 
-## Fase 5 — Carga histórica (2025 → 2022)
+## Fase 4.5 — Cierre de la Fase 4, histórico completo y escudos
 
-Trabajo de datos más que de programación, con una ayuda de la app:
-- **Importador de lote** en admin: pegar una tabla de texto o CSV (fecha, local, goles, goles, visitante) de un torneo entero. Previsualiza, normaliza los nombres de equipos contra `equipos` (con sugerencias si no coincide) y crea los partidos con `completitud = Resultado`.
-- Fuentes por año:
-  - **2025 y 2024:** resultados de "El Gráfico de la San Martín" (`ligasanmartin.com/fixture/fixture-2021/` para Primera y `fixture-2018-reserva/` para Reserva) y goleadores de las placas del Instagram del club (@depmitrefutbolmayor, que arranca a principios de 2024).
-  - **2023 y 2022:** solo resultados de El Gráfico.
-- Los torneos con zonas (Clausura 2022, 2023, 2024 y 2025) necesitan el campo `zona` en `partidos`. Agregarlo en esta fase, avisando el impacto.
-- Interzonales y fechas libres: las fechas libres no se cargan como partido.
-- **Copas oficiales:** buscar las participaciones de Mitre en copas (la copa de la Federación de años anteriores y similares), cargarlas como torneos de `tipo = Copa`, con sus fases y series de ida y vuelta. Fuentes: El Gráfico de la San Martín (tiene notas de la Copa Federación 2023), Liga oficial, prensa regional (El Litoral, Anyulin) e Instagram del club.
+Hacer en este orden. Cada punto es una tarea separada para Claude Code ("Hacé el punto 4.5.2 de docs/PLAN.md").
+
+### 4.5.1 Cerrar la Fase 4
+Probar en el navegador (PC y celular a 390 px) y contar qué se probó:
+- Sin sesión, desde la consola con la `anon key`: `insert` / `update` / `delete` en `partidos`, `goles` e `incidencias` tienen que fallar.
+- Cargar un partido completo desde el celular en menos de 2 minutos: goles de los dos lados, una roja, y penales en un playoff empatado.
+- Borrador → no se ve en la consulta. Publicar → se actualizan Resultados, Goleadores e Historial.
+- Editar un partido viejo → aparece en "Registro de cambios".
+- Completar lo que falte de la Fase 4 contra sus criterios de aceptación.
+
+### 4.5.2 Importación final del Excel histórico
+El Excel ahora tiene **2010 a 2026** (631 partidos, 652 goles): Copa Federación 2010 y Liga San Martín 2011–2026. La base hoy tiene solo 2021–2026.
+- Correr `python scripts/importar_excel.py --dry-run` y revisar el plan antes de escribir. Datos nuevos que tiene que aceptar sin error:
+  - Torneo `2010F` con `tipo = Copa` (la hoja Torneos ahora trae las columnas `tipo` y `competicion`) y partidos con `fase = Grupos` y zona.
+  - Equipos nuevos: `AMC` (América de Cañada de Gómez), `UTO` (Unión FC de Totoras), `CSL` (Combate de San Lorenzo).
+  - Partidos `Suspendido` con marcador (2015C, cuartos vs La Emilia), partidos `Inferido` sin marcador con `resultado_informado` (2010F vs Combate, 2021A F7, 2013C cuartos), finales de ida y vuelta de Reserva (2016C) y zonas con fecha libre (Clausura 2016).
+  - Unos 120 jugadores nuevos (J090 en adelante).
+- Si el importador frena por borradores o partidos que no están en el Excel, mostrar cuáles y preguntarle a M antes de usar `--forzar`.
+- Después de importar: verificar las cifras de control, que Resultados, Historial y Goleadores muestren 2010–2026 bien, y que el Historial con "Todos los años" cargue rápido en el celular.
+- **Desde acá la base es el único dato maestro.** El Excel queda congelado (M lo renombra a `Historial_Partidos_Mitre_congelado.xlsx`). El importador queda solo para `--dry-run`: si se vuelve a correr en serio, pisa las correcciones hechas en la base. Agregar un aviso en `scripts/README.md`.
+
+### 4.5.3 Corregir jugadores y unir duplicados (`#/admin/jugadores`)
+Hay muchos jugadores con inicial o solo apellido ("Díaz J.", "Fossarelli") y posibles duplicados entre años (por ejemplo `J111` "Rubiolo" y "Matías Rubiolo" de 2011–2014). La hoja Revisar del Excel tiene la lista.
+- Lista de jugadores con buscador: apellido, nombre, años en que aparece, goles y partidos. Editar apellido, nombre, apodo y notas. El `jugador_id` no se toca.
+- **Unir jugadores:** elegir el que queda y el que sobra. Sugerir duplicados por apellido parecido. Función SQL `unir_jugadores(queda, sobra)` en una transacción: pasa `goles`, `incidencias`, `sanciones` y `formaciones` al que queda (en `formaciones` la clave es `partido_id + jugador_id`: si los dos están en el mismo partido, avisar y no unir), junta las notas y borra el sobrante.
+- Auditoría: sumar triggers en `jugadores` para que los cambios y uniones queden en "Registro de cambios".
+- Normalizar: si `nombre` termina en punto (inicial), mostrarlo bien en las vistas (hoy queda "Díaz J..").
+
+### 4.5.4 Escudos de los equipos
+- Columna `escudo` (texto, ruta del archivo) en `equipos`. Archivos en `assets/escudos/<equipo_id>.png`, cuadrados, unos 128 px, fondo transparente. M consigue las imágenes de las redes oficiales de cada club.
+- Mostrarlos en las tarjetas de Resultados (24 px), el Detalle del partido (48 px), la tabla de rivales del Historial y los selectores de la pantalla de carga.
+- Sin escudo: círculo con las iniciales del nombre corto, en gris, del mismo tamaño. Nada se corre de lugar.
+- En `#/admin/jugadores`, o en una pantalla chica de equipos, poder subir o cambiar el escudo (Supabase Storage, bucket público `escudos`), para no depender de un commit cada vez.
+
+**Criterios de aceptación de la 4.5:** la base tiene 2010–2026 y coincide con las cifras del Excel; se puede corregir un jugador y unir dos sin perder goles; todos los equipos se ven con escudo o con sus iniciales.
+
+---
+
+## Fase 5 — Carga histórica
+
+La búsqueda de datos 2010–2026 ya se hizo fuera de la app y entra con la 4.5.2. Lo que queda es completar huecos (ver la hoja Revisar del Excel, que se puede pasar a una tabla `pendientes` para verla en el panel de admin):
+- Clausura 2012 (fecha 1 y de la 7 en adelante, salvo la 9), partidos sueltos de 2011, 2013C cuartos, 2014A F6, 2014C F5, 2016A F13.
+- Goleadores faltantes, sobre todo 2013.
+- Liga Independiente (antes de 2011) si aparecen fuentes.
+- **Importador de lote** en admin (opcional, solo si aparece un torneo entero para cargar): pegar una tabla de texto o CSV, previsualizar, normalizar equipos contra `equipos` y crear los partidos con `completitud = Resultado`.
 
 **Criterios de aceptación:** cada torneo cargado coincide con las tablas publicadas de esa temporada, cuando existan.
 
@@ -243,12 +280,12 @@ Trabajo de datos más que de programación, con una ayuda de la app:
 
 ## Fase 6 — Plantel y estadísticas de jugadores
 
-Cuando se consigan formaciones o planillas:
-- Carga de formación en el paso 2/3 de la pantalla de carga: titulares, suplentes que entraron con su minuto, y capitán.
-- Carga de amarillas por jugador (las rojas y demás incidencias ya se cargan desde la Fase 4).
-- **Ficha de jugador** (`#/jugador/:id`): partidos jugados, titularidades, minutos, goles por torneo y tarjetas. Línea de tiempo por temporada.
-- **Planteles** (`#/planteles`): plantel por torneo y categoría, con las estadísticas de cada uno. El ítem "Planteles · pronto" del menú pasa a estar activo.
-- Sanciones desde los boletines del Tribunal de Penas.
+Hoy hay formaciones solo del Clausura 2023 y algunas de 2011–2013 escritas en las observaciones de los partidos. Por eso el orden va de lo que ya se puede mostrar a lo que necesita datos nuevos:
+1. **Ficha de jugador** (`#/jugador/:id`) con lo que ya existe: goles por torneo y categoría, rojas, años en que aparece, partidos con formación cargada. Desde Goleadores y del Detalle del partido se llega a la ficha.
+2. **Pasar las formaciones de las observaciones a la tabla `formaciones`** (2011C F9, 2012A F9, 2012C F6 y F9, 2013C F7), creando o vinculando jugadores con la herramienta de la 4.5.3.
+3. **Carga de formación** en la pantalla de partido: titulares, suplentes que entraron con su minuto, capitán y amarillas por jugador.
+4. **Planteles** (`#/planteles`): plantel por torneo y categoría, armado con formaciones y goleadores, con las estadísticas de cada uno (partidos, titularidades, minutos si están, goles y tarjetas). El ítem "Planteles · pronto" del menú pasa a estar activo.
+5. Sanciones desde los boletines del Tribunal de Penas.
 
 ---
 
@@ -275,4 +312,4 @@ Cuando se consigan formaciones o planillas:
 - Solo partidos oficiales: Liga San Martín y copas. Los amistosos no.
 
 ## Preguntas abiertas
-1. Nombre exacto y años de la copa en la que participó Mitre (la "copa confederaciones" / Federación), para buscarla en la Fase 5.
+1. ~~Copa de la Federación~~: es la **Copa Federación** de la Federación Santafesina. Mitre la jugó en 2010 (cargada). Falta saber si la jugó otros años.

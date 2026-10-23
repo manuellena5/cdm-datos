@@ -115,20 +115,37 @@ CDM.api = (function () {
     } catch (e) {
       throw new Error('Sin conexión. No se guardó; probá de nuevo.');
     }
-    if (res.error) {
-      const e = res.error;
-      if (!e.code) throw new Error('Sin conexión. No se guardó; probá de nuevo.');
-      if (e.code === '42501' || /permiso|permission/i.test(e.message)) throw new Error('Tu usuario no tiene permiso para cargar datos.');
-      if (e.code === 'PGRST301' || /JWT/i.test(e.message)) throw new Error('Se cerró la sesión. Volvé a ingresar.');
-      throw new Error('No se pudo guardar. Revisá los datos y probá de nuevo.');
-    }
+    if (res.error) throw errorDeGuardado(res.error);
     olvidarCache();
     return res.data;
   }
 
+  // Escritura directa en una tabla (por ejemplo, corregir un jugador). Si no tocó ninguna fila, es falta de permiso.
+  async function escribir(consulta) {
+    let res;
+    try {
+      res = await consulta.abortSignal(AbortSignal.timeout(20000));
+    } catch (e) {
+      throw new Error('Sin conexión. No se guardó; probá de nuevo.');
+    }
+    if (res.error) throw errorDeGuardado(res.error);
+    if (Array.isArray(res.data) && !res.data.length) throw new Error('Tu usuario no tiene permiso para cargar datos.');
+    olvidarCache();
+    return res.data;
+  }
+
+  // Los errores de la base pasan a mensajes para el usuario. Los que empiezan con "CDM: " ya vienen escritos para mostrar.
+  function errorDeGuardado(e) {
+    if (!e.code) return new Error('Sin conexión. No se guardó; probá de nuevo.');
+    if (/^CDM: /.test(e.message || '')) return new Error(e.message.slice(5));
+    if (e.code === '42501' || /permiso|permission/i.test(e.message)) return new Error('Tu usuario no tiene permiso para cargar datos.');
+    if (e.code === 'PGRST301' || /JWT/i.test(e.message)) return new Error('Se cerró la sesión. Volvé a ingresar.');
+    return new Error('No se pudo guardar. Revisá los datos y probá de nuevo.');
+  }
+
   const COLUMNAS_PARTIDO = [
     'partido_id', 'torneo_id', 'anio', 'torneo', 'torneo_tipo', 'torneo_orden', 'fase', 'fase_orden',
-    'zona', 'serie', 'fecha_nro', 'fecha', 'hora', 'categoria', 'local', 'visitante',
+    'zona', 'serie', 'fecha_nro', 'fecha', 'hora', 'categoria', 'local_id', 'local', 'visitante_id', 'visitante',
     'goles_local', 'goles_visitante', 'penales_local', 'penales_visitante', 'condicion',
     'rival_id', 'rival', 'gf', 'gc', 'penales_favor', 'penales_contra', 'resultado',
     'goles_mitre_texto', 'rojas', 'cancha', 'arbitro', 'estado', 'completitud', 'fuente_ids'
@@ -143,9 +160,12 @@ CDM.api = (function () {
     empezarPantalla() { usandoGuardados = false; },
     get usandoGuardados() { return usandoGuardados; },
 
-    clubPropio: () => consultar('club_propio', () =>
-      cliente.from('equipos').select('nombre,nombre_corto').eq('es_propio', true))
-      .then((filas) => filas[0] || { nombre: '', nombre_corto: '' }),
+    // Equipos con su escudo (para mostrar escudos o iniciales)
+    equipos: () => consultar('equipos', () =>
+      cliente.from('equipos').select('equipo_id,nombre,nombre_corto,escudo,es_propio').order('nombre_corto')),
+
+    clubPropio: () => CDM.api.equipos()
+      .then((filas) => filas.find((x) => x.es_propio) || { nombre: '', nombre_corto: '' }),
 
     // La consulta pública muestra solo lo publicado, aunque haya sesión iniciada.
     partidos: () => consultar('partidos', () =>
@@ -199,8 +219,27 @@ CDM.api = (function () {
     admin: {
       partidos: () => todas(() => cliente.from('v_partidos')
         .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en').order('partido_id')),
-      equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre_corto,cancha,es_propio').order('nombre_corto')),
-      torneos: () => todas(() => cliente.from('torneos').select('torneo_id,anio,nombre,tipo,orden').order('orden', { ascending: false })),
+      equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,cancha,escudo,es_propio').order('nombre_corto')),
+      jugadoresResumen: () => todas(() => cliente.from('v_jugadores_resumen').select('*').order('apellido').order('nombre')),
+      editarJugador: (id, campos) => escribir(cliente.from('jugadores').update(campos).eq('jugador_id', id).select()),
+      unirJugadores: (queda, sobra) => llamar('unir_jugadores', { p_queda: queda, p_sobra: sobra }),
+      // Sube el escudo a Storage (bucket público "escudos") y guarda la URL en el equipo.
+      subirEscudo: async (equipoId, archivo) => {
+        const ext = (archivo.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';
+        const ruta = equipoId + '.' + ext;
+        const { error } = await cliente.storage.from('escudos').upload(ruta, archivo, { upsert: true, contentType: archivo.type || undefined });
+        if (error) throw new Error(/row-level|permission|Unauthorized/i.test(error.message)
+          ? 'Tu usuario no tiene permiso para cargar datos.' : 'No se pudo subir la imagen. Probá de nuevo.');
+        const url = cliente.storage.from('escudos').getPublicUrl(ruta).data.publicUrl + '?v=' + Date.now();
+        return escribir(cliente.from('equipos').update({ escudo: url }).eq('equipo_id', equipoId).select());
+      },
+      quitarEscudo: (equipoId) => escribir(cliente.from('equipos').update({ escudo: null }).eq('equipo_id', equipoId).select()),
+      torneos: () => todas(() => cliente.from('torneos').select('torneo_id,anio,nombre,tipo,orden,fechas_regular').order('orden', { ascending: false })),
+      fechasFaltantes: () => todas(() => cliente.from('v_fechas_faltantes').select('*').order('torneo_orden', { ascending: false }).order('fecha_nro')),
+      fechasLibres: () => todas(() => cliente.from('fechas_libres').select('torneo_id,fecha_nro,motivo').order('fecha_nro')),
+      marcarLibre: (torneoId, fechaNro) => escribir(cliente.from('fechas_libres').insert({ torneo_id: torneoId, fecha_nro: fechaNro }).select()),
+      quitarLibre: (torneoId, fechaNro) => escribir(cliente.from('fechas_libres').delete().eq('torneo_id', torneoId).eq('fecha_nro', fechaNro).select()),
+      guardarFechasRegular: (torneoId, n) => escribir(cliente.from('torneos').update({ fechas_regular: n }).eq('torneo_id', torneoId).select()),
       jugadores: () => todas(() => cliente.from('jugadores').select('jugador_id,apellido,nombre,division').order('apellido').order('nombre')),
       // Quién jugó (goles o formación) por categoría y año, para ordenar la lista de jugadores
       goleadoresRecientes: () => todas(() => cliente.from('v_goleadores').select('jugador_id,categoria,anio,goles')),
