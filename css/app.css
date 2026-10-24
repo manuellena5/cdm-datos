@@ -511,6 +511,46 @@ h1, h2, h3 { font-family: var(--f-titulo); font-weight: 700; color: var(--azul);
 .botones-chicos { display: flex; flex-wrap: wrap; gap: 8px; }
 .incidencia-carga { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 .botones-carga { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.formacion-carga { border-top: 1px solid var(--borde-suave); }
+.formacion-carga summary { font-weight: 700; color: var(--azul); }
+.formacion-carga__cuerpo { display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px; }
+.form-fila { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.form-fila__arriba { display: flex; align-items: center; gap: 8px; }
+.form-fila__nro { font-family: var(--f-titulo); font-weight: 700; color: var(--azul); width: 22px; text-align: center; flex: none; }
+.form-fila__jugador { flex: 1; min-width: 0; }
+.form-fila__abajo { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 12px; }
+.form-fila__abajo .campo:first-child { flex: 1 1 160px; }
+.form-fila .campo label { font-size: 12px; }
+
+/* ---------- Ficha de jugador y planteles ---------- */
+.ficha-cabeza .titulo-pantalla { margin: 0; }
+.ficha-cabeza p { margin: 4px 0 0; }
+.resumen__ficha { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+.ficha-partidos { list-style: none; margin: 0; padding: 0; }
+.ficha-partidos a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "k chip" "rival chip" "extra chip";
+  gap: 0 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--fondo-suave);
+  color: var(--texto);
+  text-decoration: none;
+  min-height: var(--alto-control);
+}
+.ficha-partidos a:hover .ficha-partido__rival { color: var(--acento); }
+.ficha-partido__k { grid-area: k; font-size: 13px; color: var(--texto-2); }
+.ficha-partido__rival { grid-area: rival; font-weight: 600; }
+.ficha-partido__extra { grid-area: extra; font-size: 13px; color: var(--texto-2); }
+.ficha-partidos .chip { grid-area: chip; }
+.tabla--plantel { min-width: 520px; }
+.tabla--plantel tr > :first-child { position: sticky; left: 0; background: var(--tarjeta); z-index: 1; }
+.goleador__nombre a, .gol__autor a, .formacion a { color: inherit; text-decoration: none; }
+.goleador__nombre a:hover, .gol__autor a:hover, .formacion a:hover { color: var(--acento); text-decoration: underline; }
+@media (max-width: 720px) {
+  .nav-inf a { font-size: 13px; }
+}
 
 /* ---------- Pendientes de carga (panel) ---------- */
 .pendiente { border-top: 1px solid var(--fondo-suave); }
@@ -729,7 +769,7 @@ details[disabled] summary { cursor: default; }
 
   .nav-inf {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     position: fixed;
     left: 0;
     right: 0;

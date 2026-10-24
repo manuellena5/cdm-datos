@@ -177,6 +177,15 @@ CDM.api = (function () {
     goleadores: () => consultar('goleadores', () =>
       cliente.from('v_goleadores').select('*').order('jugador_id').order('torneo_id').order('categoria')),
 
+    // Estadísticas de jugadores (Fase 6)
+    plantel: () => consultar('plantel', () =>
+      cliente.from('v_plantel').select('*').order('torneo_orden').order('categoria').order('jugador_id')),
+    jugador: (id) => consultar('jugador:' + id, () =>
+      cliente.from('jugadores').select('jugador_id,apellido,nombre,apodo,posicion,division').eq('jugador_id', id))
+      .then((filas) => filas[0] || null),
+    jugadorPartidos: (id) => consultar('jugador_partidos:' + id, () =>
+      cliente.from('v_jugador_partidos').select('*').eq('jugador_id', id).order('fecha', { ascending: false, nullsFirst: false }).order('partido_id')),
+
     goleadoresLiga: () => consultar('goleadores_liga', () =>
       cliente.from('goleadores_liga').select('torneo_id,categoria,jugador_id,goles,puesto').order('id')),
 
@@ -245,6 +254,9 @@ CDM.api = (function () {
       goleadoresRecientes: () => todas(() => cliente.from('v_goleadores').select('jugador_id,categoria,anio,goles')),
       golesDe: (ids) => todas(() => cliente.from('v_goles').select('*').in('partido_id', ids).order('orden').order('gol_id')),
       incidenciasDe: (ids) => todas(() => cliente.from('v_incidencias').select('*').in('partido_id', ids).order('orden').order('id')),
+      formacionesDe: (ids) => todas(() => cliente.from('formaciones').select('*').in('partido_id', ids).order('nro_lista')),
+      // Partidos con formación cargada (para "Copiar del partido anterior")
+      partidosConFormacion: () => todas(() => cliente.from('formaciones').select('partido_id')).then((f) => [...new Set(f.map((x) => x.partido_id))]),
       // Nombres ya usados para los goleadores de un equipo rival (sugerencias)
       nombresRival: (equipoId) => todas(() => cliente.from('goles').select('nombre_en_fuente')
         .eq('equipo_id', equipoId).not('nombre_en_fuente', 'is', null)),

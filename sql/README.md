@@ -9,6 +9,8 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 5. `05_admin.sql` — modo administrador: tabla `administradores`, escritura solo para administradores, auditoría (`auditoria` y `v_cambios`) y funciones `guardar_partido`, `crear_jugador` y `borrar_borrador`.
 6. `06_fase_playoff.sql` — fase "Playoff" (instancia desconocida). Después, volver a correr `02` y `03`.
 7. `07_jugadores_escudos.sql` — escudos (`equipos.escudo` y bucket público `escudos` en Storage), `v_jugadores_resumen` y `unir_jugadores`.
+8. `08_pendientes.sql` — `fechas_libres`, `torneos.fechas_regular` y `v_fechas_faltantes` (pendientes del panel).
+9. `09_estadisticas.sql` — `v_jugador_partidos` y `v_plantel` (ficha de jugador y planteles). La carga de formación está en `guardar_partido` (`05`).
 
 En una base nueva, `01` ya incluye lo de `04` y `06`.
 

@@ -117,6 +117,9 @@ create trigger goles_auditoria after insert or update or delete on goles
 drop trigger if exists incidencias_auditoria on incidencias;
 create trigger incidencias_auditoria after insert or update or delete on incidencias
   for each row execute function registrar_cambio();
+drop trigger if exists formaciones_auditoria on formaciones;
+create trigger formaciones_auditoria after insert or update or delete on formaciones
+  for each row execute function registrar_cambio();
 drop trigger if exists jugadores_auditoria on jugadores;
 create trigger jugadores_auditoria after insert or update or delete on jugadores
   for each row execute function registrar_cambio();
@@ -155,7 +158,7 @@ select
                  and coalesce((a.antes ->> 'publicado')::boolean, false) = false) then 'publicó'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean = false) then 'guardó como borrador'
     when bool_or(a.tabla = 'jugadores' and a.accion = 'baja') then 'unió jugadores'
-    when bool_or(a.tabla in ('partidos', 'goles', 'incidencias')) then 'editó'
+    when bool_or(a.tabla in ('partidos', 'goles', 'incidencias', 'formaciones')) then 'editó'
     when bool_or(a.tabla = 'jugadores' and a.accion = 'alta') then 'agregó al jugador'
     when bool_or(a.tabla = 'jugadores') then 'corrigió al jugador'
     when bool_or(a.tabla = 'equipos') then 'cambió el escudo de'
@@ -370,6 +373,35 @@ begin
       select v_id, x ->> 'equipo_id', x ->> 'jugador_id', x ->> 'nombre_en_fuente', x ->> 'tipo',
              (x ->> 'minuto')::int, x ->> 'descripcion'
       from jsonb_array_elements(v_nuevos) x;
+    end if;
+
+    -- Formación: solo si viene en el payload (si no viene, no se toca). Se reemplaza si cambió.
+    if v_cat ? 'formacion' then
+      select coalesce(jsonb_agg(x order by x::text), '[]'::jsonb) into v_nuevos from (
+        select distinct on (f ->> 'jugador_id') jsonb_build_object(
+          'jugador_id', f ->> 'jugador_id',
+          'rol', coalesce(nullif(f ->> 'rol', ''), 'Titular'),
+          'nro_lista', (f ->> 'nro_lista')::int,
+          'camiseta', (f ->> 'camiseta')::int,
+          'minuto_entra', (f ->> 'minuto_entra')::int,
+          'minuto_sale', (f ->> 'minuto_sale')::int,
+          'capitan', coalesce((f ->> 'capitan')::boolean, false)) as x
+        from jsonb_array_elements(v_cat -> 'formacion') f
+        where nullif(f ->> 'jugador_id', '') is not null
+        order by f ->> 'jugador_id'
+      ) s;
+      select coalesce(jsonb_agg(x order by x::text), '[]'::jsonb) into v_actuales from (
+        select jsonb_build_object('jugador_id', jugador_id, 'rol', rol, 'nro_lista', nro_lista, 'camiseta', camiseta,
+          'minuto_entra', minuto_entra, 'minuto_sale', minuto_sale, 'capitan', capitan) as x
+        from public.formaciones where partido_id = v_id
+      ) s;
+      if v_nuevos <> v_actuales then
+        delete from public.formaciones where partido_id = v_id;
+        insert into public.formaciones (partido_id, jugador_id, rol, nro_lista, camiseta, minuto_entra, minuto_sale, capitan)
+        select v_id, x ->> 'jugador_id', x ->> 'rol', (x ->> 'nro_lista')::int, (x ->> 'camiseta')::int,
+               (x ->> 'minuto_entra')::int, (x ->> 'minuto_sale')::int, (x ->> 'capitan')::boolean
+        from jsonb_array_elements(v_nuevos) x;
+      end if;
     end if;
 
     -- Completitud: Resultado / Con goles (todos los goles propios con autor) / Completo (además formación).

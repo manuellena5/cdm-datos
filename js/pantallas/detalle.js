@@ -57,7 +57,9 @@ CDM.pantallas.detalle = (function () {
     const cuando = (g) => (g.minuto != null ? g.minuto + "'" : g.tiempo && g.tiempo !== 'Sin dato' ? g.tiempo : '');
     const extra = (g) => (g.tipo === 'Penal' ? ' (penal)' : g.tipo === 'Tiro libre' ? ' (tiro libre)' : '');
     const filas = propios.map((g) => {
-      const texto = '<span class="gol__autor gol__autor--' + g.lado + '">' + e(g.autor + extra(g)) + '</span>';
+      const autor = g.lado === 'propio' && g.jugador_id
+        ? '<a href="#/jugador/' + encodeURIComponent(g.jugador_id) + '">' + e(g.autor) + '</a>' : e(g.autor);
+      const texto = '<span class="gol__autor gol__autor--' + g.lado + '">' + autor + e(extra(g)) + '</span>';
       const t = cuando(g);
       const pildora = '<span class="gol__cuando gol__cuando--' + g.lado + (t ? '' : ' gol__cuando--vacio') + '">' + e(t) + '</span>';
       return enLocal(g)
@@ -98,14 +100,17 @@ CDM.pantallas.detalle = (function () {
     const bloques = partidos.map((p) => {
       const de = lista.filter((f) => f.partido_id === p.partido_id);
       if (!de.length) return '';
-      const nombre = (f) => e(f.jugador) + (f.capitan ? ' <span class="capitan" title="Capitán">C</span>' : '');
+      const minutos = (f) => (f.minuto_entra != null ? ' ↑' + f.minuto_entra + "'" : '') + (f.minuto_sale != null ? ' ↓' + f.minuto_sale + "'" : '');
+      const nombre = (f) => '<a href="#/jugador/' + encodeURIComponent(f.jugador_id) + '">' + e(f.jugador) + '</a>' +
+        (f.capitan ? ' <span class="capitan" title="Capitán">C</span>' : '') + (minutos(f) ? ' <span class="texto-2">' + minutos(f) + '</span>' : '');
       const titulares = de.filter((f) => f.rol === 'Titular');
-      const resto = de.filter((f) => f.rol !== 'Titular');
+      const grupo = (rol, titulo) => {
+        const lista = de.filter((f) => f.rol === rol);
+        return lista.length ? '<p class="formacion__resto"><strong>' + titulo + ':</strong> ' + lista.map(nombre).join(', ') + '</p>' : '';
+      };
       return '<div class="formacion"><h3>' + e(p.categoria) + '</h3>' +
         '<ol class="formacion__titulares">' + titulares.map((f) => '<li>' + nombre(f) + '</li>').join('') + '</ol>' +
-        (resto.length ? '<p class="formacion__resto"><strong>' +
-          (resto.every((f) => f.rol === 'Convocado (suplente)') ? 'Convocados' : 'Suplentes') + ':</strong> ' +
-          resto.map(nombre).join(', ') + '</p>' : '') + '</div>';
+        grupo('Suplente que entró', 'Entraron') + grupo('Convocado (suplente)', 'Convocados') + grupo('Suplente sin jugar', 'No entraron') + '</div>';
     }).join('');
     return '<section class="tarjeta" aria-label="Formación"><h2 class="tarjeta__titulo">Formación</h2>' +
       (bloques || ui.vacio('Todavía no hay formación cargada para este partido.')) + '</section>';

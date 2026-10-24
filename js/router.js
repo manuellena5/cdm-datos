@@ -8,6 +8,8 @@ CDM.router = (function () {
     { patron: /^\/partido\/([^/]+)$/, pantalla: 'detalle', claves: ['id'] },
     { patron: /^\/goleadores$/, pantalla: 'goleadores' },
     { patron: /^\/historial$/, pantalla: 'historial' },
+    { patron: /^\/planteles$/, pantalla: 'planteles' },
+    { patron: /^\/jugador\/([^/]+)$/, pantalla: 'jugador', claves: ['id'] },
     { patron: /^\/admin$/, pantalla: 'admin' },
     { patron: /^\/admin\/partido\/([^/]+)$/, pantalla: 'adminPartido', claves: ['id'] },
     { patron: /^\/admin\/jugadores$/, pantalla: 'adminJugadores' },

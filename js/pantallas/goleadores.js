@@ -82,8 +82,8 @@ CDM.pantallas.goleadores = (function () {
     const notas = [];
     if (extra.enContra) notas.push('+ ' + ui.plural(extra.enContra, 'gol en contra de rivales', 'goles en contra de rivales'));
     if (extra.sinAutor) notas.push('+ ' + ui.plural(extra.sinAutor, 'gol sin autor conocido', 'goles sin autor conocido'));
-    const filas = lista.map((j) => '<tr><td class="num-chico">' + j.puesto + '</td><td><div class="goleador__nombre">' + e(j.jugador) +
-      '</div><div class="barra"><div style="width:' + Math.round(j.total / max * 100) + '%"></div></div></td>' +
+    const filas = lista.map((j) => '<tr><td class="num-chico">' + j.puesto + '</td><td><div class="goleador__nombre"><a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' +
+      e(j.jugador) + '</a></div><div class="barra"><div style="width:' + Math.round(j.total / max * 100) + '%"></div></div></td>' +
       cols.map((t) => '<td class="centro texto-2">' + (j.por[t.letra] || '–') + '</td>').join('') +
       '<td class="total">' + j.total + '</td></tr>').join('');
     return '<section class="tarjeta" aria-label="Goleadores ' + e(cat) + '"><h2 class="tarjeta__titulo">' +

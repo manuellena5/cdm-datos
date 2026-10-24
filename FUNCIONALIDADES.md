@@ -2,6 +2,14 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.7.0 — Fase 6 (plantel y estadísticas de jugadores)
+- **Ficha de jugador** (`#/jugador/:id`): nombre, apodo, posición, división y años en que aparece; totales de goles, partidos, titularidades, amarillas y rojas; tabla por torneo y categoría (cada fila lleva al plantel) y lista de sus partidos con rol, goles y tarjetas (cada uno lleva al Detalle). Se llega desde Goleadores, desde los goles y la formación del Detalle y desde Planteles.
+- **Planteles** (`#/planteles?anio=…&torneo=…&cat=…`, ítem "Planteles" del menú, ya activo): plantel por torneo (o todo el año) y categoría con PJ, titular, entró, convocado, minutos (solo si hay datos), goles, amarillas y rojas. Sin formaciones cargadas, el plantel se arma con goleadores y tarjetas, y se avisa.
+- **Cómo se cuenta:** jugó = titular, suplente que entró, o sin formación pero con gol o tarjeta. Convocado sin gol ni tarjeta: no se sabe si entró. Minutos solo con minuto de salida o de entrada y salida cargados (no se supone la duración del partido).
+- **Carga de formación** en la pantalla de partido (por categoría, opcional): jugadores en orden, rol (Titular, Suplente que entró, Convocado, Suplente sin jugar), minuto de entrada y salida, capitán (uno por categoría) y amarilla. "+ Titular" / "+ Suplente" / "+ Convocado", "+ Jugador nuevo…" y "Copiar de …" (la formación del último partido de la categoría). Aviso si hay jugadores repetidos o más de 11 titulares, y si las observaciones del partido tienen la formación escrita para pasarla.
+- La formación queda en la auditoría y hace que la completitud pase a "Completo".
+- El Detalle muestra quiénes entraron, convocados y no entraron, con los minutos de entrada y salida.
+
 ## v0.6.0 — Fase 4.5 (cierre de la 4, histórico completo, jugadores y escudos)
 - **Histórico completo 2010–2026** en la base (631 partidos): Copa Federación 2010 (tipo Copa, fase de grupos con zona) y Liga San Martín 2011–2026. **La base es el único dato maestro:** el importador escribe solo con `--pisar-la-base` y se usa para `--dry-run`.
 - **Carga de partidos, completa:** selector de **Estado** por categoría (Jugado, Programado, Suspendido, Postergado, Ganado por mesa, Sin dato) y **Resultado sin marcador** (Ganó / Empató / Perdió → completitud "Inferido"). Editar un partido suspendido o inferido ya no lo pisa.

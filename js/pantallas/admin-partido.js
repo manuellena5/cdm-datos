@@ -37,6 +37,8 @@ CDM.pantallas.adminPartido = (function () {
     return copia;
   }
   const golVacio = () => ({ jugador_id: '', minuto: null, tipo: '', tiempo: null, nombre: '' });
+  const ROLES = ['Titular', 'Suplente que entró', 'Convocado (suplente)', 'Suplente sin jugar'];
+  const filaFormacion = (rol) => ({ jugador_id: '', rol, minuto_entra: null, minuto_sale: null, capitan: false, camiseta: null, amarilla: false });
   const rivalVacio = () => ({ nombre: '', minuto: null, tiempo: null, tipo: 'Sin dato' });
 
   async function cargarEstado(torneoId, instancia, serie) {
@@ -53,9 +55,18 @@ CDM.pantallas.adminPartido = (function () {
       cats: [], incidencias: [], nuevoJugador: null
     };
     const ids = filas.map((p) => p.partido_id);
-    const [goles, incid] = ids.length
-      ? await Promise.all([CDM.api.admin.golesDe(ids), CDM.api.admin.incidenciasDe(ids)])
-      : [[], []];
+    const [goles, incid, forms] = ids.length
+      ? await Promise.all([CDM.api.admin.golesDe(ids), CDM.api.admin.incidenciasDe(ids), CDM.api.admin.formacionesDe(ids)])
+      : [[], [], []];
+    // Las amarillas de jugadores que están en la formación se marcan en su fila
+    const amarillasEnFormacion = new Set();
+    const formacionDe = (p) => forms.filter((f) => p && f.partido_id === p.partido_id)
+      .sort((a, b) => (a.nro_lista || 99) - (b.nro_lista || 99))
+      .map((f) => {
+        const am = incid.find((i) => i.partido_id === f.partido_id && i.tipo === 'Amarilla' && i.lado === 'propio' && i.jugador_id === f.jugador_id);
+        if (am) amarillasEnFormacion.add(am);
+        return { jugador_id: f.jugador_id, rol: f.rol, minuto_entra: f.minuto_entra, minuto_sale: f.minuto_sale, capitan: !!f.capitan, camiseta: f.camiseta, amarilla: !!am };
+      });
     CATEGORIAS.forEach((cat) => {
       const p = filas.find((x) => x.categoria === cat);
       const deCat = goles.filter((g) => p && g.partido_id === p.partido_id);
@@ -78,10 +89,11 @@ CDM.pantallas.adminPartido = (function () {
         gf: p ? p.gf : null, gc: p ? p.gc : null,
         pf: p ? p.penales_favor : null, pc: p ? p.penales_contra : null,
         goles: p && p.gf != null ? ajustar(propios, Math.max(p.gf, propios.length), golVacio) : [],
-        rivales: p && p.gc != null ? ajustar(rivales, Math.max(p.gc, rivales.length), rivalVacio) : []
+        rivales: p && p.gc != null ? ajustar(rivales, Math.max(p.gc, rivales.length), rivalVacio) : [],
+        formacion: formacionDe(p)
       });
     });
-    s.incidencias = incid.map((i) => ({
+    s.incidencias = incid.filter((i) => !amarillasEnFormacion.has(i)).map((i) => ({
       categoria: (filas.find((p) => p.partido_id === i.partido_id) || {}).categoria || 'Primera',
       lado: i.lado, jugador_id: i.jugador_id || '', nombre: i.jugador_id ? '' : (i.quien || ''),
       tipo: i.tipo, minuto: i.minuto, descripcion: i.descripcion || ''
@@ -154,9 +166,10 @@ CDM.pantallas.adminPartido = (function () {
     return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
   }
 
-  function formNuevoJugador(ci, gi) {
+  // Mini formulario de jugador nuevo, debajo del selector cuya ruta es `ruta` (goles o formación).
+  function formNuevoJugador(ruta) {
     const n = ctx.s.nuevoJugador;
-    if (!n || n.ci !== ci || n.gi !== gi) return '';
+    if (!n || n.ruta !== ruta) return '';
     const parecidos = n.apellido.trim().length >= 3
       ? ctx.jugadores.filter((j) => sinAcentos(j.apellido).startsWith(sinAcentos(n.apellido))).slice(0, 5) : [];
     return '<div class="nuevo-jugador"><div class="fila-2">' +
@@ -197,7 +210,7 @@ CDM.pantallas.adminPartido = (function () {
         '</div><div class="campo campo--min"><label>Min.</label><input type="number" inputmode="numeric" min="0" max="150" data-k="' + k + '.minuto" value="' + (g.minuto ?? '') + '" placeholder="–"></div></div>' +
         '<div class="pildoras" role="group" aria-label="Tipo de gol">' + TIPOS_GOL.map((t) =>
           '<button type="button" class="pildora" data-accion="tipo-gol" data-cat="' + ci + '" data-gol="' + gi + '" data-valor="' + t + '" aria-pressed="' + (g.tipo === t) + '">' + t + '</button>').join('') +
-        '</div>' + formNuevoJugador(ci, gi) + '</div>';
+        '</div>' + formNuevoJugador(k + '.jugador_id') + '</div>';
     }).join('');
 
     const lista = 'sug-' + e(s.rival_id);
@@ -218,6 +231,7 @@ CDM.pantallas.adminPartido = (function () {
       (c.goles.length ? '<div class="carga__grupo"><span class="campo__etiqueta">Goles de ' + e(propio().nombre_corto) + ' (' + c.goles.length + ')</span>' + golesPropios +
         (faltan ? '<p class="aviso-suave">' + (faltan === 1 ? 'Falta elegir 1 goleador.' : 'Faltan elegir ' + faltan + ' goleadores.') + ' Se puede guardar igual.</p>' : '') + '</div>' : '') +
       (c.rivales.length ? '<div class="carga__grupo">' + golesRival + '</div>' : '') +
+      seccionFormacion(ci, c) +
       '<div class="fila-2"><div class="campo"><label for="est-' + ci + '">Estado</label><select id="est-' + ci + '" data-k="cats.' + ci + '.estado" data-repinta="1">' +
       ESTADOS.map((x) => opcion(x, x, c.estado)).join('') + '</select></div>' +
       (c.gf == null && c.estado !== 'Programado'
@@ -227,6 +241,52 @@ CDM.pantallas.adminPartido = (function () {
       '<div class="fila-2"><div class="campo"><label for="hora-' + ci + '">Hora</label><input id="hora-' + ci + '" type="time" data-k="cats.' + ci + '.hora" value="' + e(c.hora) + '"></div>' +
       '<div class="campo"><label for="arb-' + ci + '">Árbitro</label><input id="arb-' + ci + '" data-k="cats.' + ci + '.arbitro" value="' + e(c.arbitro) + '" autocomplete="off"></div></div>' +
       '</section>';
+  }
+
+  // Último partido de la categoría con formación cargada, anterior a este (para copiar la formación).
+  function anteriorConFormacion(c) {
+    const s = ctx.s;
+    const clave = (p) => String(p.fecha || '') + String(p.torneo_orden).padStart(6, '0') + String(p.fecha_nro || 0).padStart(3, '0');
+    return ctx.partidos
+      .filter((p) => p.categoria === c.categoria && p.partido_id !== c.partido_id && ctx.conFormacion.has(p.partido_id) &&
+        (!s.fecha || !p.fecha || p.fecha < s.fecha))
+      .sort((a, b) => clave(b).localeCompare(clave(a)))[0];
+  }
+
+  function seccionFormacion(ci, c) {
+    const titulares = c.formacion.filter((f) => f.rol === 'Titular').length;
+    const repetidos = c.formacion.filter((f, i) => f.jugador_id && c.formacion.findIndex((x) => x.jugador_id === f.jugador_id) !== i).length;
+    const anterior = !c.formacion.length && anteriorConFormacion(c);
+    const filas = c.formacion.map((f, fi) => {
+      const k = 'cats.' + ci + '.formacion.' + fi;
+      const min = (campo, etiqueta) => '<div class="campo campo--min"><label>' + etiqueta + '</label><input type="number" inputmode="numeric" min="0" max="150" data-k="' +
+        k + '.' + campo + '" value="' + (f[campo] ?? '') + '" placeholder="–"></div>';
+      return '<div class="form-fila"><div class="form-fila__arriba"><span class="form-fila__nro">' + (fi + 1) + '</span>' +
+        '<div class="campo form-fila__jugador"><label class="oculto">Jugador ' + (fi + 1) + '</label>' + selectorJugador(k + '.jugador_id', c.categoria, f.jugador_id) + '</div></div>' +
+        '<div class="form-fila__abajo"><div class="campo"><label>Rol</label><select data-k="' + k + '.rol" data-repinta="1">' +
+        ROLES.map((r) => opcion(r, r === 'Convocado (suplente)' ? 'Convocado (no se sabe si entró)' : r, f.rol)).join('') + '</select></div>' +
+        (f.rol === 'Suplente que entró' ? min('minuto_entra', 'Entró') : '') +
+        (f.rol === 'Titular' || f.rol === 'Suplente que entró' ? min('minuto_sale', 'Salió') : '') +
+        '<label class="check"><input type="checkbox" data-k="' + k + '.capitan" data-capitan="' + ci + '"' + (f.capitan ? ' checked' : '') + '> Capitán</label>' +
+        '<label class="check"><input type="checkbox" data-k="' + k + '.amarilla"' + (f.amarilla ? ' checked' : '') + '> Amarilla</label>' +
+        '<button type="button" class="enlace-boton" data-accion="quitar-jugador" data-cat="' + ci + '" data-fila="' + fi + '">Quitar</button></div>' +
+        formNuevoJugador(k + '.jugador_id') + '</div>';
+    }).join('');
+    return '<details class="formacion-carga"' + (c.formacion.length ? ' open' : '') + '><summary>Formación (opcional)' +
+      (c.formacion.length ? ' · ' + ui.plural(titulares, 'titular', 'titulares') + ', ' + (c.formacion.length - titulares) + ' más' : '') + '</summary>' +
+      '<div class="formacion-carga__cuerpo">' +
+      (!c.formacion.length && c.categoria === 'Primera' && /formaci[oó]n\s*:/i.test(ctx.s.observaciones || '')
+        ? '<p class="aviso-suave">Las observaciones tienen la formación escrita. Pasala acá con "+ Titular" para que cuente en el plantel.</p>' : '') +
+      filas +
+      (repetidos ? '<p class="aviso-suave">Hay un jugador repetido en la formación. Corregilo antes de guardar.</p>' : '') +
+      (titulares > 11 ? '<p class="aviso-suave">Hay más de 11 titulares.</p>' : '') +
+      '<div class="botones-chicos">' +
+      '<button type="button" class="boton boton--borde" data-accion="agregar-jugador" data-cat="' + ci + '" data-rol="' + (titulares < 11 ? 'Titular' : 'Suplente que entró') + '">+ ' +
+      (titulares < 11 ? 'Titular' : 'Suplente') + '</button>' +
+      (titulares < 11 && c.formacion.length ? '' : '<button type="button" class="boton boton--borde" data-accion="agregar-jugador" data-cat="' + ci + '" data-rol="Convocado (suplente)">+ Convocado</button>') +
+      (anterior ? '<button type="button" class="boton boton--borde" data-accion="copiar-formacion" data-cat="' + ci + '" data-desde="' + e(anterior.partido_id) + '">Copiar de ' +
+        e(ui.instancia(anterior) + ' vs ' + anterior.rival) + '</button>' : '') +
+      '</div></div></details>';
   }
 
   function seccionIncidencias(numero) {
@@ -303,7 +363,9 @@ CDM.pantallas.adminPartido = (function () {
     let obj = ctx.s;
     partes.slice(0, -1).forEach((p) => { obj = obj[/^\d+$/.test(p) ? Number(p) : p]; });
     const ultimo = partes[partes.length - 1];
-    if (['minuto', 'pf', 'pc'].includes(ultimo)) valor = valor === '' ? null : Math.max(0, parseInt(valor, 10) || 0);
+    if (['minuto', 'pf', 'pc', 'minuto_entra', 'minuto_sale', 'camiseta'].includes(ultimo)) {
+      valor = valor === '' ? null : Math.max(0, parseInt(valor, 10) || 0);
+    }
     obj[ultimo] = valor;
   }
 
@@ -353,6 +415,14 @@ CDM.pantallas.adminPartido = (function () {
         incidencias: s.incidencias.filter((i) => i.categoria === c.categoria).map((i) => ({
           lado: i.lado, jugador_id: i.jugador_id || null, nombre: i.nombre.trim() || null, tipo: i.tipo, minuto: i.minuto,
           descripcion: i.descripcion.trim() || null
+        })).concat(c.formacion.filter((f) => f.jugador_id && f.amarilla).map((f) => ({
+          lado: 'propio', jugador_id: f.jugador_id, nombre: null, tipo: 'Amarilla', minuto: null, descripcion: null
+        }))),
+        formacion: c.formacion.filter((f) => f.jugador_id).map((f, i) => ({
+          jugador_id: f.jugador_id, rol: f.rol, nro_lista: i + 1, camiseta: f.camiseta,
+          minuto_entra: f.rol === 'Suplente que entró' ? f.minuto_entra : null,
+          minuto_sale: f.rol === 'Titular' || f.rol === 'Suplente que entró' ? f.minuto_sale : null,
+          capitan: !!f.capitan
         }))
       }))
     };
@@ -376,6 +446,8 @@ CDM.pantallas.adminPartido = (function () {
     const s = ctx.s;
     if (!s.rival_id) return mostrarError('Elegí el rival.');
     if (!s.cats.some((c) => c.incluida)) return mostrarError('Cargá al menos una categoría.');
+    const repetida = s.cats.find((c) => c.incluida && c.formacion.some((f, i) => f.jugador_id && c.formacion.findIndex((x) => x.jugador_id === f.jugador_id) !== i));
+    if (repetida) return mostrarError('En la formación de ' + repetida.categoria + ' hay un jugador repetido.');
     const hayResultado = s.cats.some((c) => c.incluida && (c.gf != null || (c.estado && c.estado !== 'Programado')));
     mostrarError('');
     const botones = vistaActual.querySelectorAll('[data-accion="guardar"]');
@@ -411,12 +483,12 @@ CDM.pantallas.adminPartido = (function () {
   async function crearJugador() {
     const n = ctx.s.nuevoJugador;
     if (!n.apellido.trim()) return mostrarError('Escribí el apellido del jugador nuevo.');
-    const cat = ctx.s.cats[n.ci].categoria;
+    const cat = ctx.s.cats[Number(n.ruta.split('.')[1])].categoria;
     try {
       const id = await CDM.api.admin.crearJugador(n.apellido.trim(), n.nombre.trim(), cat);
       ctx.jugadores.push({ jugador_id: id, apellido: n.apellido.trim(), nombre: n.nombre.trim() || null, division: cat });
       ctx.jugadores.sort((a, b) => nombreJugador(a).localeCompare(nombreJugador(b), 'es'));
-      ctx.s.cats[n.ci].goles[n.gi].jugador_id = id;
+      asignar(n.ruta, id);
       ctx.s.nuevoJugador = null;
       mostrarError('');
       pintar();
@@ -448,11 +520,28 @@ CDM.pantallas.adminPartido = (function () {
         break;
       }
       case 'quitar-incidencia': s.incidencias.splice(Number(b.dataset.inc), 1); break;
+      case 'agregar-jugador': s.cats[ci].formacion.push(filaFormacion(b.dataset.rol)); break;
+      case 'quitar-jugador': s.cats[ci].formacion.splice(Number(b.dataset.fila), 1); break;
+      case 'copiar-formacion': {
+        try {
+          const filas = await CDM.api.admin.formacionesDe([b.dataset.desde]);
+          s.cats[ci].formacion = filas.sort((x, y) => (x.nro_lista || 99) - (y.nro_lista || 99))
+            .map((f) => Object.assign(filaFormacion(f.rol), { jugador_id: f.jugador_id, capitan: !!f.capitan, camiseta: f.camiseta }));
+        } catch (err) {
+          return mostrarError(err.message || 'No se pudo copiar la formación.');
+        }
+        break;
+      }
       case 'cancelar-jugador': s.nuevoJugador = null; break;
       case 'crear-jugador': return crearJugador();
       case 'guardar': return guardar(b.dataset.publicar === '1', b);
       case 'borrar': return borrar();
-      case 'recuperar': ctx.s = ctx.recuperable; ctx.recuperable = null; await cargarNombresRival(); break;
+      case 'recuperar':
+        ctx.s = ctx.recuperable;
+        ctx.s.cats.forEach((c) => { c.formacion = c.formacion || []; });   // guardado con una versión anterior
+        ctx.recuperable = null;
+        await cargarNombresRival();
+        break;
       case 'descartar': borrarLocal(s); ctx.recuperable = null; break;
       default: {
         if (b.dataset.seg === 'condicion') {
@@ -480,8 +569,7 @@ CDM.pantallas.adminPartido = (function () {
     const k = el.dataset.k;
     if (!k) return;
     if (el.dataset.jugador && el.value === '__nuevo') {
-      const [, ci, , gi] = k.split('.');
-      ctx.s.nuevoJugador = { ci: Number(ci), gi: Number(gi), apellido: '', nombre: '' };
+      ctx.s.nuevoJugador = { ruta: k, apellido: '', nombre: '' };
       el.value = '';
       pintar();
       const ap = vistaActual.querySelector('#nj-ap');
@@ -489,7 +577,13 @@ CDM.pantallas.adminPartido = (function () {
       return;
     }
     const antesCancha = el.dataset.cancha ? canchaAutomatica() : null;
-    asignar(k, el.value);
+    asignar(k, el.type === 'checkbox' ? el.checked : el.value);
+    // Un solo capitán por categoría
+    if (el.dataset.capitan && el.checked) {
+      ctx.s.cats[Number(el.dataset.capitan)].formacion.forEach((f, i) => { if ('cats.' + el.dataset.capitan + '.formacion.' + i + '.capitan' !== k) f.capitan = false; });
+      guardarLocal();
+      return pintar();
+    }
     if (el.dataset.cancha && (!ctx.s.cancha || ctx.s.cancha === antesCancha)) ctx.s.cancha = canchaAutomatica();
     guardarLocal();
     if (el.dataset.estructura && ev.type === 'change') {
@@ -514,10 +608,11 @@ CDM.pantallas.adminPartido = (function () {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) { ctx = null; return acceso.html; }
     const api = CDM.api.admin;
-    const [partidos, equipos, torneos, jugadores, recientes] = await Promise.all([
-      api.partidos(), api.equipos(), api.torneos(), api.jugadores(), api.goleadoresRecientes()
+    const [partidos, equipos, torneos, jugadores, recientes, conFormacion] = await Promise.all([
+      api.partidos(), api.equipos(), api.torneos(), api.jugadores(), api.goleadoresRecientes(), api.partidosConFormacion()
     ]);
-    ctx = { admin: acceso.admin, partidos, equipos, torneos, jugadores, recientes, nombresRival: {}, prueba: query.get('prueba') === '1' };
+    ctx = { admin: acceso.admin, partidos, equipos, torneos, jugadores, recientes, conFormacion: new Set(conFormacion),
+      nombresRival: {}, prueba: query.get('prueba') === '1' };
 
     let torneoId, instancia, serie = '';
     const p = params.id !== 'nuevo' && partidos.find((x) => x.partido_id === params.id);
@@ -549,7 +644,7 @@ CDM.pantallas.adminPartido = (function () {
     vista.addEventListener('change', alCambiar);
     vista.addEventListener('input', (ev) => {
       const el = ev.target;
-      if (!el.dataset.k || el.tagName === 'SELECT') return;
+      if (!el.dataset.k || el.tagName === 'SELECT' || el.type === 'checkbox') return;
       asignar(el.dataset.k, el.value);
       guardarLocal();
       // Las sugerencias de jugadores parecidos se actualizan mientras se escribe el apellido
