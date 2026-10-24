@@ -633,7 +633,7 @@ CDM.pantallas.adminPartido = (function () {
     const incluir = ctx.s.cats.find((c) => c.categoria === query.get('incluir'));
     if (incluir) incluir.incluida = true;
     const titulo = ctx.s.existe && ctx.s.cats.some((c) => c.gf != null) ? 'Editar partido' : 'Cargar partido';
-    return CDM.admin.barra(titulo, acceso.admin, '#/admin') + '<form id="carga" class="carga-form" novalidate>' + formulario() + '</form>';
+    return CDM.admin.barra(titulo, acceso.admin, { volver: '#/admin' }) + '<form id="carga" class="carga-form" novalidate>' + formulario() + '</form>';
   }
 
   function montar(vista) {

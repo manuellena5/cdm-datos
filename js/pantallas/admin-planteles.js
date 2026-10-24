@@ -142,7 +142,7 @@ CDM.pantallas.adminPlanteles = (function () {
         '<button type="button" class="enlace-boton" data-quitar-lista="' + e(x.jugador_id) + '">Quitar</button></li>';
     }).join('');
 
-    return CDM.admin.barra('Planteles', acceso.admin, '#/admin') +
+    return CDM.admin.barra('Planteles', acceso.admin, { actual: 'planteles' }) +
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<section class="filtros" aria-label="Torneo">' +
       ui.selector('torneo', 'Torneo', torneos.map((t) => ({ valor: t.torneo_id, texto: t.nombre })), torneo.torneo_id) +

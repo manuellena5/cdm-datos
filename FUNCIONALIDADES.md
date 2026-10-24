@@ -2,6 +2,11 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.9.0 — Fase 6.5.0 (menú de administrador)
+- **Menú de administrador** fijo en todas las pantallas de admin (Panel · Resultados · Planteles · Jugadores · Equipos), con la pantalla actual marcada. Queda arriba al bajar por la página. En el celular es una fila con scroll horizontal que se acomoda sola para mostrar la pantalla actual. También está en la pantalla de carga de partido.
+- El Panel conserva sus acciones generales: Exportar a Excel, Ver sitio público y Salir.
+- **Resultados (admin)** (`#/admin/resultados`): por ahora una pantalla provisoria que remite al Panel; se completa en el punto 6.5.1.
+
 ## v0.8.0 — Listas de jugadores, exportar a Excel y app instalable
 - **Administrar → Planteles** (`#/admin/planteles`): lista de jugadores de cada torneo y categoría. Se pega la lista (un jugador por línea, "Apellido, Nombre", con el número de camiseta adelante si se tiene; también columnas copiadas de una planilla) o se sube un .txt/.csv. **Revisión** antes de guardar: cada línea se reconoce contra los jugadores existentes (sin importar acentos, mayúsculas ni el orden nombre-apellido) y se puede corregir; las que no coinciden quedan como jugador nuevo (con apellido y nombre editables) y se crean al guardar. Opción de usar la misma lista para el otro torneo del año. Muestra la lista actual (con quitar) y los que jugaron pero no están en la lista ("Agregarlos a la lista").
 - **Planteles** (público) incluye a los jugadores de la lista aunque no tengan partidos, con su número de camiseta.

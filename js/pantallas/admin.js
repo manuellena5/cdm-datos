@@ -51,17 +51,35 @@ CDM.admin = (function () {
       '<a class="ingreso__volver" href="#/resultados">Volver al historial</a></section>';
   }
 
-  function barra(titulo, admin, volver) {
+  // Menú de administrador (6.5.0): fijo en todas las pantallas de admin, con la actual marcada.
+  const MENU = [
+    ['panel', 'Panel', '#/admin'],
+    ['resultados', 'Resultados', '#/admin/resultados'],
+    ['planteles', 'Planteles', '#/admin/planteles'],
+    ['jugadores', 'Jugadores', '#/admin/jugadores'],
+    ['equipos', 'Equipos', '#/admin/equipos']
+  ];
+
+  function menu(actual) {
+    return '<nav class="menu-admin" aria-label="Administración"><div class="menu-admin__items">' +
+      MENU.map(([clave, texto, href]) => '<a href="' + href + '"' + (clave === actual ? ' aria-current="page"' : '') + '>' + texto + '</a>').join('') +
+      '</div></nav>';
+  }
+
+  // Encabezado de las pantallas de admin. opciones: { actual: clave del menú, volver: href (muestra la flecha) }.
+  // El Panel suma las acciones generales (exportar, sitio público, salir).
+  function barra(titulo, admin, opciones) {
+    const o = opciones || {};
     return '<header class="barra-admin">' +
-      (volver ? '<a href="' + volver + '" class="barra-admin__volver" aria-label="Volver al panel">' +
+      (o.volver ? '<a href="' + o.volver + '" class="barra-admin__volver" aria-label="Volver">' +
         '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></a>' : '') +
       '<div class="barra-admin__titulo"><h1>' + e(titulo) + '</h1><p>Modo administrador · ' + e(admin.nombre) + '</p></div>' +
       '<span class="pildora-admin">ADMIN</span>' +
-      (volver ? '' : '<div class="barra-admin__acciones"><a href="#/admin/planteles">Planteles</a><a href="#/admin/jugadores">Jugadores</a><a href="#/admin/equipos">Equipos</a>' +
+      (o.actual === 'panel' ? '<div class="barra-admin__acciones">' +
         '<button type="button" class="boton boton--claro" data-accion="exportar">Exportar a Excel</button>' +
         '<a href="#/resultados">Ver sitio público</a>' +
-        '<button type="button" class="boton boton--claro" data-accion="salir">Salir</button></div>') +
-      '</header>';
+        '<button type="button" class="boton boton--claro" data-accion="salir">Salir</button></div>' : '') +
+      '</header>' + menu(o.actual);
   }
 
   // Eventos comunes: ingresar, salir y mostrar la clave.
@@ -335,7 +353,7 @@ CDM.pantallas.admin = (function () {
     const grupos = CDM.admin.agrupar(partidos);
     const porId = Object.fromEntries(partidos.map((p) => [p.partido_id, p]));
     const aviso = CDM.admin.tomarAviso();
-    return CDM.admin.barra('Panel de carga', acceso.admin) +
+    return CDM.admin.barra('Panel de carga', acceso.admin, { actual: 'panel' }) +
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<div class="detalle"><div class="detalle__principal">' +
       '<section class="por-cargar-lista" aria-label="Para cargar"><h2 class="subtitulo">Para cargar</h2>' + paraCargar(grupos) + '</section>' +

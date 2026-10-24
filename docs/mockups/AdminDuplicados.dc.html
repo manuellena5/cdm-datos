@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Posibles duplicados – modo administrador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#062F5A}a:hover{color:#2D5BA3}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #062F5A; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #062F5A; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+      <div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1">JUGADORES</div>
+        <div style="font-size: 13px; color: #C9D4E8">Modo administrador · Manuel</div>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; background: #FFFFFF; color: #062F5A; border-radius: 999px; padding: 4px 10px">ADMIN</span>
+      <nav aria-label="Admin" style="margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap">
+        <a href="AdminPanel.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Panel</a>
+        <a href="AdminResultados.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Resultados</a>
+        <a href="AdminPlantel.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Planteles</a>
+        <a href="AdminDuplicados.dc.html" aria-current="page" style="color: #062F5A; background: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px">Jugadores</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 24px 24px 56px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <aside aria-label="Posibles duplicados" style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: #062F5A">Posibles duplicados</h2>
+      <div style="display: flex; gap: 0">
+        <button type="button" aria-pressed="true" style="height: 40px; padding: 0 12px; border: 1px solid #062F5A; background: #062F5A; color: #FFFFFF; border-radius: 8px 0 0 8px; font: 600 14px Barlow, sans-serif">Pendientes (6)</button>
+        <button type="button" aria-pressed="false" style="height: 40px; padding: 0 12px; border: 1px solid #C7CEDB; border-left: 0; background: #FFFFFF; color: #062F5A; border-radius: 0 8px 8px 0; font: 600 14px Barlow, sans-serif">Descartados (2)</button>
+      </div>
+      <ul style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+        <li style="list-style: none"><a href="AdminDuplicados.dc.html" aria-current="true" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 2px solid #062F5A; background: #EEF2F8; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Lencina, Emiliano</span><span style="font-weight: 700">Lencina, H.</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Nunca juntos</span></span></a></li><li style="list-style: none"><a href="AdminDuplicados.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid #DDE2EA; background: #FFFFFF; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Rubiolo</span><span style="font-weight: 700">Rubiolo, Matías</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Nunca juntos</span></span></a></li><li style="list-style: none"><a href="AdminDuplicados.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid #DDE2EA; background: #FFFFFF; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Bergamasco, Nicolás</span><span style="font-weight: 700">Bergamasco, Juan Carlos</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Nunca juntos</span></span></a></li><li style="list-style: none"><a href="AdminDuplicados.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid #DDE2EA; background: #FFFFFF; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Vijarra, Nahuel</span><span style="font-weight: 700">Vijarra, Ezequiel</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Nunca juntos</span></span></a></li><li style="list-style: none"><a href="AdminDuplicados.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid #DDE2EA; background: #FFFFFF; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Torres</span><span style="font-weight: 700">Torres, Emanuel</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Nunca juntos</span></span></a></li><li style="list-style: none"><a href="AdminDuplicados.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid #DDE2EA; background: #FFFFFF; text-decoration: none; color: #1A2233">
+            <span style="font-weight: 700">Fosarelli, Adrián</span><span style="font-weight: 700">Fossarelli, Antonio Ángel</span><span><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #EEF2F8; color: #2F3A4D; border: 1px solid #C7CEDB">Juntos en varios partidos · no pueden ser el mismo</span></span></a></li>
+      </ul>
+    </aside>
+
+    <section aria-label="Comparar" style="flex: 999 1 620px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 26px; color: #062F5A">¿Son el mismo jugador?</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px">
+        <div style="flex: 1 1 220px; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 14px">
+              <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">Lencina, Emiliano</div>
+              <div style="font-size: 14px; color: #4A5468">Apertura 2014</div>
+              <div style="font-size: 14px; margin-top: 4px">1 partido con datos · 1 gol</div>
+            </div>
+        <div style="flex: 1 1 220px; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 14px">
+              <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">Lencina, H.</div>
+              <div style="font-size: 14px; color: #4A5468">Apertura 2014</div>
+              <div style="font-size: 14px; margin-top: 4px">2 partidos con datos · 2 goles (1 de penal)</div>
+            </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: #E7F3EC; color: #1F5C3A; font-size: 15px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+        Nunca aparecen en el mismo partido, así que pueden ser la misma persona. Mismo apellido y mismo torneo.
+      </div>
+
+      <h3 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 20px">Partidos donde aparece cada uno</h3>
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: collapse; font-size: 15px">
+          <thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA">Partido</th><th style="text-align: center; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA">Lencina, Emiliano</th><th style="text-align: center; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA">Lencina, H.</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA"><span style="position: absolute; left: -9999px">Acciones</span></th></tr></thead>
+          <tbody><tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="font-weight: 600">Atl. Sastre 2 – 2 Dep. Mitre</div><div style="font-size: 13px; color: #4A5468">Apertura 2014 · Fecha 5 · Dom 20/04</div></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="font-size: 14px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #062F5A; color: #FFFFFF">Gol</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="color: #8A93A6">—</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="display: flex; gap: 6px; flex-wrap: wrap">
+                  <a href="Detalle.dc.html" style="height: 40px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; color: #062F5A; text-decoration: none; font-size: 14px; font-weight: 600">Ver partido</a>
+                  <button type="button" style="height: 40px; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Pasar el dato a Lencina, H.</button>
+                </div></td>
+              </tr><tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="font-weight: 600">Dep. Mitre 4 – 2 El Expreso</div><div style="font-size: 13px; color: #4A5468">Apertura 2014 · Fecha 11 · Dom 08/06</div></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="color: #8A93A6">—</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="font-size: 14px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #062F5A; color: #FFFFFF">Gol de penal</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="display: flex; gap: 6px; flex-wrap: wrap">
+                  <a href="Detalle.dc.html" style="height: 40px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; color: #062F5A; text-decoration: none; font-size: 14px; font-weight: 600">Ver partido</a>
+                  <button type="button" style="height: 40px; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Pasar el dato a Lencina, Emiliano</button>
+                </div></td>
+              </tr><tr>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="font-weight: 600">Dep. Mitre 1 – 1 Juv. Unida</div><div style="font-size: 13px; color: #4A5468">Apertura 2014 · Cuartos · Dom 29/06</div></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="color: #8A93A6">—</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center"><span style="font-size: 14px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #062F5A; color: #FFFFFF">Gol</span></td>
+                <td style="padding: 10px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><div style="display: flex; gap: 6px; flex-wrap: wrap">
+                  <a href="Detalle.dc.html" style="height: 40px; display: inline-flex; align-items: center; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; color: #062F5A; text-decoration: none; font-size: 14px; font-weight: 600">Ver partido</a>
+                  <button type="button" style="height: 40px; padding: 0 10px; border-radius: 6px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Pasar el dato a Lencina, Emiliano</button>
+                </div></td>
+              </tr></tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px">
+        <fieldset style="flex: 1 1 320px; border: 1px solid #DDE2EA; border-radius: 10px; padding: 14px 16px; margin: 0; display: flex; flex-direction: column; gap: 10px">
+          <legend style="padding: 0 6px; font-weight: 700; color: #062F5A">Son el mismo</legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Apellido<input type="text" value="Lencina" style="height: 44px; box-sizing: border-box; border: 1px solid #C7CEDB; border-radius: 8px; padding: 0 10px; font: 500 15px Barlow, sans-serif; color: #1A2233"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Nombre<input type="text" value="Emiliano H." style="height: 44px; box-sizing: border-box; border: 1px solid #C7CEDB; border-radius: 8px; padding: 0 10px; font: 500 15px Barlow, sans-serif; color: #1A2233"></label>
+          </div>
+          <p style="margin: 0; font-size: 14px; color: #4A5468">Quedan los 3 goles en un solo jugador. Queda registrado en el registro de cambios.</p>
+          <button type="button" style="height: 44px; border-radius: 8px; border: 0; background: #062F5A; color: #FFFFFF; font: 600 15px Barlow, sans-serif">Unir en un solo jugador</button>
+        </fieldset>
+        <fieldset style="flex: 1 1 260px; border: 1px solid #DDE2EA; border-radius: 10px; padding: 14px 16px; margin: 0; display: flex; flex-direction: column; gap: 10px">
+          <legend style="padding: 0 6px; font-weight: 700; color: #062F5A">No son el mismo</legend>
+          <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Por qué (opcional)<input type="text" placeholder="Ej.: son hermanos" style="height: 44px; box-sizing: border-box; border: 1px solid #C7CEDB; border-radius: 8px; padding: 0 10px; font: 500 15px Barlow, sans-serif"></label>
+          <p style="margin: 0; font-size: 14px; color: #4A5468">El par no vuelve a aparecer como posible duplicado.</p>
+          <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 15px Barlow, sans-serif">Descartar</button>
+        </fieldset>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a href="AdminPlantel.dc.html" style="height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; text-decoration: none; font-weight: 600; font-size: 15px">Editar datos de Lencina, Emiliano</a>
+        <a href="AdminPlantel.dc.html" style="height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; text-decoration: none; font-weight: 600; font-size: 15px">Editar datos de Lencina, H.</a>
+        <button type="button" style="height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 15px Barlow, sans-serif; margin-left: auto">Decidir después</button>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1360}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@ CDM.pantallas.adminEquipos = (function () {
     const equipos = await CDM.api.admin.equipos();
     const aviso = CDM.admin.tomarAviso();
     const sinEscudo = equipos.filter((x) => !x.escudo && !x.es_propio).length;
-    return CDM.admin.barra('Equipos', acceso.admin, '#/admin') +
+    return CDM.admin.barra('Equipos', acceso.admin, { actual: 'equipos' }) +
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<p class="form-error" role="alert" hidden></p>' +
       '<section class="tarjeta" aria-label="Escudos"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Escudos</h2>' +

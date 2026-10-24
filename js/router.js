@@ -14,7 +14,8 @@ CDM.router = (function () {
     { patron: /^\/admin\/partido\/([^/]+)$/, pantalla: 'adminPartido', claves: ['id'] },
     { patron: /^\/admin\/jugadores$/, pantalla: 'adminJugadores' },
     { patron: /^\/admin\/equipos$/, pantalla: 'adminEquipos' },
-    { patron: /^\/admin\/planteles$/, pantalla: 'adminPlanteles' }
+    { patron: /^\/admin\/planteles$/, pantalla: 'adminPlanteles' },
+    { patron: /^\/admin\/resultados$/, pantalla: 'adminResultados' }
   ];
   const RUTA_INICIAL = '#/resultados';
 
@@ -81,6 +82,9 @@ CDM.router = (function () {
     vista.innerHTML = (CDM.api.usandoGuardados && !fallo ? CDM.ui.avisoGuardados() : '') + html;
     contenedor.replaceChildren(vista);
     if (pantalla.montar) pantalla.montar(vista, destino.params, query);
+    // Menú de admin en el celular: que se vea el ítem de la pantalla actual
+    const actualMenu = vista.querySelector('.menu-admin [aria-current="page"]');
+    if (actualMenu) actualMenu.parentElement.scrollLeft = actualMenu.offsetLeft - 12;
     if (!mismaRuta) window.scrollTo(0, 0);
   }
 

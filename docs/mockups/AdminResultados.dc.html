@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Resultados – modo administrador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#062F5A}a:hover{color:#2D5BA3}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #062F5A; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #062F5A; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+      <div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1">RESULTADOS</div>
+        <div style="font-size: 13px; color: #C9D4E8">Modo administrador · Manuel</div>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; background: #FFFFFF; color: #062F5A; border-radius: 999px; padding: 4px 10px">ADMIN</span>
+      <nav aria-label="Admin" style="margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap">
+        <a href="AdminPanel.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Panel</a>
+        <a href="AdminResultados.dc.html" aria-current="page" style="color: #062F5A; background: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px">Resultados</a>
+        <a href="AdminPlantel.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Planteles</a>
+        <a href="AdminDuplicados.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Jugadores</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 24px 24px 56px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Año
+            <select style="height: 44px; min-width: 130px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"><option>2011</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Torneo
+            <select style="height: 44px; min-width: 130px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"><option>Clausura</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Categoría
+            <select style="height: 44px; min-width: 130px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"><option>Primera</option></select></label>
+      <fieldset style="border: 0; padding: 0; margin: 0 0 0 auto; display: flex; gap: 0">
+        <legend style="font-size: 13px; font-weight: 600; color: #4A5468; padding: 0 0 4px">Mostrar</legend>
+        <button type="button" aria-pressed="true" style="height: 44px; padding: 0 16px; border: 1px solid #062F5A; background: #062F5A; color: #FFFFFF; border-radius: 8px 0 0 8px; font: 600 14px Barlow, sans-serif">Todas las fechas</button>
+        <button type="button" aria-pressed="false" style="height: 44px; padding: 0 16px; border: 1px solid #C7CEDB; border-left: 0; background: #FFFFFF; color: #062F5A; border-radius: 0 8px 8px 0; font: 600 14px Barlow, sans-serif">Solo lo que falta</button>
+      </fieldset>
+    </div>
+
+    <section aria-label="Estado del torneo" style="background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: center">
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; color: #062F5A">Clausura 2011 · Primera</div>
+      <div style="font-size: 15px"><strong>14</strong> fechas</div>
+      <div style="font-size: 15px"><strong>11</strong> partidos cargados</div>
+      <div style="font-size: 15px"><strong>1</strong> libre</div>
+      <div style="font-size: 15px; color: #7A4300"><strong>2</strong> fechas sin partido</div>
+      <div style="font-size: 15px; color: #7A4300"><strong>2</strong> partidos con datos que faltan</div>
+      <div style="font-size: 15px; margin-left: auto">Pts <strong>13</strong> · PJ 11 · G 4 · E 1 · P 6</div>
+    </section>
+
+    <ol style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+                <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 1</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 10/07</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span>Juv. Guadalupe</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">4 – 1</span>
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: F. Villagrán · Reserva 0-2</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #EEF2F8; color: #2F3A4D; border: 1px solid #C7CEDB">Fecha aproximada</span></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 1" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFBF5; border: 2px dashed #E3A55B; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+          <div style="width: 72px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #7A4300">Fecha 2</div>
+          <div style="flex: 1 1 260px; font-size: 15px; color: #4A5468">No hay partido cargado. Por la tabla, Mitre no sumó puntos esta fecha.</div>
+          <span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #FFF4E5; color: #7A4300; border: 1px solid #F0C48A">Posible libre</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <a href="AdminCarga.dc.html" style="height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 8px; background: #062F5A; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px">Cargar partido</a>
+            <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Marcar libre</button>
+          </div>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 3</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 31/07</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">1 – 2</span>
+              <span>Americano</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: Acosta · Reserva 2-2</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #EEF2F8; color: #2F3A4D; border: 1px solid #C7CEDB">Fecha aproximada</span></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 3" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 4</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 07/08</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span>Unión (LC)</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">1 – 2</span>
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: Espinoza, F. Villagrán · Reserva 1-0</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 4" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFBF5; border: 2px dashed #E3A55B; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+          <div style="width: 72px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #7A4300">Fecha 5</div>
+          <div style="flex: 1 1 260px; font-size: 15px; color: #4A5468">No hay partido cargado ni datos de esta fecha.</div>
+          <span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #FFF4E5; color: #7A4300; border: 1px solid #F0C48A">Pendiente</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <a href="AdminCarga.dc.html" style="height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 8px; background: #062F5A; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 14px">Cargar partido</a>
+            <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Marcar libre</button>
+          </div>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 6</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 28/08</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span>Juv. Unida</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">2 – 3</span>
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: F. Villagrán, N. Zucco, D. Fosarelli · Reserva 1-1</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 6" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 7</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 04/09</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">1 – 3</span>
+              <span>Piamonte</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: Acosta · Reserva 3-3</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 7" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #F7F8FB; border: 1px dashed #C7CEDB; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px">
+          <div style="width: 72px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #4A5468">Fecha 8</div>
+          <div style="flex: 1 1 260px; color: #4A5468; font-size: 15px">Dep. Mitre <strong>libre</strong> · marcado por Manuel el 23/10</div>
+          <span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #EEF2F8; color: #2F3A4D; border: 1px solid #C7CEDB">Libre</span>
+          <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Deshacer</button>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 9</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 11/09</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">3 – 3</span>
+              <span>Juv. Guadalupe</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #E3E7EE; color: #2F3A4D; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">E</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: Acosta ×2, Fosarelli · Reserva 2-3</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #E7F3EC; color: #1F5C3A; border: 1px solid #A9D3B8">Con formación</span></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 9" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 10</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 18/09</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">0 – 1</span>
+              <span>Trebolense</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: — · Reserva 0-4</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 10" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 11</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 02/10</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">2 – 1</span>
+              <span>Unión (LC)</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: N. Zucco, Bergamasco · Reserva 4-1</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 11" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 12</div>
+            <div style="font-size: 13px; color: #4A5468">Sáb 08/10</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span>Atl. San Jorge</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">1 – 2</span>
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: N. Zucco, Quiroga · Reserva 4-2</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 12" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #F0C48A; box-shadow: inset 4px 0 0 #E3A55B; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 13</div>
+            <div style="font-size: 13px; color: #4A5468">Dom 16/10</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">0 – 3</span>
+              <span>Juv. Unida</span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: — · Reserva 1-3</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #FFF4E5; color: #7A4300; border: 1px solid #F0C48A">Sin árbitro</span></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 13" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+        <li style="list-style: none; background: #FFFFFF; border: 1px solid #F0C48A; box-shadow: inset 4px 0 0 #E3A55B; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+          <div style="width: 72px">
+            <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px">Fecha 14</div>
+            <div style="font-size: 13px; color: #4A5468">Vie 28/10</div>
+          </div>
+          <div style="flex: 1 1 340px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">
+              <span>Piamonte</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 1px">2 – 1</span>
+              <span><strong>Dep. Mitre</strong></span>
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span>
+            </div>
+            <div style="font-size: 13px; color: #4A5468; margin-top: 2px">Goles: Miño · Reserva 5-1</div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; flex: 0 1 260px; justify-content: flex-end"><span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #FFF4E5; color: #7A4300; border: 1px solid #F0C48A">Reserva dudosa</span> <span style="font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #FFF4E5; color: #7A4300; border: 1px solid #F0C48A">Falta 1 goleador del rival</span></div>
+          <a href="AdminCarga.dc.html" aria-label="Editar partido de la fecha 14" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #C7CEDB; color: #062F5A; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></a>
+        </li>
+    </ol>
+
+    <section aria-label="Playoff" style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 4px 0 0; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #062F5A">Después de la fase regular</h2>
+      <div style="background: #F7F8FB; border: 1px dashed #C7CEDB; border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center">
+        <div style="flex: 1 1 300px; font-size: 15px; color: #4A5468">Mitre no clasificó. Si jugó algún partido más (repechaje, copa), se agrega acá.</div>
+        <a href="AdminCarga.dc.html" style="height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; text-decoration: none; font-weight: 600; font-size: 14px">+ Partido de playoff</a>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1560}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

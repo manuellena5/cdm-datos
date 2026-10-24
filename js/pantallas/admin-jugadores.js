@@ -104,7 +104,7 @@ CDM.pantallas.adminJugadores = (function () {
     editando = null;
     const dups = duplicados();
     const aviso = CDM.admin.tomarAviso();
-    return CDM.admin.barra('Jugadores', acceso.admin, '#/admin') +
+    return CDM.admin.barra('Jugadores', acceso.admin, { actual: 'jugadores' }) +
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<p class="form-error" role="alert" hidden></p>' +
       '<section class="tarjeta" aria-label="Posibles duplicados"><details' + (dups.length ? '' : ' disabled') + '><summary class="tarjeta__titulo tarjeta__titulo--chico">Posibles duplicados (' + dups.length + ')</summary>' +

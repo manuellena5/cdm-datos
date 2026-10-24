@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Plantel – modo administrador</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#062F5A}a:hover{color:#2D5BA3}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #062F5A; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #062F5A; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+      <div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1">PLANTELES</div>
+        <div style="font-size: 13px; color: #C9D4E8">Modo administrador · Manuel</div>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; background: #FFFFFF; color: #062F5A; border-radius: 999px; padding: 4px 10px">ADMIN</span>
+      <nav aria-label="Admin" style="margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap">
+        <a href="AdminPanel.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Panel</a>
+        <a href="AdminResultados.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Resultados</a>
+        <a href="AdminPlantel.dc.html" aria-current="page" style="color: #062F5A; background: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px">Planteles</a>
+        <a href="AdminDuplicados.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 600; font-size: 15px">Jugadores</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1120px; margin: 0 auto; padding: 24px 24px 56px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Año
+          <select style="height: 44px; min-width: 120px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>2014</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Torneo
+          <select style="height: 44px; min-width: 120px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>Apertura</option></select></label>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Categoría
+          <select style="height: 44px; min-width: 120px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>Primera</option></select></label>
+      <div style="margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap">
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Copiar plantel de Clausura 2013</button>
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Pegar lista o CSV</button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section aria-label="Plantel" style="flex: 999 1 640px; min-width: 0; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px">
+          <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: #062F5A">Plantel Apertura 2014 · Primera</h2>
+          <span style="font-size: 14px; color: #4A5468">11 jugadores · 2 con algo para revisar · Los cambios se guardan solos</span>
+        </div>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px">
+            <thead><tr><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap"><span style="position: absolute; left: -9999px">En plantel</span></th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap">Apellido</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap">Nombre</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap">Puesto</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap">Apodo</th><th style="text-align: center; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA">Goles</th><th style="text-align: center; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA">Rojas</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap">Por qué está</th><th style="text-align: left; padding: 10px 8px; font-size: 13px; font-weight: 700; color: #4A5468; border-bottom: 2px solid #DDE2EA; white-space: nowrap"><span style="position: absolute; left: -9999px">Acciones</span></th></tr></thead>
+            <tbody>
+            <tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Aguirre" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Aguirre" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Diego" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option selected>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">5</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Aguirre del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Fosarelli" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Fosarelli" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Adrián" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option selected>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">5</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Fosarelli del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Lencina" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Lencina" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Emiliano" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option selected>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Lencina del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style=" background: #FFFBF5;">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Lencina" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Lencina" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"><div style="font-size: 12px; color: #7A4300; margin-top: 2px">¿Mismo que Lencina, Emiliano? <a href="AdminDuplicados.dc.html">Revisar</a></div></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="H." placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option selected>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">2</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Lencina del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Beltramo" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Beltramo" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Fernando" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option>Defensor</option><option selected>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Beltramo del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Vijarra" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Vijarra" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Ezequiel" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option selected>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles y roja</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Vijarra del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Torres" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Torres" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Emanuel" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option selected>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Torres del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Tini" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Tini" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Lisandro" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option selected>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Roja</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Tini del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Mendoza" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Mendoza" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Maximiliano" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option selected>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Roja</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Mendoza del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style="">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Vázquez" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Vázquez" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Jonathan" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>—</option><option>Arquero</option><option selected>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">1</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Roja</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Vázquez del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr><tr style=" background: #FFFBF5;">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" checked aria-label="En el plantel: Mena" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="Mena" placeholder="" aria-label="Apellido" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"><div style="font-size: 12px; color: #7A4300; margin-top: 2px">Falta el nombre</div></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option selected>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700">·</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Penal errado (cuartos)</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" aria-label="Quitar a Mena del plantel" style="width: 40px; height: 40px; border-radius: 6px; border: 1px solid #DDE2EA; background: #FFFFFF; color: #4A5468; display: inline-flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></td>
+            </tr>
+            <tr style="background: #F7F9FC">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">
+                <div style="position: relative">
+                  <input type="text" value="Lenc" placeholder="" aria-label="Apellido del jugador nuevo" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF">
+                  <div role="listbox" aria-label="Jugadores parecidos" style="position: absolute; top: 44px; left: 0; z-index: 2; width: 300px; background: #FFFFFF; border: 1px solid #C7CEDB; border-radius: 8px; box-shadow: 0 6px 18px rgba(6,47,90,0.12); padding: 4px">
+                    <div role="option" style="padding: 9px 10px; border-radius: 6px; background: #EEF2F8">Lencina, Emiliano <span style="color: #4A5468; font-size: 13px">· 2014 · ya está</span></div>
+                    <div role="option" style="padding: 9px 10px">Lencina, Nicolás <span style="color: #4A5468; font-size: 13px">· 2026</span></div>
+                    <div role="option" style="padding: 9px 10px; color: #062F5A; font-weight: 600; border-top: 1px solid #EEF1F5">+ Crear jugador nuevo "Lenc…"</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Nombre" aria-label="Nombre" style="width: 130px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><select aria-label="Puesto" style="height: 40px; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 6px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option selected>—</option><option>Arquero</option><option>Defensor</option><option>Volante</option><option>Delantero</option></select></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="text" value="" placeholder="Apodo" aria-label="Apodo" style="width: 90px; height: 40px; box-sizing: border-box; border: 1px solid #DDE2EA; border-radius: 6px; padding: 0 8px; font: 500 15px Barlow, sans-serif; color: #1A2233; background: #FFFFFF"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700"></td><td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px; color: #4A5468">Nuevo</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="button" style="align-self: flex-start; height: 44px; padding: 0 16px; border-radius: 8px; border: 1px dashed #062F5A; background: #FFFFFF; color: #062F5A; font: 600 15px Barlow, sans-serif; margin-top: 64px">+ Agregar fila</button>
+
+        <h3 style="margin: 14px 0 0; font-family: 'Barlow Condensed', sans-serif; font-size: 20px; color: #062F5A">Sugeridos · jugaron el torneo anterior y no tienen datos en este</h3>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; border-collapse: collapse; font-size: 15px">
+            <tbody><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Rubiolo" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Rubiolo</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Matías</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · 1 roja</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Háquin" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Háquin</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Nicolás</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · 2 goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Bergamasco" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Bergamasco</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Juan Carlos</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · 2 goles</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Acosta" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Acosta</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Gonzalo</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · 1 gol</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Ellena" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Ellena</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Martín</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · formación</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Astorga" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Astorga</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">M.</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · formación</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr><tr style="color: #4A5468">
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><input type="checkbox" aria-label="Sumar a Vidal" style="width: 22px; height: 22px; accent-color: #062F5A"></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">Vidal</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle">G.</td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle" colspan="4"><span style="font-size: 13px">Clausura 2013 · formación</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><span style="font-size: 13px">Torneo anterior</span></td>
+              <td style="padding: 6px 8px; border-bottom: 1px solid #EEF1F5; vertical-align: middle"><button type="button" style="height: 40px; padding: 0 12px; border-radius: 6px; border: 1px solid #062F5A; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar</button></td>
+            </tr></tbody>
+          </table>
+        </div>
+        <button type="button" style="align-self: flex-start; height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar los marcados</button>
+      </section>
+
+      <aside aria-label="Pegar lista" style="flex: 1 1 280px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #062F5A">Pegar lista o CSV</h2>
+        <p style="margin: 0; font-size: 14px; color: #4A5468">Un jugador por línea: apellido, nombre y puesto (opcional). También sirve copiar columnas desde Excel.</p>
+        <label style="font-size: 13px; font-weight: 600; color: #4A5468">Lista
+          <textarea rows="6" style="margin-top: 4px; width: 100%; box-sizing: border-box; border: 1px solid #C7CEDB; border-radius: 8px; padding: 8px; font: 500 14px/1.5 Barlow, sans-serif">Aguirre, Diego, Delantero
+Rubiolo, Matías, Volante
+Peretti, D., Arquero
+Caro, Juan</textarea></label>
+        <button type="button" style="height: 44px; border-radius: 8px; border: 0; background: #062F5A; color: #FFFFFF; font: 600 15px Barlow, sans-serif">Previsualizar</button>
+        <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px">
+          <li style="padding: 8px 10px; border-radius: 6px; background: #E7F3EC; color: #1F5C3A">Aguirre, Diego · ya está en el plantel</li>
+          <li style="padding: 8px 10px; border-radius: 6px; background: #EEF2F8">Rubiolo, Matías · existe, se suma</li>
+          <li style="padding: 8px 10px; border-radius: 6px; background: #FFF4E5; color: #7A4300">Peretti, D. · parecido a <strong>Peretti, D.</strong> (2011–2013). ¿Es él?</li>
+          <li style="padding: 8px 10px; border-radius: 6px; background: #EEF2F8">Caro, Juan · existe (Clausura 2014), se suma</li>
+        </ul>
+        <button type="button" style="height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Sumar 3 al plantel</button>
+      </aside>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

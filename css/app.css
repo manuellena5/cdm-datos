@@ -456,6 +456,41 @@ h1, h2, h3 { font-family: var(--f-titulo); font-weight: 700; color: var(--azul);
 .barra-admin__acciones { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .barra-admin__acciones a { color: #FFFFFF; font-weight: 600; font-size: 15px; padding: 10px 8px; }
 
+/* Menú de administrador: fijo arriba al hacer scroll; en el celular, una fila con scroll horizontal */
+.menu-admin {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  margin-top: -12px;
+  background: var(--fondo);
+  padding: 8px 0;
+}
+.menu-admin__items {
+  display: flex;
+  gap: 4px;
+  background: var(--azul);
+  border-radius: var(--radio);
+  padding: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.menu-admin__items::-webkit-scrollbar { display: none; }
+.menu-admin a {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.menu-admin a:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
+.menu-admin a[aria-current="page"] { background: #FFFFFF; color: var(--azul); font-weight: 700; }
+
 /* Panel */
 .tarjeta__cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 10px; }
 .tarjeta__cabeza .tarjeta__titulo { margin: 0; }
@@ -772,6 +807,9 @@ details[disabled] summary { cursor: default; }
 
   .ingreso { margin: -20px -16px 0; width: auto; max-width: none; border-radius: 0; padding: 28px 24px; }
   .barra-admin { margin: -20px -16px 0; border-radius: 0; padding: 12px 16px; }
+  .menu-admin { margin: -16px -16px 0; padding: 0; }
+  .menu-admin__items { border-radius: 0; padding: 4px 12px 8px; }
+  .menu-admin a { padding: 0 14px; font-size: 14px; }
   .barra-admin__titulo h1 { font-size: 22px; }
   .barra-admin__titulo { flex: 1; }
   .barra-admin__acciones { margin-left: 0; width: 100%; justify-content: space-between; }

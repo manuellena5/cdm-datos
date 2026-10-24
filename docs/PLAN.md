@@ -3,6 +3,7 @@ Plan de desarrollo por fases para trabajar con Claude Code.
 
 > Cómo usar este documento: pedile a Claude Code **una fase por vez** ("Hacé la Fase 1 de docs/PLAN.md").
 > Cada fase tiene alcance, entregables y criterios de aceptación. No avanzar a la siguiente sin cerrar los criterios de la anterior.
+> **Estado (24/10/2026):** Fases 0 a 6 hechas. Sigue la **Fase 6.5**; la 7 queda para más adelante.
 
 ---
 
@@ -286,6 +287,56 @@ Hoy hay formaciones solo del Clausura 2023 y algunas de 2011–2013 escritas en 
 3. **Carga de formación** en la pantalla de partido: titulares, suplentes que entraron con su minuto, capitán y amarillas por jugador.
 4. **Planteles** (`#/planteles`): plantel por torneo y categoría, armado con formaciones y goleadores, con las estadísticas de cada uno (partidos, titularidades, minutos si están, goles y tarjetas). El ítem "Planteles · pronto" del menú pasa a estar activo.
 5. Sanciones desde los boletines del Tribunal de Penas.
+
+---
+
+## Fase 6.5 — Herramientas de revisión en modo administrador
+
+Referencia visual: mockups **9, 10 y 11** (`docs/mockups/AdminResultados.dc.html`, `AdminPlantel.dc.html` y `AdminDuplicados.dc.html`). Reemplaza la pantalla de planteles actual (`admin-planteles.js`) y la sección de posibles duplicados de `admin-jugadores.js`. Se usa lo que ya existe: `fechas_libres`, `torneos.fechas_regular`, `v_fechas_faltantes`, `planteles`, `unir_jugadores()` y la auditoría.
+
+Hacer en este orden, un punto por vez ("Hacé el punto 6.5.1 de docs/PLAN.md").
+
+### 6.5.0 Menú de administrador
+- Barra fija en todas las pantallas de admin: **Panel · Resultados · Planteles · Jugadores** (más Equipos si ya existe), con la pantalla actual marcada. En el celular pasa a una fila con scroll horizontal.
+
+### 6.5.1 Resultados en modo administrador (`#/admin/resultados`) — mockup 9
+- Los mismos filtros que la consulta (año, torneo, categoría, guardados en la URL) y la misma tarjeta de partido, más un **lápiz** que abre `#/admin/partido/:id` con todo lo cargado (goles de los dos lados, incidencias, formación, árbitro, fuentes) para corregir o agregar.
+- Incluye borradores (con su etiqueta) y todas las fases: regular, playoff, copas.
+- **Todas las fechas de la fase regular, sin saltos**, de 1 a `fechas_regular` (o hasta la última cargada si está vacío; poder fijar la cantidad desde la misma pantalla). Cada fecha sin partido muestra una fila punteada en su lugar:
+  - **Posible libre**: no hay partido, y la tabla (`posiciones`) o el conteo de fechas indica que Mitre no sumó o no jugó esa fecha. Es una sugerencia, no se guarda sola.
+  - **Pendiente**: no hay partido ni indicios.
+  - **Libre** / **No se jugó**: ya marcada en `fechas_libres`, con quién y cuándo, y "Deshacer".
+  - Botones "Cargar partido" (abre la carga con torneo y fecha ya elegidos) y "Marcar libre".
+- **Partidos con datos que faltan**: marca naranja al costado y etiquetas por cada faltante, tomadas de `v_faltantes` (goleadores de Mitre o del rival que no suman, sin árbitro, falta Reserva o Primera de esa fecha, resultado inferido, programado vencido). Las etiquetas informativas (fecha aproximada, con formación) van en gris o verde y no cuentan como faltantes. "Fecha aproximada" sale de las observaciones del importador; si conviene, agregar una columna `fecha_aproximada boolean` a `partidos` (avisar el impacto antes).
+- Arriba, un **resumen del torneo**: fechas, partidos cargados, libres, fechas sin partido, partidos con faltantes, y Pts/PJ/G/E/P. Selector **"Todas las fechas / Solo lo que falta"**.
+- Desde el Panel, el bloque "Datos que faltan" lleva a esta pantalla ya filtrada.
+
+### 6.5.2 Plantel del torneo en tabla (`#/admin/planteles`) — mockup 10
+- Filtros año, torneo y categoría. Una **tabla editable**, una fila por jugador: incluido (tilde), apellido, nombre, puesto, apodo (y camiseta si se usa), goles y rojas del torneo (solo lectura) y **"por qué está"** (goles, roja, formación, lista cargada, nuevo).
+- Viene **precargada** con todos los jugadores que tienen algún dato en ese torneo y categoría (goles, incidencias, formaciones) más los que ya están en `planteles`. Destildar = sacarlo de la lista (no borra al jugador ni sus datos).
+- Editar apellido o nombre en la tabla corrige al jugador (con aviso si el cambio afecta a otros torneos: "Este jugador aparece también en 2013 y 2015").
+- Filas marcadas para revisar: sin nombre, o posible duplicado (link a 6.5.3 con ese par abierto).
+- **"+ Agregar fila"**: al escribir el apellido sugiere jugadores existentes (sin acentos ni mayúsculas, mostrando los años en que aparecen) y ofrece "Crear jugador nuevo". Teclado: Enter pasa a la fila siguiente.
+- **Sugeridos**: jugadores del torneo anterior de la misma categoría que no tienen datos en este, con "Sumar" y "Sumar los marcados".
+- **"Copiar plantel de…"** otro torneo.
+- **"Pegar lista o CSV"** (panel al costado): un jugador por línea, "apellido, nombre, puesto" o columnas copiadas de Excel. La previsualización dice por línea: ya está en el plantel, existe y se suma, parecido a otro (elegir cuál o crear nuevo), o nuevo. Nada se guarda hasta confirmar.
+- Guardado automático por fila, con aviso discreto "Guardado". Todo pasa por la auditoría.
+
+### 6.5.3 Posibles duplicados (`#/admin/jugadores/duplicados`) — mockup 11
+- Tabla nueva **`jugadores_distintos`** (`jugador_a`, `jugador_b`, `motivo`, `creado_en`, `creado_por`; clave por el par ordenado) para guardar los pares descartados. Explicar el impacto antes: es una tabla nueva, no rompe nada; `unir_jugadores` tiene que borrar los pares del jugador que desaparece.
+- Vista o función `v_posibles_duplicados`: pares con el mismo apellido normalizado (sin acentos, sin mayúsculas, y variantes de una letra como Fosarelli/Fossarelli), que no estén en `jugadores_distintos`. Por cada par: años de cada uno, cantidad de partidos con datos y **en cuántos partidos aparecen juntos** (goles, incidencias, formación o plantel del mismo partido/torneo). Si coinciden en algún partido, se marca "no pueden ser el mismo" y va al final.
+- Pantalla con dos columnas:
+  - Izquierda: pares **Pendientes** y **Descartados** (con "Volver a pendientes").
+  - Derecha: los dos jugadores lado a lado (años, partidos, goles), el mensaje "Nunca aparecen en el mismo partido" o "Coinciden en N partidos", y una **tabla de los partidos donde aparece cada uno**, en orden de fecha, con qué dato tiene cada uno en ese partido (gol, penal, roja, titular…), "Ver partido" y **"Pasar el dato al otro"** (mueve ese gol, incidencia o fila de formación de un jugador al otro, sin unirlos).
+  - Acciones: **Son el mismo** (elegir apellido y nombre final, usa `unir_jugadores`), **No son el mismo** (motivo opcional, guarda en `jugadores_distintos`), **Editar datos** de cada uno, y **Decidir después**.
+- El contador "Posibles duplicados (N)" en el Panel y en Jugadores cuenta solo los pendientes.
+
+**Criterios de aceptación de la 6.5**
+- En Clausura 2011 Primera se ven las 14 fechas en orden, con F2, F5 y F8 sin partido; marcar F8 como libre la saca de pendientes en el Panel y "Deshacer" la vuelve a poner.
+- Desde el lápiz se corrige un goleador de un partido de 2014 y el cambio aparece en Resultados, Goleadores y la ficha del jugador.
+- El plantel de Apertura 2014 Primera aparece precargado con los jugadores que tienen goles o rojas ese torneo; se agrega uno con "+ Agregar fila", otro con "Pegar lista", y uno de los sugeridos.
+- Un par descartado no vuelve a aparecer; uno unido deja todos los goles en el que queda; "Pasar el dato al otro" mueve un solo gol.
+- Todo funciona a 390 px de ancho.
 
 ---
 
