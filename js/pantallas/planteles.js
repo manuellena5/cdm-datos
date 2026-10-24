@@ -20,13 +20,16 @@ CDM.pantallas.planteles = (function () {
     // Sumar por jugador (si es "Todo el año", junta los torneos del año)
     const porJugador = new Map();
     plantel.filter(enSel).forEach((x) => {
-      if (!porJugador.has(x.jugador_id)) porJugador.set(x.jugador_id, { jugador_id: x.jugador_id, jugador: x.jugador, partidos: 0, titular: 0, entro: 0, convocado: 0, goles: 0, amarillas: 0, rojas: 0, minutos: 0, conMinutos: false });
+      if (!porJugador.has(x.jugador_id)) porJugador.set(x.jugador_id, { jugador_id: x.jugador_id, jugador: x.jugador, partidos: 0, titular: 0, entro: 0, convocado: 0, goles: 0, amarillas: 0, rojas: 0, minutos: 0, conMinutos: false, enLista: false, camiseta: null });
       const j = porJugador.get(x.jugador_id);
+      if (x.en_lista) { j.enLista = true; if (x.camiseta != null && j.camiseta == null) j.camiseta = x.camiseta; }
       ['partidos', 'titular', 'entro', 'convocado', 'goles', 'amarillas', 'rojas'].forEach((k) => { j[k] += num(x[k]); });
       if (x.minutos != null) { j.minutos += num(x.minutos); j.conMinutos = true; }
     });
     const lista = [...porJugador.values()].sort((a, b) => b.partidos - a.partidos || b.titular - a.titular || b.goles - a.goles || a.jugador.localeCompare(b.jugador, 'es'));
     const hayMinutos = lista.some((j) => j.conMinutos);
+    const hayCamisetas = lista.some((j) => j.camiseta != null);
+    const enLista = lista.filter((j) => j.enLista).length;
 
     const jugados = partidos.filter((p) => enSel(p) && p.resultado);
     const conFormacion = new Set(plantel.filter(enSel).filter((x) => num(x.titular) + num(x.entro) + num(x.convocado) > 0).map((x) => x.torneo_id));
@@ -37,13 +40,14 @@ CDM.pantallas.planteles = (function () {
       ui.segmentado('cat', 'Categoría', [{ valor: 'P', texto: 'Primera' }, { valor: 'R', texto: 'Reserva' }], cat) + '</section>';
 
     const titulo = (sel.torneo ? sel.torneo.nombre : 'Año ' + sel.anio) + ' · ' + categoria;
-    const filas = lista.map((j) => '<tr><th scope="row"><a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' + e(j.jugador) + '</a></th>' +
+    const filas = lista.map((j) => '<tr><th scope="row">' + (hayCamisetas ? '<span class="lista__camiseta">' + (j.camiseta ?? '') + '</span>' : '') +
+      '<a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' + e(j.jugador) + '</a></th>' +
       '<td class="centro">' + j.partidos + '</td><td class="centro">' + j.titular + '</td><td class="centro">' + j.entro + '</td>' +
       '<td class="centro">' + j.convocado + '</td>' + (hayMinutos ? '<td class="centro">' + (j.conMinutos ? j.minutos : '–') + '</td>' : '') +
       '<td class="total centro">' + j.goles + '</td><td class="centro">' + j.amarillas + '</td><td class="centro">' + j.rojas + '</td></tr>').join('');
-    const nota = conFormacion.size
+    const nota = (enLista ? 'Lista del torneo cargada (' + ui.plural(enLista, 'jugador', 'jugadores') + '). ' : '') + (conFormacion.size
       ? 'Con formación cargada: PJ, titular, entró y convocado salen de las formaciones.'
-      : 'Este torneo todavía no tiene formaciones cargadas: el plantel se arma con goleadores y tarjetas, y PJ cuenta solo los partidos con gol o tarjeta.';
+      : 'Este torneo todavía no tiene formaciones cargadas: PJ cuenta solo los partidos con gol o tarjeta.');
 
     return controles + '<section class="tarjeta" aria-label="Plantel"><h1 class="tarjeta__titulo">' + e(titulo) + '</h1>' +
       '<p class="nota">' + ui.plural(lista.length, 'jugador', 'jugadores') + ' · ' + ui.plural(jugados.length, 'partido jugado', 'partidos jugados') + '</p>' +

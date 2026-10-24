@@ -13,7 +13,8 @@ CDM.router = (function () {
     { patron: /^\/admin$/, pantalla: 'admin' },
     { patron: /^\/admin\/partido\/([^/]+)$/, pantalla: 'adminPartido', claves: ['id'] },
     { patron: /^\/admin\/jugadores$/, pantalla: 'adminJugadores' },
-    { patron: /^\/admin\/equipos$/, pantalla: 'adminEquipos' }
+    { patron: /^\/admin\/equipos$/, pantalla: 'adminEquipos' },
+    { patron: /^\/admin\/planteles$/, pantalla: 'adminPlanteles' }
   ];
   const RUTA_INICIAL = '#/resultados';
 

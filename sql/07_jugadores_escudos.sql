@@ -106,6 +106,13 @@ begin
   update public.formaciones set jugador_id = p_queda where jugador_id = p_sobra;
   get diagnostics v_form = row_count;
   update public.sanciones set jugador_id = p_queda where jugador_id = p_sobra;
+  -- Listas de jugadores (10_planteles.sql): si los dos estaban en la misma, queda una sola fila
+  if to_regclass('public.planteles') is not null then
+    execute 'delete from public.planteles s using public.planteles q
+             where s.jugador_id = $1 and q.jugador_id = $2 and q.torneo_id = s.torneo_id and q.categoria = s.categoria'
+      using p_sobra, p_queda;
+    execute 'update public.planteles set jugador_id = $2 where jugador_id = $1' using p_sobra, p_queda;
+  end if;
   update public.goleadores_liga set jugador_id = p_queda where jugador_id = p_sobra;
 
   update public.jugadores set

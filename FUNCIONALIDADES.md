@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.8.0 — Listas de jugadores, exportar a Excel y app instalable
+- **Administrar → Planteles** (`#/admin/planteles`): lista de jugadores de cada torneo y categoría. Se pega la lista (un jugador por línea, "Apellido, Nombre", con el número de camiseta adelante si se tiene; también columnas copiadas de una planilla) o se sube un .txt/.csv. **Revisión** antes de guardar: cada línea se reconoce contra los jugadores existentes (sin importar acentos, mayúsculas ni el orden nombre-apellido) y se puede corregir; las que no coinciden quedan como jugador nuevo (con apellido y nombre editables) y se crean al guardar. Opción de usar la misma lista para el otro torneo del año. Muestra la lista actual (con quitar) y los que jugaron pero no están en la lista ("Agregarlos a la lista").
+- **Planteles** (público) incluye a los jugadores de la lista aunque no tengan partidos, con su número de camiseta.
+- **Exportar a Excel** (botón del panel de administrador): baja `Historial_Partidos_Mitre_AAAA-MM-DD.xlsx` con la misma estructura de hojas que el Excel original (Partidos, Goles, Incidencias, Formaciones, Sanciones, Jugadores, Equipos, Torneos, Posiciones, Goleadores_Liga, Fuentes) más Planteles y Fechas_libres.
+- **App instalable (PWA):** se puede "Agregar a la pantalla de inicio" en el celular, con el escudo como ícono. Sin conexión abre igual y muestra lo último guardado.
+- **Escudos** de respaldo en el repo: `assets/escudos/<equipo>.png` (la app usa los de Storage).
+
 ## v0.7.0 — Fase 6 (plantel y estadísticas de jugadores)
 - **Ficha de jugador** (`#/jugador/:id`): nombre, apodo, posición, división y años en que aparece; totales de goles, partidos, titularidades, amarillas y rojas; tabla por torneo y categoría (cada fila lleva al plantel) y lista de sus partidos con rol, goles y tarjetas (cada uno lleva al Detalle). Se llega desde Goleadores, desde los goles y la formación del Detalle y desde Planteles.
 - **Planteles** (`#/planteles?anio=…&torneo=…&cat=…`, ítem "Planteles" del menú, ya activo): plantel por torneo (o todo el año) y categoría con PJ, titular, entró, convocado, minutos (solo si hay datos), goles, amarillas y rojas. Sin formaciones cargadas, el plantel se arma con goleadores y tarjetas, y se avisa.

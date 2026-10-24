@@ -11,6 +11,9 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 7. `07_jugadores_escudos.sql` — escudos (`equipos.escudo` y bucket público `escudos` en Storage), `v_jugadores_resumen` y `unir_jugadores`.
 8. `08_pendientes.sql` — `fechas_libres`, `torneos.fechas_regular` y `v_fechas_faltantes` (pendientes del panel).
 9. `09_estadisticas.sql` — `v_jugador_partidos` y `v_plantel` (ficha de jugador y planteles). La carga de formación está en `guardar_partido` (`05`).
+10. `10_planteles.sql` — tabla `planteles` (lista de jugadores de cada torneo y categoría). Después volver a correr `05`, `07` y `09`.
+
+En una base nueva el orden es 01 → 10 y después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`).
 
 En una base nueva, `01` ya incluye lo de `04` y `06`.
 

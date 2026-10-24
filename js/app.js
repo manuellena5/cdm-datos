@@ -18,4 +18,10 @@
 
   CDM.router.iniciar();
   mostrarConexion();
+
+  // App instalable y consulta sin conexión (sw.js). Solo en el sitio publicado (https):
+  // en la PC local no, para que cada cambio se vea sin tener que borrar la caché.
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(CDM.config.APP_VERSION)).catch(() => { /* sin service worker: la app anda igual */ });
+  }
 })();

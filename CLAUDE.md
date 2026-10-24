@@ -15,7 +15,7 @@ Web para consultar (y luego cargar) el historial de partidos oficiales (Liga San
 - Helper `plural(n, sing, plur)`; nunca "gol(es)".
 - El club propio sale de `equipos.es_propio`, no se hardcodea.
 - La lógica "desde el punto de vista de Mitre" (GF, GC, G/E/P) vive en vistas SQL, no en el frontend.
-- `APP_VERSION` visible en el pie; si hay service worker, subir su cache en el mismo cambio. Subir también el `?v=` de los scripts y el CSS en `index.html`.
+- `APP_VERSION` visible en el pie. Subir también el `?v=` de los scripts y el CSS en `index.html`. El service worker (`sw.js`) toma la versión de `APP_VERSION` (se registra como `sw.js?v=…`): su caché cambia sola.
 - La `service_role key` nunca va al repo (`.env` en `.gitignore`). En el frontend solo la `anon key`.
 - Antes de cambiar el modelo de datos: explicar qué se rompería y después hacerlo.
 - Verificar en el navegador (390 px y 1280 px) antes de dar algo por terminado y contar qué se probó.

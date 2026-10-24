@@ -229,6 +229,16 @@ CDM.api = (function () {
       partidos: () => todas(() => cliente.from('v_partidos')
         .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en').order('partido_id')),
       equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,cancha,escudo,es_propio').order('nombre_corto')),
+      // Una tabla completa (para exportar a Excel)
+      tabla: (nombre, orden) => todas(() => cliente.from(nombre).select('*').order(orden)),
+      // Lista de jugadores de un torneo y categoría (planteles)
+      listaPlantel: (torneoId, categoria) => todas(() => cliente.from('planteles').select('jugador_id,camiseta,posicion')
+        .eq('torneo_id', torneoId).eq('categoria', categoria).order('camiseta', { nullsFirst: false }).order('jugador_id')),
+      plantelTorneo: (torneoId, categoria) => todas(() => cliente.from('v_plantel').select('jugador_id,jugador,partidos,goles,en_lista')
+        .eq('torneo_id', torneoId).eq('categoria', categoria)),
+      guardarLista: (filas) => escribir(cliente.from('planteles').upsert(filas, { onConflict: 'torneo_id,categoria,jugador_id' }).select()),
+      quitarDeLista: (torneoId, categoria, jugadorId) => escribir(cliente.from('planteles').delete()
+        .eq('torneo_id', torneoId).eq('categoria', categoria).eq('jugador_id', jugadorId).select()),
       jugadoresResumen: () => todas(() => cliente.from('v_jugadores_resumen').select('*').order('apellido').order('nombre')),
       editarJugador: (id, campos) => escribir(cliente.from('jugadores').update(campos).eq('jugador_id', id).select()),
       unirJugadores: (queda, sobra) => llamar('unir_jugadores', { p_queda: queda, p_sobra: sobra }),

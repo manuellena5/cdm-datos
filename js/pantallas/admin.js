@@ -57,7 +57,8 @@ CDM.admin = (function () {
         '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></a>' : '') +
       '<div class="barra-admin__titulo"><h1>' + e(titulo) + '</h1><p>Modo administrador · ' + e(admin.nombre) + '</p></div>' +
       '<span class="pildora-admin">ADMIN</span>' +
-      (volver ? '' : '<div class="barra-admin__acciones"><a href="#/admin/jugadores">Jugadores</a><a href="#/admin/equipos">Equipos</a>' +
+      (volver ? '' : '<div class="barra-admin__acciones"><a href="#/admin/planteles">Planteles</a><a href="#/admin/jugadores">Jugadores</a><a href="#/admin/equipos">Equipos</a>' +
+        '<button type="button" class="boton boton--claro" data-accion="exportar">Exportar a Excel</button>' +
         '<a href="#/resultados">Ver sitio público</a>' +
         '<button type="button" class="boton boton--claro" data-accion="salir">Salir</button></div>') +
       '</header>';
@@ -98,6 +99,19 @@ CDM.admin = (function () {
         input.type = mostrar ? 'text' : 'password';
         ver.setAttribute('aria-pressed', String(mostrar));
         ver.setAttribute('aria-label', mostrar ? 'Ocultar clave' : 'Mostrar clave');
+      }
+      const exp = ev.target.closest('[data-accion="exportar"]');
+      if (exp) {
+        exp.disabled = true;
+        try {
+          await CDM.exportar.excel((hoja) => { exp.textContent = 'Armando ' + hoja + '…'; });
+          exp.textContent = 'Excel descargado';
+        } catch (err) {
+          exp.textContent = 'Exportar a Excel';
+          window.alert(err.message);
+        }
+        exp.disabled = false;
+        setTimeout(() => { exp.textContent = 'Exportar a Excel'; }, 3000);
       }
       if (ev.target.closest('[data-accion="salir"]')) {
         await CDM.api.salir();
@@ -278,7 +292,8 @@ CDM.pantallas.admin = (function () {
     return inst + (rival ? ' vs ' + rival.nombre_corto : '');
   }
 
-  function cambios(lista, porId, equipos) {
+  function cambios(lista, porId, equipos, torneos) {
+    const torneosPorId = Object.fromEntries((torneos || []).map((t) => [t.torneo_id, t]));
     if (!lista.length) return '<p class="nota">Todavía no hay cambios.</p>';
     const fecha = (f) => {
       const d = new Date(f);
@@ -296,6 +311,10 @@ CDM.pantallas.admin = (function () {
         que = 'unió a ' + (baja ? baja.texto : 'un jugador') + (queda ? ' con ' + queda.texto : '');
       } else if (c.accion === 'agregó al jugador' || c.accion === 'corrigió al jugador') {
         que = c.accion + ' ' + (jugadores[0] ? jugadores[0].texto : '');
+      } else if (c.accion === 'actualizó la lista de') {
+        const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
+        que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '') +
+          ' (' + ui.plural(c.plantel_filas, 'cambio', 'cambios') + ')';
       } else if (c.accion === 'cambió el escudo de') {
         que = c.accion + ' ' + (c.equipo || 'un equipo');
       } else {
@@ -329,7 +348,7 @@ CDM.pantallas.admin = (function () {
       '<a href="#/admin/partido/nuevo" class="enlace">+ Partido fuera del fixture</a></div>' + ultimos(grupos) + '</section></div>' +
       '<aside class="detalle__lateral">' +
       '<section class="tarjeta" aria-label="Datos que faltan"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Datos que faltan</h2>' + faltantes(falt) + '</section>' +
-      '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId, equipos) + '</section>' +
+      '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId, equipos, torneos) + '</section>' +
       '</aside></div>';
   }
 

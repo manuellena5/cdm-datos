@@ -1,6 +1,6 @@
 -- =====================================================================
 -- 09_estadisticas.sql — Fase 6: estadísticas de jugadores y planteles.
--- Correr después de 08 (y de volver a correr 05). Se puede volver a correr.
+-- Correr después de 08 y de 10 (usa la tabla planteles). Se puede volver a correr.
 -- Solo cuenta partidos publicados.
 -- Qué se rompe: nada. Son vistas nuevas.
 --
@@ -74,31 +74,65 @@ from conteos c
 join v_partidos_publicados v on v.partido_id = c.partido_id
 left join formaciones f on f.partido_id = c.partido_id and f.jugador_id = c.jugador_id;
 
--- Plantel: una fila por jugador, torneo y categoría.
+-- Plantel: una fila por jugador, torneo y categoría. Incluye a los de la lista del torneo
+-- (tabla planteles, 10_planteles.sql) aunque todavía no tengan partidos (en_lista = true).
 create view v_plantel with (security_invoker = true) as
+with estadisticas as (
+  select
+    jp.jugador_id,
+    jp.torneo_id,
+    jp.categoria,
+    count(*)                                                as presencias,
+    count(*) filter (where jp.jugo)                         as partidos,
+    count(*) filter (where jp.rol = 'Titular')              as titular,
+    count(*) filter (where jp.rol = 'Suplente que entró')   as entro,
+    count(*) filter (where jp.rol = 'Convocado (suplente)') as convocado,
+    count(*) filter (where jp.capitan)                      as capitan,
+    sum(jp.minutos)                                         as minutos,
+    sum(jp.goles)                                           as goles,
+    sum(jp.amarillas)                                       as amarillas,
+    sum(jp.rojas)                                           as rojas
+  from v_jugador_partidos jp
+  group by jp.jugador_id, jp.torneo_id, jp.categoria
+),
+juntos as (
+  select
+    coalesce(s.jugador_id, l.jugador_id) as jugador_id,
+    coalesce(s.torneo_id, l.torneo_id)   as torneo_id,
+    coalesce(s.categoria, l.categoria)   as categoria,
+    s.presencias, s.partidos, s.titular, s.entro, s.convocado, s.capitan, s.minutos, s.goles, s.amarillas, s.rojas,
+    (l.jugador_id is not null) as en_lista,
+    l.camiseta,
+    l.posicion
+  from estadisticas s
+  full join planteles l on l.jugador_id = s.jugador_id and l.torneo_id = s.torneo_id and l.categoria = s.categoria
+)
 select
-  jp.jugador_id,
+  x.jugador_id,
   j.apellido,
   j.nombre,
   j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '') as jugador,
-  jp.torneo_id,
-  jp.anio,
-  jp.torneo,
-  jp.torneo_tipo,
-  jp.torneo_orden,
-  jp.categoria,
-  count(*)                                              as presencias,
-  count(*) filter (where jp.jugo)                       as partidos,
-  count(*) filter (where jp.rol = 'Titular')            as titular,
-  count(*) filter (where jp.rol = 'Suplente que entró') as entro,
-  count(*) filter (where jp.rol = 'Convocado (suplente)') as convocado,
-  count(*) filter (where jp.capitan)                    as capitan,
-  sum(jp.minutos)                                       as minutos,
-  sum(jp.goles)                                         as goles,
-  sum(jp.amarillas)                                     as amarillas,
-  sum(jp.rojas)                                         as rojas
-from v_jugador_partidos jp
-join jugadores j on j.jugador_id = jp.jugador_id
-group by jp.jugador_id, j.apellido, j.nombre, jp.torneo_id, jp.anio, jp.torneo, jp.torneo_tipo, jp.torneo_orden, jp.categoria;
+  x.torneo_id,
+  t.anio,
+  t.nombre as torneo,
+  t.tipo   as torneo_tipo,
+  t.orden  as torneo_orden,
+  x.categoria,
+  coalesce(x.presencias, 0) as presencias,
+  coalesce(x.partidos, 0)   as partidos,
+  coalesce(x.titular, 0)    as titular,
+  coalesce(x.entro, 0)      as entro,
+  coalesce(x.convocado, 0)  as convocado,
+  coalesce(x.capitan, 0)    as capitan,
+  x.minutos,
+  coalesce(x.goles, 0)      as goles,
+  coalesce(x.amarillas, 0)  as amarillas,
+  coalesce(x.rojas, 0)      as rojas,
+  x.en_lista,
+  x.camiseta,
+  x.posicion
+from juntos x
+join jugadores j on j.jugador_id = x.jugador_id
+join torneos t on t.torneo_id = x.torneo_id;
 
 grant select on v_jugador_partidos, v_plantel to anon, authenticated;

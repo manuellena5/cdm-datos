@@ -151,6 +151,10 @@ select
       'nombre', coalesce(a.despues, a.antes) ->> 'nombre')
     order by a.accion, a.id) filter (where a.tabla = 'jugadores'), '[]'::jsonb) as jugadores,
   (array_agg(coalesce(a.despues, a.antes) ->> 'nombre_corto') filter (where a.tabla = 'equipos'))[1] as equipo,
+  -- lista de jugadores tocada (planteles): torneo y categoría
+  (array_agg(jsonb_build_object('torneo_id', coalesce(a.despues, a.antes) ->> 'torneo_id',
+      'categoria', coalesce(a.despues, a.antes) ->> 'categoria')) filter (where a.tabla = 'planteles'))[1] as plantel,
+  count(*) filter (where a.tabla = 'planteles') as plantel_filas,
   case
     when max(a.usuario) = 'Importación' then 'importó'
     when bool_or(a.tabla = 'partidos' and a.accion = 'baja') then 'borró'
@@ -158,6 +162,7 @@ select
                  and coalesce((a.antes ->> 'publicado')::boolean, false) = false) then 'publicó'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean = false) then 'guardó como borrador'
     when bool_or(a.tabla = 'jugadores' and a.accion = 'baja') then 'unió jugadores'
+    when bool_or(a.tabla = 'planteles') then 'actualizó la lista de'
     when bool_or(a.tabla in ('partidos', 'goles', 'incidencias', 'formaciones')) then 'editó'
     when bool_or(a.tabla = 'jugadores' and a.accion = 'alta') then 'agregó al jugador'
     when bool_or(a.tabla = 'jugadores') then 'corrigió al jugador'
