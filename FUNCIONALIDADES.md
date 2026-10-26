@@ -2,6 +2,16 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.11.0 — Fase 6.5.2 (plantel del torneo en tabla)
+- **Administrar → Planteles** (`#/admin/planteles?anio=…&torneo=…&cat=…`) pasa a ser una **tabla editable**, una fila por jugador: en plantel (tilde), apellido, nombre, puesto (Arquero, Defensor, Volante, Delantero), apodo, camiseta (si la lista la usa), goles y rojas del torneo, y **"por qué está"** (goles, roja, formación, incidencia, lista cargada, nuevo).
+- **Viene precargada** con los jugadores que tienen algún dato en ese torneo y categoría, más los de la lista. Los que tienen datos quedan siempre (el tilde está bloqueado: jugaron); los que están solo por la lista se pueden destildar o quitar, sin borrar al jugador.
+- **Se guarda solo, fila por fila**, con un aviso discreto "Guardado". Apellido, nombre y apodo corrigen al jugador (y avisa si aparece también en otros años); el puesto queda en la lista del torneo. Todo pasa por la auditoría.
+- **Para revisar**: sin nombre, o mismo apellido que otro jugador cuando a uno le falta el nombre o tiene solo la inicial ("¿Mismo que Lencina, Emiliano? Revisar").
+- **+ Agregar fila**: al escribir el apellido sugiere jugadores existentes (sin acentos ni mayúsculas, con los años en que aparecen) y ofrece "Crear jugador nuevo". Enter pasa a la fila siguiente.
+- **Sugeridos**: jugadores del torneo anterior de la misma categoría sin datos en este, con "Sumar" y "Sumar los marcados".
+- **Copiar plantel de…** otro torneo.
+- **Pegar lista o CSV** (panel al costado): "apellido, nombre, puesto" o columnas de Excel, también desde un .txt/.csv. La previsualización dice por línea si ya está en el plantel, si existe y se suma, si se parece a otro (elegir cuál o crear nuevo) o si es nuevo. Nada se guarda hasta "Sumar al plantel".
+
 ## v0.10.0 — Fase 6.5.1 (Resultados en modo administrador)
 - **Resultados (admin)** (`#/admin/resultados?anio=…&torneo=…&cat=…&ver=falta`): mismos filtros que la consulta, guardados en la URL. Incluye borradores y todas las fases.
 - **Todas las fechas de la fase regular, sin saltos**, de 1 a la cantidad de fechas del torneo (o la última cargada; la cantidad se fija desde la misma pantalla). Cada fecha sin partido aparece en su lugar, punteada:

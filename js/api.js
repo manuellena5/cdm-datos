@@ -234,7 +234,7 @@ CDM.api = (function () {
       // Lista de jugadores de un torneo y categoría (planteles)
       listaPlantel: (torneoId, categoria) => todas(() => cliente.from('planteles').select('jugador_id,camiseta,posicion')
         .eq('torneo_id', torneoId).eq('categoria', categoria).order('camiseta', { nullsFirst: false }).order('jugador_id')),
-      plantelTorneo: (torneoId, categoria) => todas(() => cliente.from('v_plantel').select('jugador_id,jugador,partidos,goles,en_lista')
+      plantelTorneo: (torneoId, categoria) => todas(() => cliente.from('v_plantel').select('*')
         .eq('torneo_id', torneoId).eq('categoria', categoria)),
       guardarLista: (filas) => escribir(cliente.from('planteles').upsert(filas, { onConflict: 'torneo_id,categoria,jugador_id' }).select()),
       quitarDeLista: (torneoId, categoria, jugadorId) => escribir(cliente.from('planteles').delete()
