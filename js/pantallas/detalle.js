@@ -96,10 +96,14 @@ CDM.pantallas.detalle = (function () {
       '<ul class="incidencias">' + items + '</ul></section>';
   }
 
-  function formacion(lista, partidos) {
+  // Formación de cada categoría y, debajo, el cuerpo técnico del torneo (6.6.1).
+  function formacion(lista, partidos, cuerpos) {
     const bloques = partidos.map((p) => {
       const de = lista.filter((f) => f.partido_id === p.partido_id);
-      if (!de.length) return '';
+      const cuerpo = ui.cuerpoTecnico(cuerpos, p.torneo_id, p.categoria).html;
+      const lineaCuerpo = cuerpo ? '<p class="formacion__resto">' + cuerpo + '</p>' : '';
+      if (!de.length) return lineaCuerpo ? '<div class="formacion"><h3>' + e(p.categoria) + '</h3>' +
+        '<p class="nota">Sin formación cargada.</p>' + lineaCuerpo + '</div>' : '';
       const minutos = (f) => (f.minuto_entra != null ? ' ↑' + f.minuto_entra + "'" : '') + (f.minuto_sale != null ? ' ↓' + f.minuto_sale + "'" : '');
       const nombre = (f) => '<a href="#/jugador/' + encodeURIComponent(f.jugador_id) + '">' + e(f.jugador) + '</a>' +
         (f.capitan ? ' <span class="capitan" title="Capitán">C</span>' : '') + (minutos(f) ? ' <span class="texto-2">' + minutos(f) + '</span>' : '');
@@ -110,7 +114,7 @@ CDM.pantallas.detalle = (function () {
       };
       return '<div class="formacion"><h3>' + e(p.categoria) + '</h3>' +
         '<ol class="formacion__titulares">' + titulares.map((f) => '<li>' + nombre(f) + '</li>').join('') + '</ol>' +
-        grupo('Suplente que entró', 'Entraron') + grupo('Convocado (suplente)', 'Convocados') + grupo('Suplente sin jugar', 'No entraron') + '</div>';
+        grupo('Suplente que entró', 'Entraron') + grupo('Convocado (suplente)', 'Convocados') + grupo('Suplente sin jugar', 'No entraron') + lineaCuerpo + '</div>';
     }).join('');
     return '<section class="tarjeta" aria-label="Formación"><h2 class="tarjeta__titulo">Formación</h2>' +
       (bloques || ui.vacio('Todavía no hay formación cargada para este partido.')) + '</section>';
@@ -159,16 +163,16 @@ CDM.pantallas.detalle = (function () {
     const ambos = [p, par].filter(Boolean).sort((a, b) => a.categoria.localeCompare(b.categoria));
     const ids = ambos.map((x) => x.partido_id);
     const idsFuentes = [...new Set(ambos.flatMap((x) => x.fuente_ids || []))];
-    const [listaGoles, listaInc, listaForm, posiciones, listaFuentes] = await Promise.all([
+    const [listaGoles, listaInc, listaForm, posiciones, listaFuentes, cuerpos] = await Promise.all([
       CDM.api.golesDe(ids), CDM.api.incidenciasDe(ids), CDM.api.formacionesDe(ids), CDM.api.posicionesDe(p.torneo_id),
-      idsFuentes.length ? CDM.api.fuentes(idsFuentes) : Promise.resolve([])
+      idsFuentes.length ? CDM.api.fuentes(idsFuentes) : Promise.resolve([]), CDM.api.cuerposTecnicos()
     ]);
 
     return encabezado(p, equipos) +
       '<div class="detalle">' +
       '<div class="detalle__principal">' + datos(p, posiciones) +
       ambos.map((x) => goles(x, listaGoles)).join('') +
-      incidencias(listaInc, ambos, propio) + formacion(listaForm, ambos) + '</div>' +
+      incidencias(listaInc, ambos, propio) + formacion(listaForm, ambos, cuerpos) + '</div>' +
       '<aside class="detalle__lateral">' + contraRival(p, partidos, historial) + fuentes(listaFuentes, p) + '</aside>' +
       '</div>';
   }

@@ -151,11 +151,12 @@ select
       'nombre', coalesce(a.despues, a.antes) ->> 'nombre')
     order by a.accion, a.id) filter (where a.tabla = 'jugadores'), '[]'::jsonb) as jugadores,
   (array_agg(coalesce(a.despues, a.antes) ->> 'nombre_corto') filter (where a.tabla = 'equipos'))[1] as equipo,
-  -- lista de jugadores tocada (planteles): torneo y categoría
+  -- lista de jugadores o cuerpo técnico tocados (planteles, cuerpos_tecnicos): torneo y categoría
   (array_agg(jsonb_build_object('torneo_id', coalesce(a.despues, a.antes) ->> 'torneo_id',
-      'categoria', coalesce(a.despues, a.antes) ->> 'categoria')) filter (where a.tabla = 'planteles'))[1] as plantel,
+      'categoria', coalesce(a.despues, a.antes) ->> 'categoria')) filter (where a.tabla in ('planteles', 'cuerpos_tecnicos')))[1] as plantel,
   count(*) filter (where a.tabla = 'planteles') as plantel_filas,
   case
+    when bool_and(a.tabla = 'cuerpos_tecnicos') then 'actualizó el cuerpo técnico de'
     when max(a.usuario) = 'Importación' then 'importó'
     when bool_or(a.tabla = 'partidos' and a.accion = 'baja') then 'borró'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean

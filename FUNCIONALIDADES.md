@@ -2,6 +2,15 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.14.0 — Fase 6.6.1 (cuerpo técnico)
+- Cada torneo y categoría tiene **un técnico y hasta 3 integrantes** del cuerpo técnico, sin función (no se distingue ayudante, preparador físico, etc.). El nombre es texto libre.
+- **Administrar → Planteles**: bloque **Cuerpo técnico** arriba de la tabla del plantel, con Técnico e Integrante ("+ Integrante" hasta 3, ✕ para quitar). Sugiere los nombres ya usados en otros torneos y, si el torneo no tiene cuerpo técnico, ofrece **"Usar el del …"** torneo anterior de la misma categoría. Se guarda solo al salir del campo (o con Enter), con el aviso "Guardado". **"Copiar plantel de…"** también copia el cuerpo técnico si este torneo todavía no tiene.
+- **Planteles** (consulta): "Técnico: … · Cuerpo técnico: …" arriba de la lista de jugadores (con "Todo el año", uno por torneo).
+- **Historial**: columna **Técnico** en las campañas por torneo (aparece cuando hay alguno cargado).
+- **Detalle del partido**: el técnico y el cuerpo técnico del torneo debajo de la formación de cada categoría.
+- Ya cargados desde las observaciones de los partidos: Rubén Leyes (Primera, Clausura 2011 y Apertura 2012), Jorge Falappa (Primera, Clausura 2012 y Clausura 2013), Mingo Magaz y Andrés Chuard (Reserva, Clausura 2016).
+- El registro de cambios muestra "actualizó el cuerpo técnico de …".
+
 ## v0.13.0 — Fase 6.5.4 (formación en 18 lugares)
 - En **Cargar / editar partido**, la sección **Formación** de cada categoría es una tabla fija de **18 lugares**: 1 a 11 titulares y 12 a 18 suplentes. Se completa uno por uno; los lugares vacíos no se guardan. "+ Agregar suplente" suma lugares si la lista del partido tiene más de 18.
 - Cada lugar tiene un **buscador de jugador**: se escribe parte del apellido o del nombre (sin acentos ni mayúsculas) o se elige de la lista. Primero aparecen los del **plantel de ese torneo**, después los de la categoría y después el resto. No muestra a los que ya están en otro lugar. Flechas para moverse, Enter o clic para elegir, Escape para dejar como estaba. Al elegir, pasa al lugar siguiente.

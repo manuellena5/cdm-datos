@@ -213,6 +213,62 @@ CDM.pantallas.adminPlanteles = (function () {
     ]);
     Object.assign(ctx, { torneo, categoria, lista, estadisticas, anterior: anteriorT, estAnterior });
     ctx.hayCamisetas = lista.some((l) => l.camiseta != null);
+    // Cuerpo técnico (6.6.1). Si todavía no se corrió 13_cuerpos_tecnicos.sql, el bloque no aparece.
+    const cuerpos = await api.cuerposTecnicos().catch(() => null);
+    ctx.cuerpos = cuerpos;
+    if (cuerpos) {
+      ctx.cuerpo = cuerpoDe(torneo.torneo_id, categoria);
+      ctx.cuerpoAnterior = anteriorT ? cuerpoDe(anteriorT.torneo_id, categoria) : ['', '', '', ''];
+      ctx.integrantes = Math.max(1, ctx.cuerpo.slice(1).filter(Boolean).length);
+      ctx.nombresCT = [...new Set(cuerpos.map((c) => c.nombre))].sort((a, b) => a.localeCompare(b, 'es'));
+    }
+  }
+
+  // ---------- Cuerpo técnico (6.6.1) ----------
+  // ['técnico', 'integrante 1', 'integrante 2', 'integrante 3'] ('' si no hay)
+  function cuerpoDe(torneoId, categoria) {
+    const nombres = ['', '', '', ''];
+    (ctx.cuerpos || []).filter((c) => c.torneo_id === torneoId && c.categoria === categoria).forEach((c) => { nombres[c.orden] = c.nombre; });
+    return nombres;
+  }
+  const textoCuerpo = (n) => [n[0] ? 'Técnico: ' + n[0] : '', n.slice(1).filter(Boolean).join(', ')].filter(Boolean).join(' · ');
+
+  function cuerpoHtml() {
+    if (!ctx.cuerpos) return '';
+    const n = ctx.cuerpo;
+    const vacio = !n.some(Boolean);
+    const campo = (orden, etiqueta) => '<div class="campo cuerpo__campo"><label for="ct-' + orden + '">' + etiqueta + '</label><div class="cuerpo__fila">' +
+      '<input id="ct-' + orden + '" data-cuerpo="' + orden + '" value="' + e(n[orden]) + '" list="nombres-ct" autocomplete="off"' +
+      (orden ? ' placeholder="Nombre y apellido"' : ' placeholder="Nombre y apellido del técnico"') + '>' +
+      (orden ? '<button type="button" class="boton-icono boton-icono--chico" data-accion="quitar-integrante" data-orden="' + orden + '" aria-label="Quitar integrante ' + orden + '">✕</button>' : '') +
+      '</div></div>';
+    let integrantes = '';
+    for (let i = 1; i <= ctx.integrantes; i++) integrantes += campo(i, 'Integrante');
+    const anterior = ctx.anterior && ctx.cuerpoAnterior.some(Boolean) ? ctx.anterior : null;
+    return '<section class="cuerpo" aria-label="Cuerpo técnico"><div class="cuerpo__cabeza"><h3 class="cuerpo__titulo">Cuerpo técnico</h3>' +
+      '<span class="plantel-estado" id="cuerpo-estado" role="status"></span></div>' +
+      '<div class="cuerpo__campos">' + campo(0, 'Técnico') + integrantes + '</div>' +
+      '<datalist id="nombres-ct">' + (ctx.nombresCT || []).map((x) => '<option value="' + e(x) + '">').join('') + '</datalist>' +
+      '<div class="botones-chicos">' + (ctx.integrantes < 3 ? '<button type="button" class="boton boton--borde" data-accion="agregar-integrante">+ Integrante</button>' : '') +
+      (vacio && anterior ? '<button type="button" class="boton boton--borde" data-accion="usar-cuerpo-anterior">Usar el del ' + e(anterior.nombre) + '</button>' : '') + '</div>' +
+      '<p class="nota">' + (vacio && anterior ? 'Sugerido: ' + e(textoCuerpo(ctx.cuerpoAnterior)) + ' (' + e(anterior.nombre) + '). ' : '') +
+      'Los integrantes van sin función (ayudante, preparador físico…); hasta 3.</p></section>';
+  }
+
+  function pintarCuerpo() {
+    const c = vistaActual.querySelector('.cuerpo');
+    if (c) c.outerHTML = cuerpoHtml();
+  }
+
+  // Guarda el cuerpo técnico entero, con los integrantes juntos (sin huecos).
+  async function guardarCuerpo(nombres) {
+    const integrantes = nombres.slice(1).map((x) => String(x || '').trim()).filter(Boolean);
+    const final = [String(nombres[0] || '').trim()].concat(integrantes, ['', '', '']).slice(0, 4);
+    await CDM.api.admin.guardarCuerpo(ctx.torneo.torneo_id, ctx.categoria, final);
+    ctx.cuerpo = final;
+    ctx.cuerpos = ctx.cuerpos.filter((c) => !(c.torneo_id === ctx.torneo.torneo_id && c.categoria === ctx.categoria))
+      .concat(final.map((nombre, orden) => ({ torneo_id: ctx.torneo.torneo_id, categoria: ctx.categoria, orden, nombre })).filter((c) => c.nombre));
+    ctx.nombresCT = [...new Set(ctx.cuerpos.map((c) => c.nombre))].sort((a, b) => a.localeCompare(b, 'es'));
   }
 
   async function render(params, query) {
@@ -251,6 +307,7 @@ CDM.pantallas.adminPlanteles = (function () {
       '<div class="plantel-layout">' +
       '<section class="tarjeta plantel" aria-label="Plantel"><div class="tarjeta__cabeza"><h2 class="tarjeta__titulo">Plantel ' + e(torneo.nombre + ' · ' + ctx.categoria) + '</h2>' +
       '<span class="texto-2" id="plantel-cuenta">' + e(cuenta()) + '</span></div>' +
+      cuerpoHtml() +
       '<div class="tabla-scroll"><table class="tabla tabla--plantel-admin"><thead><tr><th><span class="oculto">En plantel</span></th>' +
       (ctx.hayCamisetas ? '<th>N°</th>' : '') + '<th>Apellido</th><th>Nombre</th><th>Puesto</th><th>Apodo</th><th class="centro">Goles</th><th class="centro">Rojas</th>' +
       '<th>Por qué está</th><th><span class="oculto">Acciones</span></th></tr></thead>' +
@@ -393,6 +450,18 @@ CDM.pantallas.adminPlanteles = (function () {
 
     vista.addEventListener('change', async (ev) => {
       const el = ev.target;
+      if (el.dataset.cuerpo != null) {
+        ctx.cuerpo[Number(el.dataset.cuerpo)] = el.value;   // por si se repinta el bloque mientras se guarda
+        const nombres = ctx.cuerpo.slice();
+        const estado = vista.querySelector('#cuerpo-estado');
+        try {
+          await guardarCuerpo(nombres);
+          ctx.integrantes = Math.max(1, ctx.cuerpo.slice(1).filter(Boolean).length, Math.min(3, ctx.integrantes));
+          error('');
+          if (estado) { estado.textContent = 'Guardado'; clearTimeout(estado._t); estado._t = setTimeout(() => { estado.textContent = ''; }, 4000); }
+        } catch (err) { error(err.message); }
+        return;
+      }
       if (el.dataset.filtro === 'anio') return ir({ anio: el.value, torneo: undefined });
       if (el.dataset.filtro === 'torneo') return ir({ torneo: el.value });
       if (el.id === 'pegar-archivo' && el.files[0]) {
@@ -424,6 +493,7 @@ CDM.pantallas.adminPlanteles = (function () {
     // Enter pasa a la fila siguiente (en la fila nueva, agrega al jugador)
     vista.addEventListener('keydown', (ev) => {
       if (ev.key !== 'Enter' || ev.target.tagName !== 'INPUT') return;
+      if (ev.target.dataset.cuerpo != null) { ev.preventDefault(); ev.target.blur(); return; }   // guarda el nombre
       const tr = ev.target.closest('tr');
       if (!tr || !tr.closest('#plantel-tabla')) return;
       ev.preventDefault();
@@ -480,6 +550,30 @@ CDM.pantallas.adminPlanteles = (function () {
           try { await sumar(ids); error(''); pintarTabla(); } catch (err) { error(err.message); }
           return;
         }
+        case 'agregar-integrante':
+          ctx.integrantes = Math.min(3, ctx.integrantes + 1);
+          pintarCuerpo();
+          vista.querySelector('#ct-' + ctx.integrantes).focus();
+          return;
+        case 'quitar-integrante': {
+          const orden = Number(b.dataset.orden);
+          const nombres = ctx.cuerpo.slice();
+          nombres[orden] = '';
+          try {
+            if (ctx.cuerpo[orden]) await guardarCuerpo(nombres);
+            ctx.integrantes = Math.max(1, Math.min(ctx.integrantes - 1, 3), ctx.cuerpo.slice(1).filter(Boolean).length);
+            pintarCuerpo();
+          } catch (err) { error(err.message); }
+          return;
+        }
+        case 'usar-cuerpo-anterior':
+          b.disabled = true;
+          try {
+            await guardarCuerpo(ctx.cuerpoAnterior);
+            ctx.integrantes = Math.max(1, ctx.cuerpo.slice(1).filter(Boolean).length);
+            pintarCuerpo();
+          } catch (err) { b.disabled = false; error(err.message); }
+          return;
         case 'copiar': {
           const desde = vista.querySelector('#copiar-de').value;
           const t = ctx.torneos.find((x) => x.torneo_id === desde);
@@ -489,7 +583,12 @@ CDM.pantallas.adminPlanteles = (function () {
             const ids = [...new Set(est.map((x) => x.jugador_id).concat(lista.map((x) => x.jugador_id)))].filter((id) => !ctx.filas.some((f) => f.jugador_id === id));
             const extra = Object.fromEntries(lista.map((l) => [l.jugador_id, { posicion: l.posicion || null }]));
             const n = await sumar(ids, extra);
-            CDM.admin.avisar('Copiado de ' + t.nombre + ': ' + ui.plural(n, 'jugador sumado', 'jugadores sumados') + '.');
+            // El cuerpo técnico se copia solo si este torneo todavía no tiene
+            const cuerpoOrigen = ctx.cuerpos ? cuerpoDe(desde, ctx.categoria) : ['', '', '', ''];
+            const copiaCuerpo = cuerpoOrigen.some(Boolean) && !ctx.cuerpo.some(Boolean);
+            if (copiaCuerpo) await guardarCuerpo(cuerpoOrigen);
+            CDM.admin.avisar('Copiado de ' + t.nombre + ': ' + ui.plural(n, 'jugador sumado', 'jugadores sumados') +
+              (copiaCuerpo ? ' y el cuerpo técnico' : '') + '.');
             CDM.router.recargar();
           } catch (err) { b.disabled = false; error(err.message); }
           return;

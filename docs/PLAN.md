@@ -3,7 +3,7 @@ Plan de desarrollo por fases para trabajar con Claude Code.
 
 > Cómo usar este documento: pedile a Claude Code **una fase por vez** ("Hacé la Fase 1 de docs/PLAN.md").
 > Cada fase tiene alcance, entregables y criterios de aceptación. No avanzar a la siguiente sin cerrar los criterios de la anterior.
-> **Estado (24/10/2026):** Fases 0 a 6 hechas. Sigue la **Fase 6.5**; la 7 queda para más adelante.
+> **Estado (26/10/2026):** Fases 0 a 6.5 hechas. Sigue la **Fase 6.6**; después, la 7.
 
 ---
 
@@ -343,6 +343,37 @@ Hacer en este orden, un punto por vez ("Hacé el punto 6.5.1 de docs/PLAN.md").
 - Desde el lápiz se corrige un goleador de un partido de 2014 y el cambio aparece en Resultados, Goleadores y la ficha del jugador.
 - El plantel de Apertura 2014 Primera aparece precargado con los jugadores que tienen goles o rojas ese torneo; se agrega uno con "+ Agregar fila", otro con "Pegar lista", y uno de los sugeridos.
 - Un par descartado no vuelve a aparecer; uno unido deja todos los goles en el que queda; "Pasar el dato al otro" mueve un solo gol.
+- Todo funciona a 390 px de ancho.
+
+---
+
+## Fase 6.6 — Cuerpo técnico e historial contra cada rival
+
+Referencia visual: mockup **10** (bloque "Cuerpo técnico" en `docs/mockups/AdminPlantel.dc.html`) y mockup **12** (`docs/mockups/HistorialRival.dc.html`). Un punto por vez ("Hacé el punto 6.6.1 de docs/PLAN.md").
+
+### 6.6.1 Cuerpo técnico de cada plantel
+- Por torneo y categoría: **un técnico** y **hasta 3 integrantes** más, sin función (no se distingue ayudante, preparador físico, etc.).
+- Modelo: tabla nueva `cuerpos_tecnicos` (`torneo_id`, `categoria`, `orden` 0 = técnico y 1–3 = integrantes, `nombre` texto, `notas`, `fuente_ids`), clave (`torneo_id`, `categoria`, `orden`), RLS como `planteles` (lectura pública, escritura de administradores) y auditoría. Explicar el impacto antes: es una tabla nueva, no rompe nada. El nombre es texto libre con sugerencias, no un jugador; si más adelante hace falta seguir a una persona entre torneos, se normaliza.
+- **Admin (`#/admin/planteles`)**: bloque "Cuerpo técnico" arriba de la tabla del plantel: campo Técnico, campos Integrante (empieza con uno, "+ Integrante" hasta 3, quitar cada uno). Autocompletar con los nombres ya usados en otros torneos, y sugerir el cuerpo técnico del torneo anterior de la misma categoría ("Usar el del Clausura 2013"). Guardado automático igual que la tabla. "Copiar plantel de…" también copia el cuerpo técnico.
+- **Consulta**: en Planteles, el cuerpo técnico arriba de la lista de jugadores ("Técnico: … · Cuerpo técnico: …, …"); en Historial, la columna o línea "Técnico" en cada campaña; en el Detalle del partido, el técnico del torneo debajo de la formación.
+- Datos que ya hay para cargar: Jorge Falappa (2012C y 2013C), Rubén Leyes (2011C y 2012A), Mingo Magaz y Andrés Chuard (Reserva 2016C). Están en las observaciones de los partidos; ofrecer pasarlos con un script o cargarlos a mano.
+
+### 6.6.2 Historial contra un rival (`#/historial/rival/:id?cat=P&periodo=todo`) — mockup 12
+Hoy "Ver historial completo" lleva a la tabla general de rivales. Pasa a llevar a esta pantalla, con el rival ya elegido. También se llega desde cada fila de la tabla "Contra cada rival" del Historial y desde el nombre del rival en Resultados.
+- **Filtros**: rival (lista con escudo), categoría (Primera / Reserva / Las dos) y período (todo o un año), en la URL.
+- **Resumen**: los dos escudos, PJ, G, E, P, goles a favor, goles en contra, efectividad (% de puntos) y una barra G/E/P con texto alternativo.
+- **Local / Visitante / Playoffs**: tres tarjetas con PJ, G-E-P, goles y efectividad de cada una. Los partidos en cancha neutral van aparte si los hay.
+- **Destacados**: mayor goleada, peor derrota (con torneo, fecha y dónde), racha actual (ganados, sin perder o sin ganar, desde cuándo), primer partido y goleadores de Mitre contra ese rival (top 3).
+- **Todos los partidos**, del más nuevo al más viejo, agrupados por año: torneo e instancia, día, local/visitante, equipos con el club propio en negrita, marcador, etiqueta G/E/P, penales si hubo, goleadores de Mitre (o "Goleadores sin cargar"). Toda la fila lleva al Detalle del partido. Selector Todos / De local / De visitante / Playoffs.
+- Con "Las dos" categorías, cada fila muestra Primera y Reserva del mismo partido juntas.
+- Datos: alcanza con `v_partidos` filtrada por rival (y `v_goles` para los goleadores). Si hace falta por rendimiento, una vista `v_rival_resumen` con los totales por rival, categoría, condición y año.
+- Incluye borradores solo en modo administrador. Los partidos sin marcador (inferidos) cuentan en PJ y en el resultado, pero no en goles, y se aclara con una nota al pie.
+- En el **Detalle del partido**, el recuadro "Contra Susanense · Primera" suma la línea "De local x · de visitante y" y el link "Ver historial completo" va a esta pantalla.
+
+**Criterios de aceptación de la 6.6**
+- Contra Susanense en Primera, todo el período: 25 PJ, 10 G, 4 E, 11 P, 28–32; de local 11 PJ (6-2-3, 15–9); de visitante 14 PJ (4-2-8, 13–23); 2 playoffs perdidos; mayor goleada 4–0 (Clausura 2025 F4) y racha actual de 4 triunfos (con los datos de la base al 26/10/2026).
+- Desde cada partido de la lista se llega al Detalle y "Atrás" vuelve a la lista con los mismos filtros.
+- Se carga el cuerpo técnico de un torneo, aparece en Planteles e Historial, y "Copiar plantel de…" lo trae al torneo siguiente.
 - Todo funciona a 390 px de ancho.
 
 ---

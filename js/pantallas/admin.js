@@ -333,6 +333,9 @@ CDM.pantallas.admin = (function () {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '') +
           ' (' + ui.plural(c.plantel_filas, 'cambio', 'cambios') + ')';
+      } else if (c.accion === 'actualizó el cuerpo técnico de') {
+        const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
+        que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
       } else if (c.accion === 'cambió el escudo de') {
         que = c.accion + ' ' + (c.equipo || 'un equipo');
       } else {

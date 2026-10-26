@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Historial contra un rival</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F8}
+a{color:#062F5A}a:hover{color:#2D5BA3}
+</style>
+</helmet>
+<div style="font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; min-height: 100vh">
+  <header style="background: #062F5A; color: #FFFFFF">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; color: #062F5A; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px">CDM</div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px; line-height: 1">DEPORTIVO MITRE<div style="font-family: Barlow, sans-serif; font-weight: 500; font-size: 13px; color: #C9D4E8">Historial de partidos</div></div>
+      <nav aria-label="Principal" style="margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap">
+        <a href="Main.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; font-weight: 600">Resultados</a>
+        <a href="Goleadores.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; font-weight: 600">Goleadores</a>
+        <a href="Historial.dc.html" aria-current="page" style="color: #062F5A; background: #FFFFFF; border-radius: 8px; text-decoration: none; padding: 10px 14px; font-weight: 700">Historial</a>
+        <a href="Main.dc.html" style="color: #FFFFFF; text-decoration: none; padding: 10px 14px; font-weight: 600">Planteles</a>
+      </nav>
+    </div>
+  </header>
+  <main style="max-width: 1120px; margin: 0 auto; padding: 22px 24px 56px; display: flex; flex-direction: column; gap: 18px">
+    <nav aria-label="Ruta" style="font-size: 14px"><a href="Historial.dc.html">Historial</a> <span style="color: #4A5468">›</span> Contra Susanense</nav>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Rival
+        <select style="height: 44px; min-width: 220px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 600 15px Barlow, sans-serif; background: #FFFFFF"><option>Susanense</option></select></label>
+      <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Categoría<div style="display: flex; flex-wrap: wrap"><button type="button" aria-pressed="true" style="height: 44px; padding: 0 14px; border: 1px solid #062F5A; margin-left: 0; background: #062F5A; color: #FFFFFF; border-radius: 8px 0 0 8px; font: 600 14px Barlow, sans-serif">Primera</button><button type="button" aria-pressed="false" style="height: 44px; padding: 0 14px; border: 1px solid #C7CEDB; margin-left: -1px; background: #FFFFFF; color: #062F5A; border-radius: 0; font: 600 14px Barlow, sans-serif">Reserva</button><button type="button" aria-pressed="false" style="height: 44px; padding: 0 14px; border: 1px solid #C7CEDB; margin-left: -1px; background: #FFFFFF; color: #062F5A; border-radius: 0 8px 8px 0; font: 600 14px Barlow, sans-serif">Las dos</button></div></div>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: #4A5468">Período
+        <select style="height: 44px; min-width: 150px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 10px; font: 500 15px Barlow, sans-serif; background: #FFFFFF"><option>Todo (2012–2026)</option></select></label>
+    </div>
+
+    <section aria-label="Resumen" style="background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #062F5A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700">CDM</div>
+        <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; color: #062F5A">Dep. Mitre vs Susanense</div>
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700">SUS</div>
+        <span style="margin-left: auto; font-size: 14px; color: #4A5468">Primera · 2012–2026 · liga y playoffs</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">25</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Partidos</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">10</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Ganados</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">4</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Empatados</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">11</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Perdidos</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">28</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Goles a favor</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">32</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Goles en contra</div></div><div style="flex: 1 1 90px; text-align: center"><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; color: #062F5A">45%</div><div style="font-size: 13px; color: #4A5468; margin-top: 4px">Efectividad</div></div>
+      </div>
+      <div role="img" aria-label="10 ganados, 4 empatados, 11 perdidos" style="display: flex; height: 14px; border-radius: 7px; overflow: hidden">
+        <div style="width: 40%; background: #062F5A"></div><div style="width: 16%; background: #B9C2D0"></div><div style="width: 44%; background: #E9A77A"></div>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px">
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px">
+          <div style="font-weight: 700; color: #062F5A">De local en Landeta</div>
+          <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 15px; flex-wrap: wrap"><span><strong>11</strong> PJ</span><span>6 G · 2 E · 3 P</span><span>Goles 15–9</span></div>
+          <div style="margin-top: 10px; height: 10px; border-radius: 5px; background: #E3E7EE; overflow: hidden"><div style="width: 61%; height: 10px; background: #062F5A"></div></div>
+          <div style="font-size: 13px; color: #4A5468; margin-top: 4px">61% de los puntos</div>
+        </div>
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px">
+          <div style="font-weight: 700; color: #062F5A">De visitante</div>
+          <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 15px; flex-wrap: wrap"><span><strong>14</strong> PJ</span><span>4 G · 2 E · 8 P</span><span>Goles 13–23</span></div>
+          <div style="margin-top: 10px; height: 10px; border-radius: 5px; background: #E3E7EE; overflow: hidden"><div style="width: 33%; height: 10px; background: #062F5A"></div></div>
+          <div style="font-size: 13px; color: #4A5468; margin-top: 4px">33% de los puntos</div>
+        </div>
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px">
+          <div style="font-weight: 700; color: #062F5A">Playoffs</div>
+          <div style="display: flex; gap: 14px; margin-top: 8px; font-size: 15px; flex-wrap: wrap"><span><strong>2</strong> PJ</span><span>0 G · 0 E · 2 P</span><span>Goles 1–6</span></div>
+          <div style="margin-top: 10px; height: 10px; border-radius: 5px; background: #E3E7EE; overflow: hidden"><div style="width: 0%; height: 10px; background: #062F5A"></div></div>
+          <div style="font-size: 13px; color: #4A5468; margin-top: 4px">0% de los puntos</div>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 12px">
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px"><div style="font-size: 12px; font-weight: 700; color: #4A5468; letter-spacing: .5px">MAYOR GOLEADA</div><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; color: #062F5A">4 – 0</div><div style="font-size: 14px; color: #4A5468">Clausura 2025 · F4 · en Landeta</div></div>
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px"><div style="font-size: 12px; font-weight: 700; color: #4A5468; letter-spacing: .5px">PEOR DERROTA</div><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; color: #062F5A">1 – 4</div><div style="font-size: 14px; color: #4A5468">Clausura 2018 · F9 · en Susana</div></div>
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px"><div style="font-size: 12px; font-weight: 700; color: #4A5468; letter-spacing: .5px">RACHA ACTUAL</div><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; color: #062F5A">4 triunfos</div><div style="font-size: 14px; color: #4A5468">seguidos, desde Clausura 2025 F4</div></div>
+      <div style="flex: 1 1 220px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 12px; padding: 14px 16px"><div style="font-size: 12px; font-weight: 700; color: #4A5468; letter-spacing: .5px">GOLEADORES DE MITRE</div><div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; color: #062F5A">Fossarelli A. 5</div><div style="font-size: 14px; color: #4A5468">Tarquini 4 · Busquets 3</div></div>
+    </div>
+
+    <section aria-label="Todos los partidos" style="display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+        <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: #062F5A">Todos los partidos</h2>
+        <div style="margin-left: auto"><div style="display: flex; flex-wrap: wrap"><button type="button" aria-pressed="true" style="height: 44px; padding: 0 14px; border: 1px solid #062F5A; margin-left: 0; background: #062F5A; color: #FFFFFF; border-radius: 8px 0 0 8px; font: 600 14px Barlow, sans-serif">Todos</button><button type="button" aria-pressed="false" style="height: 44px; padding: 0 14px; border: 1px solid #C7CEDB; margin-left: -1px; background: #FFFFFF; color: #062F5A; border-radius: 0; font: 600 14px Barlow, sans-serif">De local</button><button type="button" aria-pressed="false" style="height: 44px; padding: 0 14px; border: 1px solid #C7CEDB; margin-left: -1px; background: #FFFFFF; color: #062F5A; border-radius: 0; font: 600 14px Barlow, sans-serif">De visitante</button><button type="button" aria-pressed="false" style="height: 44px; padding: 0 14px; border: 1px solid #C7CEDB; margin-left: -1px; background: #FFFFFF; color: #062F5A; border-radius: 0 8px 8px 0; font: 600 14px Barlow, sans-serif">Playoffs</button></div></div>
+      </div>
+      <ol style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+        <li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2026</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 26 · F2</span>Dom 09/08 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 3</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Tarquini J., Camargo A., Ruiz Díaz G.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 26 · F2</span>Mié 18/03 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 0</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Díaz J.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2025</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 25 · F9</span>Vie 03/10 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 2</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Tarquini J., Busquets T.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 25 · F4</span>Dom 24/08 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">4 – 0</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Tarquini J. ×2, Busquets T. ×2</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 25 · F6</span>Mar 15/04 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #E3E7EE; color: #2F3A4D; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">E</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Mendoza A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2024</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 24 · Cuartos</span>Vie 01/11 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">3 – 0</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 24 · F12</span>Dom 16/06 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 2</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Pochettino D., Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2023</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 23 · F12</span>Vie 09/06 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Gómez G., Jominy F.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2021</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 21 · F2</span>Dom 21/03 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2019</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 19 · F10</span>Sáb 26/10 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 0</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 19 · F5</span>Dom 15/09 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 19 · F6</span>Dom 14/04 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #E3E7EE; color: #2F3A4D; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">E</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Pereyra</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2018</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 18 · F9</span>Dom 21/10 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">4 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 18 · F4</span>Dom 16/09 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #E3E7EE; color: #2F3A4D; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">E</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 18 · F6</span>Dom 13/05 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">3 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2017</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 17 · F5</span>Lun 01/05 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goleadores sin cargar</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2016</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 16 · Playoff</span>Sáb 05/11 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">3 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goleadores sin cargar</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 16 · F5</span>Dom 22/05 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 0</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #E3E7EE; color: #2F3A4D; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">E</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2015</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 15 · F13</span>Dom 18/10 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 15 · F13</span>Dom 28/06 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 0</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Fossarelli A.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2014</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 14 · F7</span>Dom 14/09 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">1 – 2</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goles: Caro J.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 14 · F7</span>Dom 04/05 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 0</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2013</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Clausura 13 · F3</span>Dom 11/08 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">0 – 1</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goleadores sin cargar</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 13 · F3</span>Dom 07/04 · Local</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px"><strong>Dep. Mitre</strong> <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 1</span> Susanense <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #062F5A; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">G</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Goleadores sin cargar</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+<li style="list-style: none; padding: 14px 4px 4px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: #062F5A">2012</li>
+<li style="list-style: none"><a href="Detalle.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #DDE2EA; border-radius: 10px; text-decoration: none; color: #1A2233">
+            <span style="width: 128px; font-size: 14px; color: #4A5468"><span style="display: block; font-weight: 600; color: #1A2233">Apertura 12 · F12</span>Dom 10/06 · Visitante</span>
+            <span style="flex: 1 1 300px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px">Susanense <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">2 – 0</span> <strong>Dep. Mitre</strong> <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: #FCE3D2; color: #8A3B0F; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">P</span></span>
+            <span style="flex: 1 1 200px; font-size: 14px; color: #4A5468">Sin goles de Mitre</span>
+            <span style="font-size: 14px; font-weight: 600; color: #062F5A">Ver detalle ›</span>
+          </a></li>
+      </ol>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

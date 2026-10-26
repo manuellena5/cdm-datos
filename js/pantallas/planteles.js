@@ -10,7 +10,7 @@ CDM.pantallas.planteles = (function () {
   let actual = null;
 
   async function render(params, query) {
-    const [plantel, campanas, partidos] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos()]);
+    const [plantel, campanas, partidos, cuerpos] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos(), CDM.api.cuerposTecnicos()]);
     const sel = filtros.elegirTorneo(campanas, query);
     const cat = filtros.categoria(query);
     const categoria = filtros.nombreCategoria(cat);
@@ -49,7 +49,12 @@ CDM.pantallas.planteles = (function () {
       ? 'Con formación cargada: PJ, titular, entró y convocado salen de las formaciones.'
       : 'Este torneo todavía no tiene formaciones cargadas: PJ cuenta solo los partidos con gol o tarjeta.');
 
-    return controles + '<section class="tarjeta" aria-label="Plantel"><h1 class="tarjeta__titulo">' + e(titulo) + '</h1>' +
+    // Cuerpo técnico arriba de la lista; con "Todo el año", uno por torneo
+    const torneosSel = sel.torneo ? [sel.torneo] : filtros.torneos(campanas).filter((t) => t.anio === sel.anio);
+    const lineasCuerpo = torneosSel.map((t) => ({ t, c: ui.cuerpoTecnico(cuerpos, t.id, categoria) })).filter((x) => x.c.html)
+      .map((x) => '<p class="cuerpo-tecnico">' + (sel.torneo ? '' : '<span class="texto-2">' + e(ui.torneoSinAnio(x.t.nombre)) + ':</span> ') + x.c.html + '</p>').join('');
+
+    return controles + '<section class="tarjeta" aria-label="Plantel"><h1 class="tarjeta__titulo">' + e(titulo) + '</h1>' + lineasCuerpo +
       '<p class="nota">' + ui.plural(lista.length, 'jugador', 'jugadores') + ' · ' + ui.plural(jugados.length, 'partido jugado', 'partidos jugados') + '</p>' +
       (lista.length
         ? '<div class="tabla-scroll"><table class="tabla tabla--plantel"><thead><tr><th>Jugador</th>' +

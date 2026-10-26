@@ -29,19 +29,23 @@ CDM.pantallas.historial = (function () {
     return texto.charAt(0).toUpperCase() + texto.slice(1);
   }
 
-  function campanas(lista, cat) {
+  function campanas(lista, cat, cuerpos) {
+    const categoria = filtros.nombreCategoria(cat);
+    const tecnico = (c) => ui.cuerpoTecnico(cuerpos, c.torneo_id, categoria).tecnico;
+    const hayTecnicos = lista.some((c) => tecnico(c));
     const filas = lista.slice().sort((a, b) => b.torneo_orden - a.torneo_orden).map((c) => {
       const href = CDM.router.armar('/resultados', { anio: c.anio, torneo: filtros.sufijo(c.torneo_id), cat });
       return '<tr><th scope="row"><a href="' + href + '">' + e(c.torneo) + '</a></th>' +
         ['pj', 'g', 'e', 'p', 'gf', 'gc'].map((k) => '<td class="centro">' + c[k] + '</td>').join('') +
-        '<td class="total centro">' + c.pts + '</td><td class="texto-2">' + e(comoTermino(c)) + '</td></tr>';
+        '<td class="total centro">' + c.pts + '</td><td class="texto-2">' + e(comoTermino(c)) + '</td>' +
+        (hayTecnicos ? '<td class="texto-2">' + e(tecnico(c) || '–') + '</td>' : '') + '</tr>';
     }).join('');
     return '<section class="tarjeta" aria-label="Campañas por torneo"><h2 class="tarjeta__titulo">Campañas · ' +
       e(filtros.nombreCategoria(cat)) + '</h2>' +
       (filas
         ? '<div class="tabla-scroll"><table class="tabla tabla--ancha"><thead><tr><th>Torneo</th>' +
           ['PJ', 'G', 'E', 'P', 'GF', 'GC', 'Pts'].map((k) => '<th class="centro">' + k + '</th>').join('') +
-          '<th>Cómo terminó</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+          '<th>Cómo terminó</th>' + (hayTecnicos ? '<th>Técnico</th>' : '') + '</tr></thead><tbody>' + filas + '</tbody></table></div>'
         : ui.vacio('Todavía no hay campañas cargadas.')) +
       '<p class="nota">Fase regular (con zonas e interzonales). Tocá un torneo para ver sus partidos.</p></section>';
   }
@@ -96,8 +100,8 @@ CDM.pantallas.historial = (function () {
   }
 
   async function render(params, query) {
-    const [listaCampanas, partidos, historial, listaEquipos] = await Promise.all([
-      CDM.api.campanas(), CDM.api.partidos(), CDM.api.historialRival(), CDM.api.equipos()
+    const [listaCampanas, partidos, historial, listaEquipos, cuerpos] = await Promise.all([
+      CDM.api.campanas(), CDM.api.partidos(), CDM.api.historialRival(), CDM.api.equipos(), CDM.api.cuerposTecnicos()
     ]);
     const equipos = Object.fromEntries(listaEquipos.map((x) => [x.equipo_id, x]));
     const cat = filtros.categoria(query);
@@ -118,7 +122,7 @@ CDM.pantallas.historial = (function () {
         .concat([{ valor: 'todo', texto: 'Todo el historial' }]), periodo) +
       '<p class="filtros__nota">El período aplica a los datos destacados y a la tabla de rivales</p></section>';
 
-    return controles + campanas(listaCampanas.filter((c) => c.categoria === categoria), cat) +
+    return controles + campanas(listaCampanas.filter((c) => c.categoria === categoria), cat, cuerpos) +
       destacados(jugados, rivales, etiquetaPeriodo) + tablaRivales(rivales, cat, etiquetaPeriodo, equipos);
   }
 

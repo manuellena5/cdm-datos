@@ -1016,3 +1016,15 @@ details[disabled] summary { cursor: default; }
 .buscador__opcion:hover, .buscador__opcion--activa { background: var(--fondo-suave); }
 .buscador__opcion--activa { box-shadow: inset 3px 0 0 var(--azul); }
 .buscador__opcion--nuevo { color: var(--acento); font-weight: 600; border-top: 1px solid var(--borde-suave); }
+
+/* ---------- Cuerpo técnico (6.6.1) ---------- */
+.cuerpo { width: 100%; border: 1px solid var(--borde-suave); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.cuerpo__cabeza { display: flex; align-items: baseline; gap: 12px; }
+.cuerpo__titulo { margin: 0; font-size: 16px; }
+.cuerpo__campos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 12px; }
+.cuerpo__campo { margin: 0; }
+.cuerpo__fila { display: flex; gap: 6px; align-items: center; }
+.cuerpo__fila input { flex: 1; min-width: 0; }
+.cuerpo .nota { margin: 0; }
+.cuerpo-tecnico { margin: 0 0 12px; font-size: 15px; }
+.cuerpo-tecnico strong { color: var(--azul); }

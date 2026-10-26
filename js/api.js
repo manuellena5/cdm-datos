@@ -186,6 +186,10 @@ CDM.api = (function () {
     jugadorPartidos: (id) => consultar('jugador_partidos:' + id, () =>
       cliente.from('v_jugador_partidos').select('*').eq('jugador_id', id).order('fecha', { ascending: false, nullsFirst: false }).order('partido_id')),
 
+    // Cuerpo técnico de cada torneo y categoría (orden 0 = técnico). Si la tabla todavía no existe, vacío.
+    cuerposTecnicos: () => consultar('cuerpos_tecnicos', () =>
+      cliente.from('cuerpos_tecnicos').select('torneo_id,categoria,orden,nombre').order('torneo_id').order('categoria').order('orden')).catch(() => []),
+
     goleadoresLiga: () => consultar('goleadores_liga', () =>
       cliente.from('goleadores_liga').select('torneo_id,categoria,jugador_id,goles,puesto').order('id')),
 
@@ -237,6 +241,24 @@ CDM.api = (function () {
       plantelTorneo: (torneoId, categoria) => todas(() => cliente.from('v_plantel').select('*')
         .eq('torneo_id', torneoId).eq('categoria', categoria)),
       guardarLista: (filas) => escribir(cliente.from('planteles').upsert(filas, { onConflict: 'torneo_id,categoria,jugador_id' }).select()),
+      cuerposTecnicos: () => todas(() => cliente.from('cuerpos_tecnicos').select('torneo_id,categoria,orden,nombre').order('orden')),
+      // Guarda el cuerpo técnico entero: nombres[0] = técnico, 1 a 3 = integrantes. Los vacíos se borran.
+      guardarCuerpo: async (torneoId, categoria, nombres) => {
+        const filas = nombres.map((n, orden) => ({ torneo_id: torneoId, categoria, orden, nombre: String(n || '').trim() })).filter((f) => f.nombre);
+        const vacios = nombres.map((n, orden) => orden).filter((orden) => !String(nombres[orden] || '').trim());
+        if (filas.length) await escribir(cliente.from('cuerpos_tecnicos').upsert(filas, { onConflict: 'torneo_id,categoria,orden' }).select());
+        if (vacios.length) {
+          let res;
+          try {
+            res = await cliente.from('cuerpos_tecnicos').delete().eq('torneo_id', torneoId).eq('categoria', categoria).in('orden', vacios)
+              .abortSignal(AbortSignal.timeout(20000));
+          } catch (e) {
+            throw new Error('Sin conexión. No se guardó; probá de nuevo.');
+          }
+          if (res.error) throw errorDeGuardado(res.error);
+          olvidarCache();
+        }
+      },
       quitarDeLista: (torneoId, categoria, jugadorId) => escribir(cliente.from('planteles').delete()
         .eq('torneo_id', torneoId).eq('categoria', categoria).eq('jugador_id', jugadorId).select()),
       jugadoresResumen: () => todas(() => cliente.from('v_jugadores_resumen').select('*').order('apellido').order('nombre')),

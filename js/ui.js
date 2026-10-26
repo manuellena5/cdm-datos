@@ -175,9 +175,20 @@ CDM.ui = (function () {
     return nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1];
   }
 
+  // Cuerpo técnico de un torneo y categoría (filas de cuerpos_tecnicos: orden 0 = técnico).
+  // → { tecnico: 'Jorge Falappa', integrantes: ['A', 'B'], html: '<strong>Técnico:</strong> … · <strong>Cuerpo técnico:</strong> …' }
+  function cuerpoTecnico(cuerpos, torneoId, categoria) {
+    const de = (cuerpos || []).filter((c) => c.torneo_id === torneoId && c.categoria === categoria).sort((a, b) => a.orden - b.orden);
+    const tecnico = (de.find((c) => c.orden === 0) || {}).nombre || '';
+    const integrantes = de.filter((c) => c.orden > 0).map((c) => c.nombre);
+    const html = [tecnico ? '<strong>Técnico:</strong> ' + escaparHtml(tecnico) : '',
+      integrantes.length ? '<strong>Cuerpo técnico:</strong> ' + escaparHtml(integrantes.join(', ')) : ''].filter(Boolean).join(' · ');
+    return { tecnico, integrantes, html };
+  }
+
   return {
     plural, fechaCorta, fechaLarga, hora, escaparHtml, chipResultado, torneoSinAnio, instancia, instanciaLarga,
     marcador, penales, tituloChip, icono, rojas, selector, segmentado, cargando, errorCarga, avisoGuardados,
-    vacio, unir, escudo, iniciales
+    vacio, unir, escudo, iniciales, cuerpoTecnico
   };
 })();
