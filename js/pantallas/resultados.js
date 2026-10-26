@@ -23,16 +23,20 @@ CDM.pantallas.resultados = (function () {
   }
 
   function tarjeta(p, propio, equipos) {
-    const nombre = (id, texto) => '<span class="partido__nombre con-escudo">' + ui.escudo(equipos[id], 24) +
-      '<span class="partido__texto">' + e(texto) + '</span></span>';
+    // El nombre del rival lleva a su historial; el resto de la tarjeta, al detalle del partido
+    const nombre = (id, texto) => (id === p.rival_id
+      ? '<a class="partido__nombre partido__rival con-escudo" href="' + CDM.router.armar('/historial/rival/' + encodeURIComponent(id),
+        { cat: p.categoria === 'Reserva' ? 'R' : 'P', periodo: 'todo' }) + '" title="Historial contra ' + e(texto) + '">'
+      : '<span class="partido__nombre con-escudo">') + ui.escudo(equipos[id], 24) +
+      '<span class="partido__texto">' + e(texto) + '</span>' + (id === p.rival_id ? '</a>' : '</span>');
     const local = p.condicion === 'L';
     const goles = (n) => (n == null ? '' : n);
     const pen = ui.penales(p);
     // En el celular no hay marcador central: la hora o los penales van en la línea de abajo.
     const extraCel = [pen, p.goles_local == null ? ui.marcador(p) : ''].filter(Boolean).join(' · ');
     const etiqueta = (local ? p.local + ' ' : p.visitante + ' ') + 'contra ' + (local ? p.visitante : p.local);
-    return '<a class="partido" href="#/partido/' + encodeURIComponent(p.partido_id) + '" aria-label="Detalle: ' +
-      e(etiqueta + ', ' + ui.instanciaLarga(p)) + '">' +
+    return '<article class="partido"><a class="partido__enlace" href="#/partido/' + encodeURIComponent(p.partido_id) + '" aria-label="Detalle: ' +
+      e(etiqueta + ', ' + ui.instanciaLarga(p)) + '"></a>' +
       '<div class="partido__fecha"><span class="partido__nro">' + e(ui.instancia(p)) + '</span>' +
       '<span class="partido__dia">' + e(ui.fechaCorta(p.fecha) || 'Sin fecha') + '</span></div>' +
       '<div class="partido__eq partido__eq--local' + (local ? ' es-propio' : '') + '">' + nombre(p.local_id, p.local) +
@@ -46,7 +50,7 @@ CDM.pantallas.resultados = (function () {
       (p.goles_mitre_texto ? '<div class="partido__goleadores"><strong>' + e(propio.nombre_corto) + ':</strong> ' +
         e(p.goles_mitre_texto) + (extraCel ? ' <span class="partido__pen-cel">· ' + e(extraCel) + '</span>' : '') + '</div>'
         : (extraCel ? '<div class="partido__goleadores partido__pen-cel">' + e(extraCel) + '</div>' : '')) +
-      '</a>';
+      '</article>';
   }
 
   async function render(params, query) {

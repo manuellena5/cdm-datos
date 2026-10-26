@@ -126,14 +126,20 @@ CDM.pantallas.detalle = (function () {
       x.gf != null).sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')) || b.torneo_orden - a.torneo_orden)
       .slice(0, 5);
     const n = (v, k) => '<div><div class="mini__v">' + (v ?? 0) + '</div><div class="mini__k">' + k + '</div></div>';
+    const todos = partidos.filter((x) => x.rival_id === p.rival_id && x.categoria === p.categoria && x.resultado);
+    const gep = (lista) => lista.filter((x) => x.resultado === 'G').length + '-' + lista.filter((x) => x.resultado === 'E').length + '-' +
+      lista.filter((x) => x.resultado === 'P').length;
+    const deLocal = todos.filter((x) => x.condicion === 'L');
+    const deVisitante = todos.filter((x) => x.condicion === 'V');
     const corto = (x) => ui.torneoSinAnio(x.torneo) + ' ' + String(x.anio).slice(2) + ' · ' + ui.instancia(x);
     return '<section class="tarjeta" aria-label="Historial contra el rival"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Contra ' +
       e(p.rival) + ' · ' + e(p.categoria) + '</h2>' +
       '<div class="mini">' + n(h && h.pj, 'PJ') + n(h && h.g, 'Ganados') + n(h && h.e, 'Empates') + n(h && h.p, 'Perdidos') + '</div>' +
+      (todos.length ? '<p class="nota mini__condicion">De local ' + gep(deLocal) + ' · de visitante ' + gep(deVisitante) + ' <span class="texto-2">(G-E-P)</span></p>' : '') +
       (cruces.length ? '<ul class="cruces">' + cruces.map((x) => '<li><a href="#/partido/' + encodeURIComponent(x.partido_id) + '"' +
         (x.partido_id === p.partido_id ? ' aria-current="page"' : '') + '><span>' + e(corto(x)) + '</span><span class="cruces__res">' +
         e(x.gf + ' - ' + x.gc) + ' ' + ui.chipResultado(x.resultado) + '</span></a></li>').join('') + '</ul>' : '') +
-      '<a class="enlace" href="' + CDM.router.armar('/historial', { cat: p.categoria === 'Reserva' ? 'R' : 'P', periodo: 'todo' }) +
+      '<a class="enlace" href="' + CDM.router.armar('/historial/rival/' + encodeURIComponent(p.rival_id), { cat: p.categoria === 'Reserva' ? 'R' : 'P', periodo: 'todo' }) +
       '">Ver historial completo</a></section>';
   }
 

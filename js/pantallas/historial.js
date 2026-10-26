@@ -80,11 +80,12 @@ CDM.pantallas.historial = (function () {
       '</section>';
   }
 
-  function tablaRivales(rivales, cat, etiquetaPeriodo, equipos) {
+  function tablaRivales(rivales, cat, etiquetaPeriodo, equipos, periodo) {
     const filas = rivales.slice().sort((a, b) => Number(b.porcentaje_puntos) - Number(a.porcentaje_puntos) || b.pj - a.pj ||
       a.rival.localeCompare(b.rival, 'es')).map((r) => {
       const pct = Math.round(Number(r.porcentaje_puntos));
-      return '<tr><th scope="row"><span class="con-escudo">' + ui.escudo(equipos[r.rival_id], 24) + e(r.rival) + '</span></th>' +
+      const href = CDM.router.armar('/historial/rival/' + encodeURIComponent(r.rival_id), { cat, periodo });
+      return '<tr><th scope="row"><a class="con-escudo" href="' + href + '">' + ui.escudo(equipos[r.rival_id], 24) + e(r.rival) + '</a></th>' +
         ['pj', 'g', 'e', 'p', 'gf', 'gc'].map((k) => '<td class="centro">' + r[k] + '</td>').join('') +
         '<td class="total centro">' + r.pts + '</td><td><div class="rendimiento"><div class="barra"><div style="width:' + pct +
         '%"></div></div><span>' + pct + '%</span></div></td></tr>';
@@ -123,7 +124,7 @@ CDM.pantallas.historial = (function () {
       '<p class="filtros__nota">El período aplica a los datos destacados y a la tabla de rivales</p></section>';
 
     return controles + campanas(listaCampanas.filter((c) => c.categoria === categoria), cat, cuerpos) +
-      destacados(jugados, rivales, etiquetaPeriodo) + tablaRivales(rivales, cat, etiquetaPeriodo, equipos);
+      destacados(jugados, rivales, etiquetaPeriodo) + tablaRivales(rivales, cat, etiquetaPeriodo, equipos, periodo);
   }
 
   function montar(vista) {

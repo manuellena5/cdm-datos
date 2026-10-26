@@ -2,6 +2,17 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.15.0 — Fase 6.6.2 (historial contra un rival)
+- Pantalla nueva **Historial contra un rival** (`#/historial/rival/:id?cat=P&periodo=todo`). Se llega desde cada rival de la tabla "Contra cada rival" del Historial, desde el nombre del rival en las tarjetas de Resultados y desde "Ver historial completo" en el Detalle del partido.
+- **Filtros** en la URL: rival, categoría (Primera / Reserva / Las dos) y período (todo o un año).
+- **Resumen**: los dos escudos, partidos, ganados, empatados, perdidos, goles a favor y en contra, efectividad (% de puntos) y una barra G/E/P.
+- **De local / De visitante / Playoffs**: partidos, G-E-P, goles y efectividad de cada uno.
+- **Destacados**: mayor goleada, peor derrota (torneo, fecha, de local o de visitante), racha actual (triunfos seguidos, sin perder o sin ganar, desde cuándo), primer partido y los 3 goleadores de Mitre contra ese rival.
+- **Todos los partidos**, del más nuevo al más viejo y agrupados por año: torneo e instancia, día, local o visitante, equipos con Mitre en negrita, marcador, G/E/P, penales y goleadores de Mitre ("Sin goles de Mitre" o "Goleadores sin cargar"). Toda la fila lleva al Detalle y "Atrás" vuelve con los mismos filtros. Selector Todos / De local / De visitante / Playoffs. Con "Las dos", Primera y Reserva del mismo partido van en la misma fila.
+- Los partidos con resultado sin marcador cuentan en partidos y en G/E/P pero no en goles (nota al pie). En modo administrador también se ven los borradores, con su etiqueta.
+- En el **Detalle del partido**, el recuadro "Contra … " suma "De local G-E-P · de visitante G-E-P".
+- En **Resultados**, la tarjeta sigue llevando al Detalle; el nombre del rival lleva a su historial.
+
 ## v0.14.0 — Fase 6.6.1 (cuerpo técnico)
 - Cada torneo y categoría tiene **un técnico y hasta 3 integrantes** del cuerpo técnico, sin función (no se distingue ayudante, preparador físico, etc.). El nombre es texto libre.
 - **Administrar → Planteles**: bloque **Cuerpo técnico** arriba de la tabla del plantel, con Técnico e Integrante ("+ Integrante" hasta 3, ✕ para quitar). Sugiere los nombres ya usados en otros torneos y, si el torneo no tiene cuerpo técnico, ofrece **"Usar el del …"** torneo anterior de la misma categoría. Se guarda solo al salir del campo (o con Enter), con el aviso "Guardado". **"Copiar plantel de…"** también copia el cuerpo técnico si este torneo todavía no tiene.

@@ -1028,3 +1028,60 @@ details[disabled] summary { cursor: default; }
 .cuerpo .nota { margin: 0; }
 .cuerpo-tecnico { margin: 0 0 12px; font-size: 15px; }
 .cuerpo-tecnico strong { color: var(--azul); }
+
+/* ---------- Tarjeta de partido con dos enlaces (6.6.2) ---------- */
+/* Toda la tarjeta lleva al detalle (enlace estirado); el nombre del rival, a su historial. */
+.partido { position: relative; }
+.partido__enlace { position: absolute; inset: 0; z-index: 1; border-radius: var(--radio); }
+.partido__enlace:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.partido__rival { position: relative; z-index: 2; color: inherit; text-decoration: none; }
+.partido__rival:hover .partido__texto { text-decoration: underline; color: var(--acento); }
+
+/* ---------- Historial contra un rival (6.6.2) ---------- */
+.migas { font-size: 14px; color: var(--texto-2); margin: 0 0 10px; }
+.migas a { color: var(--acento); }
+.rival-tarjeta { display: flex; flex-direction: column; gap: 14px; }
+.rival-cabeza { display: flex; align-items: center; gap: 14px; }
+.rival-cabeza__texto { flex: 1; min-width: 0; text-align: center; }
+.rival-cabeza__titulo { margin: 0; font-family: var(--f-titulo); font-size: 30px; color: var(--azul); line-height: 1.1; }
+.rival-cabeza__texto .texto-2 { margin: 4px 0 0; }
+.rival-resumen { display: flex; flex-direction: column; gap: 10px; }
+.rival-resumen__datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+.rival-resumen .dato { box-shadow: none; border: 1px solid var(--borde-suave); padding: 10px 12px; }
+.rival-resumen .dato__v { font-size: 32px; }
+.barra-gep { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--fondo-suave); }
+.barra-gep__g { background: var(--g-fondo); }
+.barra-gep__e { background: #9FB0CF; }
+.barra-gep__p { background: #E5895A; }
+.rival-conds { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.rival-cond p { margin: 2px 0; }
+.rival-cond__titulo { margin: 0 0 6px; font-size: 15px; color: var(--texto-2); }
+.rival-cond__pj strong { font-family: var(--f-titulo); font-size: 28px; color: var(--azul); }
+.destacado__lider a, .destacado__t a { color: inherit; }
+.rival-anio { margin: 14px 0 6px; font-family: var(--f-titulo); font-size: 20px; color: var(--azul); }
+.rival-partidos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rival-partido {
+  display: grid; grid-template-columns: 150px minmax(0, 1fr) auto; gap: 6px 14px; align-items: center;
+  padding: 10px 12px; border: 1px solid var(--borde-suave); border-radius: 10px; color: var(--texto); text-decoration: none;
+}
+.rival-partido:hover { border-color: var(--acento); color: var(--texto); }
+.rival-partido__cuando { display: flex; flex-direction: column; }
+.rival-partido__torneo { font-weight: 700; color: var(--azul); }
+.rival-partido__lineas { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rival-partido__linea { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.rival-partido__linea .chip { width: 26px; height: 26px; font-size: 13px; }
+.rival-partido__cat { font-size: 12px; font-weight: 700; color: var(--texto-2); text-transform: uppercase; min-width: 62px; }
+.rival-partido__marcador { font-weight: 700; white-space: nowrap; }
+.rival-partido__equipos { flex: 1 1 0; min-width: 0; }   /* se achica antes que bajar la etiqueta G/E/P */
+.rival-partido__goles { flex-basis: 100%; font-size: 14px; }
+.rival-partido__ver { color: var(--acento); font-weight: 600; white-space: nowrap; }
+
+@media (max-width: 720px) {
+  .rival-cabeza__titulo { font-size: 24px; }
+  .rival-resumen__datos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rival-resumen .dato__v { font-size: 26px; }
+  .rival-partido { grid-template-columns: minmax(0, 1fr); }
+  .rival-partido__ver { display: none; }
+  .rival-partido__cat { min-width: 54px; }
+  .tarjeta__cabeza .segmentado { flex-wrap: wrap; }
+}
