@@ -625,7 +625,8 @@ CDM.pantallas.adminPartido = (function () {
       const regulares = partidos.filter((x) => x.torneo_id === torneoId && x.fase === 'Regular');
       const pend = regulares.filter((x) => x.estado === 'Programado').sort((a, b) => a.fecha_nro - b.fecha_nro)[0];
       // Desde "Pendientes de carga" llega la fecha que falta (?instancia=F3)
-      instancia = /^F\d+$/.test(query.get('instancia') || '') ? query.get('instancia')
+      const pedida = query.get('instancia') || '';
+      instancia = /^F\d+$/.test(pedida) || PLAYOFF.includes(pedida) || pedida === 'Playoff' ? pedida
         : 'F' + (pend ? pend.fecha_nro : Math.max(0, ...regulares.map((x) => x.fecha_nro || 0)) + 1);
     }
     await cargarEstado(torneoId, instancia, serie);

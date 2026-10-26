@@ -597,6 +597,51 @@ h1, h2, h3 { font-family: var(--f-titulo); font-weight: 700; color: var(--azul);
   .nav-inf a { font-size: 13px; }
 }
 
+/* ---------- Resultados en modo administrador (6.5.1) ---------- */
+.estado-torneo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; font-size: 15px; }
+.estado-torneo__titulo { margin: 0; font-size: 22px; width: 100%; }
+.estado-torneo__pts { margin-left: auto; }
+.texto-falta { color: #7A4300; }
+.fechas-admin { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.fechas-admin--solo-falta > [data-falta="0"] { display: none; }
+.fecha-admin {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde-suave);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.fecha-admin--falta { border-color: #F0C48A; box-shadow: inset 4px 0 0 #E3A55B; }
+.fecha-admin--sin { background: #FFFBF5; border: 2px dashed #E3A55B; }
+.fecha-admin--libre { background: #F7F8FB; border: 1px dashed var(--borde); }
+.fecha-admin__nro { width: 84px; flex: none; }
+.fecha-admin__nro > div:first-child { font-family: var(--f-titulo); font-weight: 700; font-size: 18px; }
+.fecha-admin--sin .fecha-admin__nro > div:first-child { color: #7A4300; }
+.fecha-admin__partido { flex: 1 1 320px; min-width: 0; }
+.fecha-admin__marcador { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 16px; }
+.fecha-admin__marcador .es-propio { font-weight: 700; }
+.fecha-admin__marcador .chip { width: 28px; height: 28px; font-size: 14px; }
+.fecha-admin__score { font-family: var(--f-titulo); font-weight: 700; font-size: 22px; letter-spacing: 1px; }
+.fecha-admin__score small { font-family: var(--f-texto); font-size: 12px; letter-spacing: 0; color: var(--texto-2); }
+.fecha-admin__texto { flex: 1 1 260px; font-size: 15px; color: var(--texto-2); }
+.fecha-admin__etiquetas { display: flex; flex-wrap: wrap; gap: 6px; flex: 0 1 300px; justify-content: flex-end; }
+.etiqueta { font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+.etiqueta--falta { background: #FFF4E5; color: #7A4300; border-color: #F0C48A; }
+.etiqueta--info { background: #EEF2F8; color: #2F3A4D; border-color: var(--borde); }
+.etiqueta--ok { background: #E7F3EC; color: #1F5C3A; border-color: #A9D3B8; }
+.fecha-admin .boton-icono { margin-left: auto; }
+.fechas-admin__despues { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.fechas-admin__despues .fechas-admin { width: 100%; }
+@media (max-width: 720px) {
+  .fecha-admin { padding: 10px 12px; }
+  .fecha-admin__nro { width: auto; }
+  .fecha-admin__etiquetas { justify-content: flex-start; flex-basis: 100%; }
+  .estado-torneo__pts { margin-left: 0; }
+}
+
 /* ---------- Pendientes de carga (panel) ---------- */
 .pendiente { border-top: 1px solid var(--fondo-suave); }
 .pendiente summary { gap: 4px 12px; flex-wrap: wrap; padding: 6px 0; list-style-position: inside; }

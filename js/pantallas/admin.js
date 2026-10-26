@@ -365,7 +365,8 @@ CDM.pantallas.admin = (function () {
       '<section class="tarjeta" aria-label="Últimos cargados"><div class="tarjeta__cabeza"><h2 class="tarjeta__titulo">Últimos cargados</h2>' +
       '<a href="#/admin/partido/nuevo" class="enlace">+ Partido fuera del fixture</a></div>' + ultimos(grupos) + '</section></div>' +
       '<aside class="detalle__lateral">' +
-      '<section class="tarjeta" aria-label="Datos que faltan"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Datos que faltan</h2>' + faltantes(falt) + '</section>' +
+      '<section class="tarjeta" aria-label="Datos que faltan"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Datos que faltan</h2>' + faltantes(falt) +
+      '<a class="enlace" href="#/admin/resultados?ver=falta">Revisar torneo por torneo</a></section>' +
       '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId, equipos, torneos) + '</section>' +
       '</aside></div>';
   }

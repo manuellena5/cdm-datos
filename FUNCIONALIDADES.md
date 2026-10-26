@@ -2,6 +2,19 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.10.0 — Fase 6.5.1 (Resultados en modo administrador)
+- **Resultados (admin)** (`#/admin/resultados?anio=…&torneo=…&cat=…&ver=falta`): mismos filtros que la consulta, guardados en la URL. Incluye borradores y todas las fases.
+- **Todas las fechas de la fase regular, sin saltos**, de 1 a la cantidad de fechas del torneo (o la última cargada; la cantidad se fija desde la misma pantalla). Cada fecha sin partido aparece en su lugar, punteada:
+  - **Posible libre**, con el motivo: la tabla (`posiciones`) muestra que Mitre no jugó o no sumó esa fecha, las observaciones del torneo dicen "Fecha N: Mitre libre", o es la única fecha sin partido del torneo. Es una sugerencia: no se guarda sola.
+  - **Pendiente**: sin partido ni indicios. **Falta Primera/Reserva**: hay partido de la otra categoría (abre ese partido para sumarla).
+  - **Libre / No se jugó**: marcada, con quién y cuándo, y "Deshacer".
+  - Botones "Cargar partido" (abre la carga con torneo y fecha elegidos), "Marcar libre" y "No se jugó".
+- **Cada partido**: tarjeta con fecha, equipos, marcador, G/E/P, goles de Mitre y el resultado de la otra categoría, un **lápiz** que abre la carga para corregir, y etiquetas de lo que falta. En naranja (cuentan como faltantes y marcan el partido): borrador, programado vencido, sin resultado, resultado inferido, goleadores de Mitre que no suman, falta la otra categoría de esa fecha. En gris (informativas): goleadores del rival que no suman, sin árbitro, fecha aproximada (de las observaciones). En verde: con formación.
+- **Resumen del torneo**: fechas, partidos cargados, libres, fechas sin partido, partidos con faltantes y Pts/PJ/G/E/P. Selector **"Todas las fechas / Solo lo que falta"**.
+- **Después de la fase regular**: los partidos de playoff con sus faltantes y "+ Partido de playoff".
+- Desde el Panel, "Datos que faltan" tiene el link "Revisar torneo por torneo" (abre esta pantalla en "Solo lo que falta").
+- `sql/11_fechas_libres_quien.sql`: guarda quién marcó cada fecha libre.
+
 ## v0.9.0 — Fase 6.5.0 (menú de administrador)
 - **Menú de administrador** fijo en todas las pantallas de admin (Panel · Resultados · Planteles · Jugadores · Equipos), con la pantalla actual marcada. Queda arriba al bajar por la página. En el celular es una fila con scroll horizontal que se acomoda sola para mostrar la pantalla actual. También está en la pantalla de carga de partido.
 - El Panel conserva sus acciones generales: Exportar a Excel, Ver sitio público y Salir.

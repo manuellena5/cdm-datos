@@ -202,7 +202,7 @@ CDM.api = (function () {
       cliente.from('v_formaciones').select('*').in('partido_id', lista(ids)).order('nro_lista')),
 
     posicionesDe: (torneoId) => consultar('posiciones:' + torneoId, () =>
-      cliente.from('posiciones').select('categoria,tras_fecha,posicion,pts').eq('torneo_id', torneoId).order('id')),
+      cliente.from('posiciones').select('categoria,tras_fecha,posicion,pts,pj').eq('torneo_id', torneoId).order('id')),
 
     fuentes: (ids) => consultar('fuentes:' + lista(ids), () =>
       cliente.from('fuentes').select('fuente_id,medio,que_cubre,url').in('fuente_id', lista(ids)).order('fuente_id')),
@@ -227,7 +227,7 @@ CDM.api = (function () {
     },
     admin: {
       partidos: () => todas(() => cliente.from('v_partidos')
-        .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en').order('partido_id')),
+        .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en,observaciones').order('partido_id')),
       equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,cancha,escudo,es_propio').order('nombre_corto')),
       // Una tabla completa (para exportar a Excel)
       tabla: (nombre, orden) => todas(() => cliente.from(nombre).select('*').order(orden)),
@@ -255,8 +255,8 @@ CDM.api = (function () {
       quitarEscudo: (equipoId) => escribir(cliente.from('equipos').update({ escudo: null }).eq('equipo_id', equipoId).select()),
       torneos: () => todas(() => cliente.from('torneos').select('torneo_id,anio,nombre,tipo,orden,fechas_regular').order('orden', { ascending: false })),
       fechasFaltantes: () => todas(() => cliente.from('v_fechas_faltantes').select('*').order('torneo_orden', { ascending: false }).order('fecha_nro')),
-      fechasLibres: () => todas(() => cliente.from('fechas_libres').select('torneo_id,fecha_nro,motivo').order('fecha_nro')),
-      marcarLibre: (torneoId, fechaNro) => escribir(cliente.from('fechas_libres').insert({ torneo_id: torneoId, fecha_nro: fechaNro }).select()),
+      fechasLibres: () => todas(() => cliente.from('fechas_libres').select('*').order('fecha_nro')),
+      marcarLibre: (torneoId, fechaNro, motivo) => escribir(cliente.from('fechas_libres').insert({ torneo_id: torneoId, fecha_nro: fechaNro, motivo: motivo || 'Libre' }).select()),
       quitarLibre: (torneoId, fechaNro) => escribir(cliente.from('fechas_libres').delete().eq('torneo_id', torneoId).eq('fecha_nro', fechaNro).select()),
       guardarFechasRegular: (torneoId, n) => escribir(cliente.from('torneos').update({ fechas_regular: n }).eq('torneo_id', torneoId).select()),
       jugadores: () => todas(() => cliente.from('jugadores').select('jugador_id,apellido,nombre,division').order('apellido').order('nombre')),

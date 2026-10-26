@@ -12,6 +12,7 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 8. `08_pendientes.sql` — `fechas_libres`, `torneos.fechas_regular` y `v_fechas_faltantes` (pendientes del panel).
 9. `09_estadisticas.sql` — `v_jugador_partidos` y `v_plantel` (ficha de jugador y planteles). La carga de formación está en `guardar_partido` (`05`).
 10. `10_planteles.sql` — tabla `planteles` (lista de jugadores de cada torneo y categoría). Después volver a correr `05`, `07` y `09`.
+11. `11_fechas_libres_quien.sql` — `fechas_libres.creado_por` (quién marcó la fecha libre), completado solo por un trigger.
 
 En una base nueva el orden es 01 → 10 y después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`).
 
