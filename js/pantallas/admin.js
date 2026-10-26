@@ -346,10 +346,12 @@ CDM.pantallas.admin = (function () {
   async function render() {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) return acceso.html;
-    const [partidos, falt, listaCambios, equipos, fechasFaltan, torneos, libres] = await Promise.all([
+    const [partidos, falt, listaCambios, equipos, fechasFaltan, torneos, libres, pares] = await Promise.all([
       CDM.api.admin.partidos(), CDM.api.admin.faltantes(), CDM.api.admin.cambios(), CDM.api.admin.equipos(),
-      CDM.api.admin.fechasFaltantes(), CDM.api.admin.torneos(), CDM.api.admin.fechasLibres()
+      CDM.api.admin.fechasFaltantes(), CDM.api.admin.torneos(), CDM.api.admin.fechasLibres(),
+      CDM.api.admin.posiblesDuplicados().catch(() => null)   // sin 12_duplicados.sql, el bloque no aparece
     ]);
+    const dupPendientes = pares ? pares.filter((p) => !p.descartado).length : 0;
     const grupos = CDM.admin.agrupar(partidos);
     const porId = Object.fromEntries(partidos.map((p) => [p.partido_id, p]));
     const aviso = CDM.admin.tomarAviso();
@@ -367,6 +369,9 @@ CDM.pantallas.admin = (function () {
       '<aside class="detalle__lateral">' +
       '<section class="tarjeta" aria-label="Datos que faltan"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Datos que faltan</h2>' + faltantes(falt) +
       '<a class="enlace" href="#/admin/resultados?ver=falta">Revisar torneo por torneo</a></section>' +
+      (dupPendientes ? '<section class="tarjeta" aria-label="Posibles duplicados"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Posibles duplicados (' + dupPendientes + ')</h2>' +
+        '<p class="nota">Jugadores con el mismo apellido que pueden ser la misma persona.</p>' +
+        '<a class="enlace" href="#/admin/jugadores/duplicados">Revisar</a></section>' : '') +
       '<section class="tarjeta" aria-label="Registro de cambios"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Registro de cambios</h2>' + cambios(listaCambios, porId, equipos, torneos) + '</section>' +
       '</aside></div>';
   }

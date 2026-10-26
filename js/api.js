@@ -242,6 +242,15 @@ CDM.api = (function () {
       jugadoresResumen: () => todas(() => cliente.from('v_jugadores_resumen').select('*').order('apellido').order('nombre')),
       editarJugador: (id, campos) => escribir(cliente.from('jugadores').update(campos).eq('jugador_id', id).select()),
       unirJugadores: (queda, sobra) => llamar('unir_jugadores', { p_queda: queda, p_sobra: sobra }),
+      // Posibles duplicados (6.5.3): pares con el mismo apellido, pendientes y descartados
+      posiblesDuplicados: () => todas(() => cliente.from('v_posibles_duplicados').select('*').order('jugador_a').order('jugador_b')),
+      datosJugadores: (ids) => todas(() => cliente.from('v_datos_jugador').select('*').in('jugador_id', ids).order('partido_id')),
+      descartarPar: (a, b, motivo) => escribir(cliente.from('jugadores_distintos')
+        .insert({ jugador_a: a < b ? a : b, jugador_b: a < b ? b : a, motivo: motivo || null }).select()),
+      volverAPendientes: (a, b) => escribir(cliente.from('jugadores_distintos').delete()
+        .eq('jugador_a', a < b ? a : b).eq('jugador_b', a < b ? b : a).select()),
+      pasarDato: (clase, dato, partido, de, a) =>
+        llamar('pasar_dato', { p_clase: clase, p_dato: dato || '', p_partido: partido, p_de: de, p_a: a }),
       // Sube el escudo a Storage (bucket público "escudos") y guarda la URL en el equipo.
       subirEscudo: async (equipoId, archivo) => {
         const ext = (archivo.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png';

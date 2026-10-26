@@ -13,8 +13,9 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 9. `09_estadisticas.sql` — `v_jugador_partidos` y `v_plantel` (ficha de jugador y planteles). La carga de formación está en `guardar_partido` (`05`).
 10. `10_planteles.sql` — tabla `planteles` (lista de jugadores de cada torneo y categoría). Después volver a correr `05`, `07` y `09`.
 11. `11_fechas_libres_quien.sql` — `fechas_libres.creado_por` (quién marcó la fecha libre), completado solo por un trigger.
+12. `12_duplicados.sql` — posibles duplicados de jugadores: tabla `jugadores_distintos` (pares descartados), vistas `v_posibles_duplicados` y `v_datos_jugador`, y función `pasar_dato`.
 
-En una base nueva el orden es 01 → 10 y después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`).
+En una base nueva el orden es 01 → 10, después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`), y al final `11` y `12`.
 
 En una base nueva, `01` ya incluye lo de `04` y `06`.
 

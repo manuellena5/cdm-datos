@@ -11,6 +11,7 @@ CDM.pantallas.adminJugadores = (function () {
   let editando = null;     // id del jugador en edición
   let filtro = '';
   let vistaActual = null;
+  let volverA = null;      // ?volver= (desde Posibles duplicados): adónde ir después de guardar o cancelar
 
   const sinAcentos = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
   const nombre = (j) => j.apellido + (j.nombre ? ', ' + j.nombre : '');
@@ -26,17 +27,6 @@ CDM.pantallas.adminJugadores = (function () {
       i = j;
     }
     return partes.join(', ') || 'Sin partidos';
-  }
-
-  // Posibles duplicados: mismo apellido (sin acentos ni mayúsculas).
-  function duplicados() {
-    const grupos = new Map();
-    datos.forEach((j) => {
-      const k = sinAcentos(j.apellido).replace(/[^a-zñ ]/g, '');
-      if (!grupos.has(k)) grupos.set(k, []);
-      grupos.get(k).push(j);
-    });
-    return [...grupos.values()].filter((g) => g.length > 1);
   }
 
   function fila(j) {
@@ -69,7 +59,7 @@ CDM.pantallas.adminJugadores = (function () {
 
   function barraUnir() {
     if (seleccion.length < 2) {
-      return '<div class="unir"><p class="nota">Para unir dos jugadores, tildá los dos (o usá "Elegir estos" en un posible duplicado).' +
+      return '<div class="unir"><p class="nota">Para unir dos jugadores, tildá los dos.' +
         (seleccion.length === 1 ? ' Falta elegir uno más.' : '') + '</p></div>';
     }
     const [a, b] = seleccion.map((id) => datos.find((j) => j.jugador_id === id));
@@ -96,21 +86,25 @@ CDM.pantallas.adminJugadores = (function () {
     if (texto) p.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
-  async function render() {
+  async function render(params, query) {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) { datos = []; return acceso.html; }
-    datos = await CDM.api.admin.jugadoresResumen();
+    // Si todavía no se corrió 12_duplicados.sql, el contador no aparece
+    const [resumen, pares] = await Promise.all([CDM.api.admin.jugadoresResumen(), CDM.api.admin.posiblesDuplicados().catch(() => null)]);
+    datos = resumen;
     seleccion = seleccion.filter((id) => datos.some((j) => j.jugador_id === id));
-    editando = null;
-    const dups = duplicados();
+    // ?editar=J012 (desde Posibles duplicados): abre ese jugador en edición
+    const aEditar = query && query.get('editar') && datos.find((j) => j.jugador_id === query.get('editar'));
+    editando = aEditar ? aEditar.jugador_id : null;
+    if (aEditar) filtro = aEditar.apellido;
+    volverA = aEditar && /^#\/admin\//.test(query.get('volver') || '') ? query.get('volver') : null;
+    const pendientes = pares ? pares.filter((p) => !p.descartado).length : null;
     const aviso = CDM.admin.tomarAviso();
     return CDM.admin.barra('Jugadores', acceso.admin, { actual: 'jugadores' }) +
       (aviso ? '<div class="aviso aviso--ok" role="status">' + e(aviso) + '</div>' : '') +
       '<p class="form-error" role="alert" hidden></p>' +
-      '<section class="tarjeta" aria-label="Posibles duplicados"><details' + (dups.length ? '' : ' disabled') + '><summary class="tarjeta__titulo tarjeta__titulo--chico">Posibles duplicados (' + dups.length + ')</summary>' +
-      (dups.length ? '<ul class="duplicados">' + dups.map((g) => '<li><span>' + e(g.map(nombre).join(' · ')) + '</span>' +
-        (g.length === 2 ? '<button type="button" class="enlace-boton" data-par="' + e(g.map((j) => j.jugador_id).join(',')) + '">Elegir estos</button>' : '') +
-        '</li>').join('') + '</ul>' : '<p class="nota">No hay jugadores con el mismo apellido.</p>') + '</details></section>' +
+      (pendientes == null ? '' : '<section class="tarjeta tarjeta--fila" aria-label="Posibles duplicados"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Posibles duplicados (' + pendientes + ')</h2>' +
+        '<a class="enlace" href="#/admin/jugadores/duplicados">' + (pendientes ? 'Revisar' : 'Ver descartados') + '</a></section>') +
       '<section class="tarjeta" aria-label="Unir jugadores"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Unir jugadores</h2><div id="barra-unir">' + barraUnir() + '</div></section>' +
       '<section class="tarjeta" aria-label="Lista de jugadores"><div class="campo"><label for="buscar">Buscar</label>' +
       '<input id="buscar" type="search" value="' + e(filtro) + '" placeholder="Apellido, nombre o apodo" autocomplete="off"></div>' +
@@ -130,11 +124,10 @@ CDM.pantallas.adminJugadores = (function () {
       pintarLista();
     });
     vista.addEventListener('click', async (ev) => {
-      const b = ev.target.closest('[data-editar], [data-par], [data-accion]');
+      const b = ev.target.closest('[data-editar], [data-accion]');
       if (!b) return;
       if (b.dataset.editar) { editando = b.dataset.editar; pintarLista(); const i = vista.querySelector('#j-ap'); if (i) i.focus(); return; }
-      if (b.dataset.par) { seleccion = b.dataset.par.split(','); pintarLista(); vista.querySelector('#barra-unir').scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
-      if (b.dataset.accion === 'cancelar') { editando = null; pintarLista(); return; }
+      if (b.dataset.accion === 'cancelar') { if (volverA) { location.hash = volverA; return; } editando = null; pintarLista(); return; }
       if (b.dataset.accion === 'limpiar') { seleccion = []; pintarLista(); return; }
       if (b.dataset.accion === 'unir') {
         const queda = vista.querySelector('#u-queda').value;
@@ -167,7 +160,8 @@ CDM.pantallas.adminJugadores = (function () {
       try {
         await CDM.api.admin.editarJugador(form.dataset.id, campos);
         CDM.admin.avisar('Guardado: ' + apellido + (campos.nombre ? ', ' + campos.nombre : '') + '.');
-        CDM.router.recargar();
+        if (volverA) location.hash = volverA;
+        else CDM.router.recargar();
       } catch (err) {
         error(err.message);
       }

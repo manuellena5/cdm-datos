@@ -944,3 +944,56 @@ details[disabled] summary { cursor: default; }
   }
   .nav-inf a[aria-current="page"] { color: var(--azul); font-weight: 700; border-top-color: var(--azul); }
 }
+
+/* ---------- Posibles duplicados (6.5.3) ---------- */
+.tarjeta--fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.tarjeta--fila .tarjeta__titulo { margin: 0; }
+.dup-layout { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.dup-lado { flex: 1 1 280px; max-width: 360px; min-width: 0; padding: 12px; }
+.dup-detalle { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 64px; }   /* debajo del menú fijo */
+.dup-pestanas { display: flex; gap: 4px; background: var(--fondo-suave); border-radius: 10px; padding: 4px; margin-bottom: 10px; }
+.dup-pestanas a {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; min-height: 40px;
+  border-radius: 8px; text-decoration: none; font-weight: 600; color: var(--texto-2);
+}
+.dup-pestanas a[aria-current="page"] { background: var(--tarjeta); color: var(--azul); box-shadow: var(--sombra); }
+.dup-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 70vh; overflow-y: auto; }
+.dup-par {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px;
+  border: 1px solid var(--borde-suave); border-radius: 10px; text-decoration: none; color: var(--texto);
+}
+.dup-par:hover { border-color: var(--acento); }
+.dup-par[aria-current="true"] { border-color: var(--azul); box-shadow: inset 3px 0 0 var(--azul); background: #F7F9FC; }
+.dup-par__nombres { display: flex; flex-direction: column; font-weight: 600; }
+.dup-par .etiqueta { white-space: normal; }
+.dup-jugadores { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dup-jugador { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.dup-jugador__nombre { font-family: var(--f-titulo); font-size: 22px; font-weight: 700; color: var(--azul); text-decoration: none; }
+.dup-mensaje { margin: 0; padding: 10px 12px; border-radius: 10px; background: #E7F3EC; color: #1F5C3A; }
+.dup-detalle .aviso-suave { padding: 10px 12px; border-radius: 10px; background: #FFF4E5; }
+.dup-sub { margin: 0; font-size: 16px; }
+.tabla--dup { min-width: 640px; }
+.tabla--dup th[scope="row"] { font-weight: 600; min-width: 200px; }
+.tabla--dup td { vertical-align: top; }
+.dup-fila--juntos { background: #FFF4E5; }
+.dup-datos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.dup-datos li { display: flex; flex-direction: column; align-items: flex-start; }
+.dup-datos .enlace-boton { font-size: 13px; min-height: 32px; padding: 0; text-align: left; }
+.dup-acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dup-accion { border: 1px solid var(--borde-suave); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.dup-accion h3 { margin: 0; font-size: 16px; }
+.dup-accion .fila-2, .dup-accion .campo { width: 100%; }
+.dup-pie { flex-wrap: wrap; }
+
+@media (max-width: 720px) {
+  .dup-lado { max-width: none; }
+  .dup-lista { max-height: 38vh; }
+  .dup-jugadores, .dup-acciones { grid-template-columns: 1fr; }
+  /* La tabla de partidos pasa a una tarjeta por partido */
+  .tabla--dup { min-width: 0; }
+  .tabla--dup thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tabla--dup tr { display: block; padding: 8px 0; border-bottom: 1px solid var(--borde-suave); }
+  .tabla--dup th, .tabla--dup td { display: block; border: 0; padding: 4px 0; }
+  .tabla--dup td[data-titulo]::before { content: attr(data-titulo); display: block; font-size: 13px; font-weight: 600; color: var(--texto-2); }
+  .dup-pie .boton { width: 100%; justify-content: center; }
+}

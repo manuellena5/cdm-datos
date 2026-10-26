@@ -2,6 +2,16 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.12.0 — Fase 6.5.3 (posibles duplicados)
+- **Administrar → Jugadores → Posibles duplicados** (`#/admin/jugadores/duplicados`): pares de jugadores con el mismo apellido (sin acentos, sin mayúsculas y con las letras dobles juntadas: Fosarelli y Fossarelli van juntos).
+- **A la izquierda**, la lista en dos pestañas: **Pendientes** (primero los más probables: a uno le falta el nombre o tiene la inicial; al final los que aparecen juntos en algún partido, marcados "no pueden ser el mismo") y **Descartados**.
+- **A la derecha**, el par elegido: los dos jugadores lado a lado (años, partidos con datos, goles y rojas), si aparecen juntos o no, y la **tabla de los partidos donde aparece cada uno**, en orden de fecha, con cada dato (gol, gol de penal, roja, titular…), "Ver partido" y **"Pasar a …"** por dato: mueve ese gol, tarjeta o fila de formación al otro jugador sin unirlos.
+- **Son el mismo**: se elige el apellido y nombre final y se unen (todo pasa a uno solo). No se ofrece si aparecen juntos en algún partido.
+- **No son el mismo**: con motivo opcional; el par pasa a Descartados con quién y cuándo, y no vuelve a aparecer como pendiente. "Volver a pendientes" lo deshace.
+- **Editar datos** de cada uno (abre Jugadores con ese jugador en edición y vuelve al par al guardar) y **Decidir después** (pasa al siguiente).
+- El contador **"Posibles duplicados (N)"** (solo pendientes) está en Jugadores y en el Panel. El "Revisar" de la tabla de Planteles abre ese par.
+- Reemplaza la lista de posibles duplicados que había en Jugadores.
+
 ## v0.11.0 — Fase 6.5.2 (plantel del torneo en tabla)
 - **Administrar → Planteles** (`#/admin/planteles?anio=…&torneo=…&cat=…`) pasa a ser una **tabla editable**, una fila por jugador: en plantel (tilde), apellido, nombre, puesto (Arquero, Defensor, Volante, Delantero), apodo, camiseta (si la lista la usa), goles y rojas del torneo, y **"por qué está"** (goles, roja, formación, incidencia, lista cargada, nuevo).
 - **Viene precargada** con los jugadores que tienen algún dato en ese torneo y categoría, más los de la lista. Los que tienen datos quedan siempre (el tilde está bloqueado: jugaron); los que están solo por la lista se pueden destildar o quitar, sin borrar al jugador.

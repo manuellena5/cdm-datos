@@ -331,6 +331,13 @@ Hacer en este orden, un punto por vez ("Hacé el punto 6.5.1 de docs/PLAN.md").
   - Acciones: **Son el mismo** (elegir apellido y nombre final, usa `unir_jugadores`), **No son el mismo** (motivo opcional, guarda en `jugadores_distintos`), **Editar datos** de cada uno, y **Decidir después**.
 - El contador "Posibles duplicados (N)" en el Panel y en Jugadores cuenta solo los pendientes.
 
+### 6.5.4 Formación en 18 lugares (`#/admin/partido/:id`)
+- En la carga del partido, la sección **Formación** pasa a ser una **tabla fija de 18 lugares** por categoría: 1 a 11 titulares, 12 a 18 suplentes. Se completa uno por uno; los lugares vacíos no se guardan. El número de lugar se guarda en `formaciones.nro_lista` (ya existe: no cambia el modelo).
+- Cada lugar tiene un **selector de jugador que se puede escribir para buscar** (sin acentos ni mayúsculas): primero los del plantel de ese torneo y categoría, después el resto, y "+ Jugador nuevo". Al elegir pasa al lugar siguiente.
+- Por fila: rol (titular fijo en 1–11; en 12–18 "No se sabe si entró" / "Entró" / "No entró"), minuto en que entró o salió, capitán y amarilla, como hoy.
+- Las formaciones ya cargadas se acomodan por `nro_lista`; si no lo tienen, titulares primero y después el resto. "Copiar de…" el partido anterior llena los mismos lugares.
+- Avisos que no impiden guardar: jugador repetido (sí impide), menos de 11 titulares.
+
 **Criterios de aceptación de la 6.5**
 - En Clausura 2011 Primera se ven las 14 fechas en orden, con F2, F5 y F8 sin partido; marcar F8 como libre la saca de pendientes en el Panel y "Deshacer" la vuelve a poner.
 - Desde el lápiz se corrige un goleador de un partido de 2014 y el cambio aparece en Resultados, Goleadores y la ficha del jugador.
