@@ -39,6 +39,23 @@ CDM.pantallas.adminPartido = (function () {
   const golVacio = () => ({ jugador_id: '', minuto: null, tipo: '', tiempo: null, nombre: '' });
   const ROLES = ['Titular', 'Suplente que entró', 'Convocado (suplente)', 'Suplente sin jugar'];
   const filaFormacion = (rol) => ({ jugador_id: '', rol, minuto_entra: null, minuto_sale: null, capitan: false, camiseta: null, amarilla: false });
+  // Formación en lugares fijos (6.5.4): 1 a 11 titulares, 12 a 18 suplentes (se pueden sumar más).
+  const LUGARES = 18;
+  const TITULARES = 11;
+  const ROLES_SUPLENTE = [['Convocado (suplente)', 'No se sabe si entró'], ['Suplente que entró', 'Entró'], ['Suplente sin jugar', 'No entró']];
+  const rolDeLugar = (i) => (i < TITULARES ? 'Titular' : 'Convocado (suplente)');
+  // Acomoda una formación cargada (ordenada por nro_lista) en los lugares: titulares primero, después el resto.
+  // Si hay más de 11 titulares, los que sobran pasan a los lugares de suplentes con su rol.
+  function enLugares(filas) {
+    const llenas = (filas || []).filter((f) => f.jugador_id);
+    const titulares = llenas.filter((f) => f.rol === 'Titular');
+    const resto = titulares.slice(TITULARES).concat(llenas.filter((f) => f.rol !== 'Titular'));
+    const lugares = [];
+    for (let i = 0; i < TITULARES; i++) lugares.push(titulares[i] || filaFormacion('Titular'));
+    const total = Math.max(LUGARES, TITULARES + resto.length);
+    for (let i = TITULARES; i < total; i++) lugares.push(resto[i - TITULARES] || filaFormacion(rolDeLugar(i)));
+    return lugares;
+  }
   const rivalVacio = () => ({ nombre: '', minuto: null, tiempo: null, tipo: 'Sin dato' });
 
   async function cargarEstado(torneoId, instancia, serie) {
@@ -90,7 +107,8 @@ CDM.pantallas.adminPartido = (function () {
         pf: p ? p.penales_favor : null, pc: p ? p.penales_contra : null,
         goles: p && p.gf != null ? ajustar(propios, Math.max(p.gf, propios.length), golVacio) : [],
         rivales: p && p.gc != null ? ajustar(rivales, Math.max(p.gc, rivales.length), rivalVacio) : [],
-        formacion: formacionDe(p)
+        formacion: enLugares(formacionDe(p)),
+        enLugares: true
       });
     });
     s.incidencias = incid.filter((i) => !amarillasEnFormacion.has(i)).map((i) => ({
@@ -98,6 +116,9 @@ CDM.pantallas.adminPartido = (function () {
       lado: i.lado, jugador_id: i.jugador_id || '', nombre: i.jugador_id ? '' : (i.quien || ''),
       tipo: i.tipo, minuto: i.minuto, descripcion: i.descripcion || ''
     }));
+    // Plantel del torneo (lista y jugadores con datos): van primero en el buscador de la formación
+    const planteles = await Promise.all(CATEGORIAS.map((cat) => CDM.api.admin.plantelTorneo(torneoId, cat).catch(() => [])));
+    ctx.plantel = Object.fromEntries(CATEGORIAS.map((cat, i) => [cat, new Set(planteles[i].map((x) => x.jugador_id))]));
     ctx.s = s;
     ctx.recuperable = leerGuardado(s, filas);
     await cargarNombresRival();
@@ -253,40 +274,79 @@ CDM.pantallas.adminPartido = (function () {
       .sort((a, b) => clave(b).localeCompare(clave(a)))[0];
   }
 
+  // Buscador de jugador para un lugar de la formación: se escribe para filtrar o se elige de la lista.
+  function buscadorJugador(k, ci, lugar, valor) {
+    const j = valor && ctx.jugadores.find((x) => x.jugador_id === valor);
+    return '<div class="buscador">' +
+      '<input type="text" class="buscador__texto" data-buscar="' + e(k) + '" data-cat="' + ci + '" data-lugar="' + lugar + '" value="' + e(j ? nombreJugador(j) : '') + '"' +
+      ' placeholder="Escribí o elegí…" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="lista-' + ci + '-' + lugar + '"' +
+      ' aria-label="Jugador del lugar ' + lugar + '">' +
+      '<ul class="buscador__lista" id="lista-' + ci + '-' + lugar + '" role="listbox" hidden></ul></div>';
+  }
+
+  // Opciones del buscador: primero el plantel del torneo, después los de la categoría, después el resto.
+  // No muestra a los que ya están en otro lugar de la misma formación.
+  function opcionesBuscador(texto, ci, k) {
+    const c = ctx.s.cats[ci];
+    const usados = new Set(c.formacion.filter((f, i) => f.jugador_id && 'cats.' + ci + '.formacion.' + i + '.jugador_id' !== k).map((f) => f.jugador_id));
+    const buscado = sinAcentos(texto).replace(/[.,]/g, ' ').split(/\s+/).filter(Boolean);
+    const plantel = ctx.plantel[c.categoria] || new Set();
+    const grupo = (j) => (plantel.has(j.jugador_id) ? 0 : j.division === c.categoria || j.division === 'Ambas' ? 1 : 2);
+    const lista = ctx.jugadores.filter((j) => !usados.has(j.jugador_id) &&
+      buscado.every((t) => sinAcentos(j.apellido + ' ' + (j.nombre || '')).replace(/[.,]/g, ' ').split(/\s+/).some((p) => p.startsWith(t))))
+      .sort((a, b) => grupo(a) - grupo(b) || nombreJugador(a).localeCompare(nombreJugador(b), 'es'))
+      .slice(0, 60);
+    const titulos = ['Plantel del torneo', c.categoria, 'Otros'];
+    let actual = -1;
+    let html = '';
+    lista.forEach((j) => {
+      const g = grupo(j);
+      if (g !== actual) { html += '<li class="buscador__grupo" role="presentation">' + e(titulos[g]) + '</li>'; actual = g; }
+      html += '<li role="option" class="buscador__opcion" data-elegir-jugador="' + e(j.jugador_id) + '">' + e(nombreJugador(j)) + '</li>';
+    });
+    if (!lista.length) html += '<li class="buscador__grupo" role="presentation">No hay jugadores con "' + e(texto.trim()) + '"</li>';
+    return html + '<li role="option" class="buscador__opcion buscador__opcion--nuevo" data-elegir-jugador="__nuevo">+ Jugador nuevo' +
+      (texto.trim() ? ' "' + e(texto.trim()) + '"' : '') + '</li>';
+  }
+
   function seccionFormacion(ci, c) {
-    const titulares = c.formacion.filter((f) => f.rol === 'Titular').length;
+    const titulares = c.formacion.filter((f, i) => i < TITULARES && f.jugador_id).length;
+    const cargados = c.formacion.filter((f) => f.jugador_id).length;
     const repetidos = c.formacion.filter((f, i) => f.jugador_id && c.formacion.findIndex((x) => x.jugador_id === f.jugador_id) !== i).length;
-    const anterior = !c.formacion.length && anteriorConFormacion(c);
-    const filas = c.formacion.map((f, fi) => {
+    const anterior = !cargados && anteriorConFormacion(c);
+    const lugar = (f, fi) => {
       const k = 'cats.' + ci + '.formacion.' + fi;
       const min = (campo, etiqueta) => '<div class="campo campo--min"><label>' + etiqueta + '</label><input type="number" inputmode="numeric" min="0" max="150" data-k="' +
         k + '.' + campo + '" value="' + (f[campo] ?? '') + '" placeholder="–"></div>';
-      return '<div class="form-fila"><div class="form-fila__arriba"><span class="form-fila__nro">' + (fi + 1) + '</span>' +
-        '<div class="campo form-fila__jugador"><label class="oculto">Jugador ' + (fi + 1) + '</label>' + selectorJugador(k + '.jugador_id', c.categoria, f.jugador_id) + '</div></div>' +
-        '<div class="form-fila__abajo"><div class="campo"><label>Rol</label><select data-k="' + k + '.rol" data-repinta="1">' +
-        ROLES.map((r) => opcion(r, r === 'Convocado (suplente)' ? 'Convocado (no se sabe si entró)' : r, f.rol)).join('') + '</select></div>' +
-        (f.rol === 'Suplente que entró' ? min('minuto_entra', 'Entró') : '') +
-        (f.rol === 'Titular' || f.rol === 'Suplente que entró' ? min('minuto_sale', 'Salió') : '') +
-        '<label class="check"><input type="checkbox" data-k="' + k + '.capitan" data-capitan="' + ci + '"' + (f.capitan ? ' checked' : '') + '> Capitán</label>' +
-        '<label class="check"><input type="checkbox" data-k="' + k + '.amarilla"' + (f.amarilla ? ' checked' : '') + '> Amarilla</label>' +
-        '<button type="button" class="enlace-boton" data-accion="quitar-jugador" data-cat="' + ci + '" data-fila="' + fi + '">Quitar</button></div>' +
+      const esTitular = fi < TITULARES;
+      const roles = ROLES_SUPLENTE.concat(f.rol === 'Titular' ? [['Titular', 'Titular']] : []);
+      return (fi === 0 ? '<h4 class="lugares__titulo">Titulares</h4>' : fi === TITULARES ? '<h4 class="lugares__titulo">Suplentes</h4>' : '') +
+        '<div class="form-fila' + (f.jugador_id ? '' : ' form-fila--vacia') + '"><div class="form-fila__arriba"><span class="form-fila__nro">' + (fi + 1) + '</span>' +
+        '<div class="campo form-fila__jugador">' + buscadorJugador(k + '.jugador_id', ci, fi + 1, f.jugador_id) + '</div>' +
+        (f.jugador_id ? '<button type="button" class="boton-icono boton-icono--chico" data-accion="vaciar-lugar" data-cat="' + ci + '" data-fila="' + fi + '" aria-label="Vaciar el lugar ' + (fi + 1) + '">✕</button>' : '') +
+        '</div>' +
+        (f.jugador_id ? '<div class="form-fila__abajo">' +
+          (esTitular ? '' : '<div class="campo"><label>Rol</label><select data-k="' + k + '.rol" data-repinta="1">' +
+            roles.map(([r, t]) => opcion(r, t, f.rol)).join('') + '</select></div>') +
+          (f.rol === 'Suplente que entró' ? min('minuto_entra', 'Entró') : '') +
+          (f.rol === 'Titular' || f.rol === 'Suplente que entró' ? min('minuto_sale', 'Salió') : '') +
+          '<label class="check"><input type="checkbox" data-k="' + k + '.capitan" data-capitan="' + ci + '"' + (f.capitan ? ' checked' : '') + '> Capitán</label>' +
+          '<label class="check"><input type="checkbox" data-k="' + k + '.amarilla"' + (f.amarilla ? ' checked' : '') + '> Amarilla</label></div>' : '') +
         formNuevoJugador(k + '.jugador_id') + '</div>';
-    }).join('');
-    return '<details class="formacion-carga"' + (c.formacion.length ? ' open' : '') + '><summary>Formación (opcional)' +
-      (c.formacion.length ? ' · ' + ui.plural(titulares, 'titular', 'titulares') + ', ' + (c.formacion.length - titulares) + ' más' : '') + '</summary>' +
+    };
+    return '<details class="formacion-carga" data-formacion="' + ci + '"' + (cargados || c.verFormacion ? ' open' : '') + '><summary>Formación (opcional)' +
+      (cargados ? ' · ' + ui.plural(titulares, 'titular', 'titulares') + ', ' + ui.plural(cargados - titulares, 'suplente', 'suplentes') : '') + '</summary>' +
       '<div class="formacion-carga__cuerpo">' +
-      (!c.formacion.length && c.categoria === 'Primera' && /formaci[oó]n\s*:/i.test(ctx.s.observaciones || '')
-        ? '<p class="aviso-suave">Las observaciones tienen la formación escrita. Pasala acá con "+ Titular" para que cuente en el plantel.</p>' : '') +
-      filas +
+      (!cargados && c.categoria === 'Primera' && /formaci[oó]n\s*:/i.test(ctx.s.observaciones || '')
+        ? '<p class="aviso-suave">Las observaciones tienen la formación escrita. Pasala acá para que cuente en el plantel.</p>' : '') +
+      (anterior ? '<div class="botones-chicos"><button type="button" class="boton boton--borde" data-accion="copiar-formacion" data-cat="' + ci + '" data-desde="' + e(anterior.partido_id) + '">Copiar de ' +
+        e(ui.instancia(anterior) + ' vs ' + anterior.rival) + '</button></div>' : '') +
+      '<p class="nota">Escribí el apellido o elegí de la lista. Al elegir, pasa al lugar siguiente. Los lugares vacíos no se guardan.</p>' +
+      '<div class="lugares">' + c.formacion.map(lugar).join('') + '</div>' +
       (repetidos ? '<p class="aviso-suave">Hay un jugador repetido en la formación. Corregilo antes de guardar.</p>' : '') +
-      (titulares > 11 ? '<p class="aviso-suave">Hay más de 11 titulares.</p>' : '') +
-      '<div class="botones-chicos">' +
-      '<button type="button" class="boton boton--borde" data-accion="agregar-jugador" data-cat="' + ci + '" data-rol="' + (titulares < 11 ? 'Titular' : 'Suplente que entró') + '">+ ' +
-      (titulares < 11 ? 'Titular' : 'Suplente') + '</button>' +
-      (titulares < 11 && c.formacion.length ? '' : '<button type="button" class="boton boton--borde" data-accion="agregar-jugador" data-cat="' + ci + '" data-rol="Convocado (suplente)">+ Convocado</button>') +
-      (anterior ? '<button type="button" class="boton boton--borde" data-accion="copiar-formacion" data-cat="' + ci + '" data-desde="' + e(anterior.partido_id) + '">Copiar de ' +
-        e(ui.instancia(anterior) + ' vs ' + anterior.rival) + '</button>' : '') +
-      '</div></div></details>';
+      (cargados && titulares < TITULARES ? '<p class="aviso-suave">Hay ' + ui.plural(titulares, 'titular', 'titulares') + ' de 11.</p>' : '') +
+      '<div class="botones-chicos"><button type="button" class="boton boton--borde" data-accion="agregar-suplente" data-cat="' + ci + '">+ Agregar suplente</button></div>' +
+      '</div></details>';
   }
 
   function seccionIncidencias(numero) {
@@ -418,8 +478,9 @@ CDM.pantallas.adminPartido = (function () {
         })).concat(c.formacion.filter((f) => f.jugador_id && f.amarilla).map((f) => ({
           lado: 'propio', jugador_id: f.jugador_id, nombre: null, tipo: 'Amarilla', minuto: null, descripcion: null
         }))),
-        formacion: c.formacion.filter((f) => f.jugador_id).map((f, i) => ({
-          jugador_id: f.jugador_id, rol: f.rol, nro_lista: i + 1, camiseta: f.camiseta,
+        // nro_lista = número de lugar (1–11 titulares, 12 en adelante suplentes)
+        formacion: c.formacion.map((f, i) => ({ f, lugar: i + 1 })).filter((x) => x.f.jugador_id).map(({ f, lugar }) => ({
+          jugador_id: f.jugador_id, rol: f.rol, nro_lista: lugar, camiseta: f.camiseta,
           minuto_entra: f.rol === 'Suplente que entró' ? f.minuto_entra : null,
           minuto_sale: f.rol === 'Titular' || f.rol === 'Suplente que entró' ? f.minuto_sale : null,
           capitan: !!f.capitan
@@ -520,13 +581,17 @@ CDM.pantallas.adminPartido = (function () {
         break;
       }
       case 'quitar-incidencia': s.incidencias.splice(Number(b.dataset.inc), 1); break;
-      case 'agregar-jugador': s.cats[ci].formacion.push(filaFormacion(b.dataset.rol)); break;
-      case 'quitar-jugador': s.cats[ci].formacion.splice(Number(b.dataset.fila), 1); break;
+      case 'agregar-suplente': s.cats[ci].formacion.push(filaFormacion('Convocado (suplente)')); break;
+      case 'vaciar-lugar': {
+        const fi = Number(b.dataset.fila);
+        s.cats[ci].formacion[fi] = filaFormacion(rolDeLugar(fi));
+        break;
+      }
       case 'copiar-formacion': {
         try {
           const filas = await CDM.api.admin.formacionesDe([b.dataset.desde]);
-          s.cats[ci].formacion = filas.sort((x, y) => (x.nro_lista || 99) - (y.nro_lista || 99))
-            .map((f) => Object.assign(filaFormacion(f.rol), { jugador_id: f.jugador_id, capitan: !!f.capitan, camiseta: f.camiseta }));
+          s.cats[ci].formacion = enLugares(filas.sort((x, y) => (x.nro_lista || 99) - (y.nro_lista || 99))
+            .map((f) => Object.assign(filaFormacion(f.rol), { jugador_id: f.jugador_id, capitan: !!f.capitan, camiseta: f.camiseta })));
         } catch (err) {
           return mostrarError(err.message || 'No se pudo copiar la formación.');
         }
@@ -538,7 +603,8 @@ CDM.pantallas.adminPartido = (function () {
       case 'borrar': return borrar();
       case 'recuperar':
         ctx.s = ctx.recuperable;
-        ctx.s.cats.forEach((c) => { c.formacion = c.formacion || []; });   // guardado con una versión anterior
+        // guardado con una versión anterior (sin lugares fijos)
+        ctx.s.cats.forEach((c) => { if (!c.enLugares) { c.formacion = enLugares(c.formacion); c.enLugares = true; } });
         ctx.recuperable = null;
         await cargarNombresRival();
         break;
@@ -657,6 +723,112 @@ CDM.pantallas.adminPartido = (function () {
       }
     });
     vista.addEventListener('submit', (ev) => ev.preventDefault());
+    // La sección de formación queda abierta aunque se repinte el formulario
+    vista.addEventListener('toggle', (ev) => {
+      const d = ev.target;
+      if (d.dataset && d.dataset.formacion != null && ctx.s.cats[Number(d.dataset.formacion)]) ctx.s.cats[Number(d.dataset.formacion)].verFormacion = d.open;
+    }, true);
+    montarBuscador(vista);
+  }
+
+  // ---------- Buscador de jugador de la formación (6.5.4) ----------
+  function montarBuscador(vista) {
+    const lista = (input) => input.parentElement.querySelector('.buscador__lista');
+    const opciones = (input) => [...lista(input).querySelectorAll('[role="option"]')];
+    const marcar = (input, i) => {
+      const ops = opciones(input);
+      ops.forEach((o, n) => o.classList.toggle('buscador__opcion--activa', n === i));
+      input.dataset.activa = String(i);
+      if (ops[i]) { ops[i].scrollIntoView({ block: 'nearest' }); input.setAttribute('aria-activedescendant', ops[i].id = input.getAttribute('aria-controls') + '-' + i); }
+    };
+    const mostrar = (input, texto) => {
+      const ul = lista(input);
+      ul.innerHTML = opcionesBuscador(texto, Number(input.dataset.cat), input.dataset.buscar);
+      ul.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      marcar(input, texto.trim() ? 0 : -1);
+    };
+    const cerrar = (input) => {
+      lista(input).hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+    };
+    const elegir = (input, id) => {
+      const k = input.dataset.buscar;
+      const ci = Number(input.dataset.cat);
+      const lugar = Number(input.dataset.lugar);
+      if (id === '__nuevo') {
+        const escrito = input.value.trim() !== (input.dataset.original || '') ? input.value.trim() : '';
+        const [apellido, nombre] = escrito.split(',').map((x) => x.trim());
+        ctx.s.nuevoJugador = { ruta: k, apellido: apellido || '', nombre: nombre || '' };
+        pintar();
+        const ap = vistaActual.querySelector('#nj-ap');
+        if (ap) ap.focus();
+        return;
+      }
+      asignar(k, id);
+      guardarLocal();
+      pintar();
+      const siguiente = vistaActual.querySelector('[data-buscar][data-cat="' + ci + '"][data-lugar="' + (lugar + 1) + '"]');
+      if (siguiente) siguiente.focus();
+    };
+
+    vista.addEventListener('focusin', (ev) => {
+      const input = ev.target.closest('[data-buscar]');
+      if (!input) return;
+      input.dataset.original = input.value;
+      input.select();
+      mostrar(input, '');
+    });
+    vista.addEventListener('input', (ev) => {
+      const input = ev.target.closest('[data-buscar]');
+      if (input) mostrar(input, input.value);
+    });
+    vista.addEventListener('keydown', (ev) => {
+      const input = ev.target.closest('[data-buscar]');
+      if (!input) return;
+      const ops = opciones(input);
+      const activa = Number(input.dataset.activa ?? -1);
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        if (lista(input).hidden) mostrar(input, input.value === input.dataset.original ? '' : input.value);
+        marcar(input, Math.max(0, Math.min(ops.length - 1, activa + (ev.key === 'ArrowDown' ? 1 : -1))));
+      } else if (ev.key === 'Enter') {
+        ev.preventDefault();
+        if (ops[activa]) return elegir(input, ops[activa].dataset.elegirJugador);
+        // Sin cambios: pasa al lugar siguiente
+        if (input.value === input.dataset.original) {
+          const sig = vistaActual.querySelector('[data-buscar][data-cat="' + input.dataset.cat + '"][data-lugar="' + (Number(input.dataset.lugar) + 1) + '"]');
+          if (sig) sig.focus();
+        }
+      } else if (ev.key === 'Escape') {
+        input.value = input.dataset.original || '';
+        cerrar(input);
+      }
+    });
+    // mousedown (no click) para elegir antes de que el campo pierda el foco
+    vista.addEventListener('mousedown', (ev) => {
+      const op = ev.target.closest('.buscador__opcion');
+      if (!op) return;
+      ev.preventDefault();
+      elegir(op.closest('.buscador').querySelector('[data-buscar]'), op.dataset.elegirJugador);
+    });
+    vista.addEventListener('focusout', (ev) => {
+      const input = ev.target.closest('[data-buscar]');
+      if (!input) return;
+      setTimeout(() => {
+        if (!input.isConnected || document.activeElement === input) return;
+        cerrar(input);
+        // Borrar el texto y salir vacía el lugar; si no, vuelve el jugador que estaba
+        if (!input.value.trim() && input.dataset.original) {
+          asignar(input.dataset.buscar, '');
+          guardarLocal();
+          pintar();
+        } else {
+          input.value = input.dataset.original || '';
+        }
+      }, 0);
+    });
   }
 
   return { titulo: 'Cargar partido', seccion: 'admin', render, montar };

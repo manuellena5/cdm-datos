@@ -997,3 +997,22 @@ details[disabled] summary { cursor: default; }
   .tabla--dup td[data-titulo]::before { content: attr(data-titulo); display: block; font-size: 13px; font-weight: 600; color: var(--texto-2); }
   .dup-pie .boton { width: 100%; justify-content: center; }
 }
+
+/* ---------- Formación en 18 lugares (6.5.4) ---------- */
+.lugares { display: flex; flex-direction: column; gap: 6px; }
+.lugares__titulo { margin: 8px 0 0; font-size: 13px; font-weight: 700; color: var(--texto-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.form-fila--vacia { padding: 4px 8px; border-style: dashed; }
+.form-fila--vacia .buscador__texto { border-color: transparent; background: transparent; }
+.form-fila--vacia .buscador__texto:focus { border-color: var(--acento); background: var(--tarjeta); }
+.buscador { position: relative; }
+.buscador__texto { width: 100%; }
+.buscador__lista {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20;
+  list-style: none; margin: 0; padding: 4px; max-height: 280px; overflow-y: auto;
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px; box-shadow: 0 6px 20px rgba(6, 47, 90, 0.18);
+}
+.buscador__grupo { padding: 6px 8px 2px; font-size: 12px; font-weight: 700; color: var(--texto-2); }
+.buscador__opcion { padding: 9px 10px; min-height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; }
+.buscador__opcion:hover, .buscador__opcion--activa { background: var(--fondo-suave); }
+.buscador__opcion--activa { box-shadow: inset 3px 0 0 var(--azul); }
+.buscador__opcion--nuevo { color: var(--acento); font-weight: 600; border-top: 1px solid var(--borde-suave); }

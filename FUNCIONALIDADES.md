@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.13.0 — Fase 6.5.4 (formación en 18 lugares)
+- En **Cargar / editar partido**, la sección **Formación** de cada categoría es una tabla fija de **18 lugares**: 1 a 11 titulares y 12 a 18 suplentes. Se completa uno por uno; los lugares vacíos no se guardan. "+ Agregar suplente" suma lugares si la lista del partido tiene más de 18.
+- Cada lugar tiene un **buscador de jugador**: se escribe parte del apellido o del nombre (sin acentos ni mayúsculas) o se elige de la lista. Primero aparecen los del **plantel de ese torneo**, después los de la categoría y después el resto. No muestra a los que ya están en otro lugar. Flechas para moverse, Enter o clic para elegir, Escape para dejar como estaba. Al elegir, pasa al lugar siguiente.
+- "+ Jugador nuevo" (al final de la lista) abre el formulario con lo escrito ("Pérez, Juan" completa apellido y nombre).
+- Por jugador: en los suplentes, el rol (**No se sabe si entró** / **Entró** / **No entró**); minuto en que entró o salió, capitán y amarilla, como antes. ✕ vacía el lugar; borrar el nombre también.
+- El número de lugar se guarda como orden de la lista. Las formaciones ya cargadas se acomodan solas (titulares primero) y "Copiar de…" el partido anterior llena los mismos lugares.
+
 ## v0.12.0 — Fase 6.5.3 (posibles duplicados)
 - **Administrar → Jugadores → Posibles duplicados** (`#/admin/jugadores/duplicados`): pares de jugadores con el mismo apellido (sin acentos, sin mayúsculas y con las letras dobles juntadas: Fosarelli y Fossarelli van juntos).
 - **A la izquierda**, la lista en dos pestañas: **Pendientes** (primero los más probables: a uno le falta el nombre o tiene la inicial; al final los que aparecen juntos en algún partido, marcados "no pueden ser el mismo") y **Descartados**.
