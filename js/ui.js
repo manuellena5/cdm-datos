@@ -175,6 +175,16 @@ CDM.ui = (function () {
     return nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1];
   }
 
+  // Plantel por puesto (6.6.4): Arqueros, Defensores, Volantes, Delanteros y al final Sin puesto cargado.
+  const PUESTOS = ['Arquero', 'Defensor', 'Volante', 'Delantero'];
+  const GRUPOS_PUESTO = { Arquero: 'Arqueros', Defensor: 'Defensores', Volante: 'Volantes', Delantero: 'Delanteros' };
+  // → [{ puesto, titulo, items }], solo los grupos con alguien
+  function porPuesto(items, puestoDe) {
+    const de = (x) => (PUESTOS.includes(puestoDe(x)) ? puestoDe(x) : '');
+    return PUESTOS.concat(['']).map((p) => ({ puesto: p, titulo: p ? GRUPOS_PUESTO[p] : 'Sin puesto cargado', items: items.filter((x) => de(x) === p) }))
+      .filter((g) => g.items.length);
+  }
+
   // Cuerpo técnico de un torneo y categoría (filas de cuerpos_tecnicos: orden 0 = técnico).
   // → { tecnico: 'Jorge Falappa', integrantes: ['A', 'B'], html: '<strong>Técnico:</strong> … · <strong>Cuerpo técnico:</strong> …' }
   function cuerpoTecnico(cuerpos, torneoId, categoria) {
@@ -189,6 +199,6 @@ CDM.ui = (function () {
   return {
     plural, fechaCorta, fechaLarga, hora, escaparHtml, chipResultado, torneoSinAnio, instancia, instanciaLarga,
     marcador, penales, tituloChip, icono, rojas, selector, segmentado, cargando, errorCarga, avisoGuardados,
-    vacio, unir, escudo, iniciales, cuerpoTecnico
+    vacio, unir, escudo, iniciales, cuerpoTecnico, PUESTOS, porPuesto
   };
 })();

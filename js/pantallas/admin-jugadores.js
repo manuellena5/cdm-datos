@@ -1,5 +1,5 @@
 // Corregir jugadores y unir duplicados (#/admin/jugadores) — PLAN 4.5.3.
-// El ID del jugador no se toca: solo apellido, nombre, apodo y notas.
+// Los datos de cada jugador y sus torneos se editan en #/admin/jugadores/:id (6.6.4).
 window.CDM = window.CDM || {};
 CDM.pantallas = CDM.pantallas || {};
 
@@ -8,10 +8,8 @@ CDM.pantallas.adminJugadores = (function () {
   const e = ui.escaparHtml;
   let datos = [];
   let seleccion = [];      // ids elegidos para unir (máximo 2)
-  let editando = null;     // id del jugador en edición
   let filtro = '';
   let vistaActual = null;
-  let volverA = null;      // ?volver= (desde Posibles duplicados): adónde ir después de guardar o cancelar
 
   const sinAcentos = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
   const nombre = (j) => j.apellido + (j.nombre ? ', ' + j.nombre : '');
@@ -31,15 +29,6 @@ CDM.pantallas.adminJugadores = (function () {
 
   function fila(j) {
     const elegido = seleccion.includes(j.jugador_id);
-    if (editando === j.jugador_id) {
-      return '<li class="jugador jugador--editando"><form class="jugador__form" data-form="jugador" data-id="' + e(j.jugador_id) + '">' +
-        '<div class="fila-2"><div class="campo"><label for="j-ap">Apellido</label><input id="j-ap" name="apellido" value="' + e(j.apellido) + '" required autocomplete="off"></div>' +
-        '<div class="campo"><label for="j-no">Nombre</label><input id="j-no" name="nombre" value="' + e(j.nombre || '') + '" autocomplete="off"></div>' +
-        '<div class="campo"><label for="j-apodo">Apodo</label><input id="j-apodo" name="apodo" value="' + e(j.apodo || '') + '" autocomplete="off"></div></div>' +
-        '<div class="campo"><label for="j-notas">Notas</label><textarea id="j-notas" name="notas" rows="2">' + e(j.notas || '') + '</textarea></div>' +
-        '<div class="botones-chicos"><button type="submit" class="boton">Guardar</button>' +
-        '<button type="button" class="boton boton--borde" data-accion="cancelar">Cancelar</button></div></form></li>';
-    }
     return '<li class="jugador' + (elegido ? ' jugador--elegido' : '') + '">' +
       '<label class="check jugador__check"><input type="checkbox" data-elegir="' + e(j.jugador_id) + '"' + (elegido ? ' checked' : '') +
       (!elegido && seleccion.length >= 2 ? ' disabled' : '') + '><span class="oculto">Elegir para unir</span></label>' +
@@ -47,7 +36,7 @@ CDM.pantallas.adminJugadores = (function () {
       '<div class="texto-2">' + e(rangos(j.anios)) + ' · ' + ui.plural(Number(j.goles), 'gol', 'goles') + ' · ' +
       ui.plural(Number(j.partidos), 'partido', 'partidos') + (j.division ? ' · ' + e(j.division) : '') + '</div>' +
       (j.notas ? '<div class="jugador__notas">' + e(j.notas) + '</div>' : '') + '</div>' +
-      '<button type="button" class="enlace-boton" data-editar="' + e(j.jugador_id) + '">Editar</button></li>';
+      '<a class="enlace" href="#/admin/jugadores/' + encodeURIComponent(j.jugador_id) + '">Editar</a></li>';
   }
 
   function lista() {
@@ -89,15 +78,15 @@ CDM.pantallas.adminJugadores = (function () {
   async function render(params, query) {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) { datos = []; return acceso.html; }
+    // ?editar=J012 (links viejos): la edición está en la pantalla del jugador (6.6.4)
+    if (query && query.get('editar')) {
+      location.replace(CDM.router.armar('/admin/jugadores/' + encodeURIComponent(query.get('editar')), { volver: query.get('volver') || undefined }));
+      return '';
+    }
     // Si todavía no se corrió 12_duplicados.sql, el contador no aparece
     const [resumen, pares] = await Promise.all([CDM.api.admin.jugadoresResumen(), CDM.api.admin.posiblesDuplicados().catch(() => null)]);
     datos = resumen;
     seleccion = seleccion.filter((id) => datos.some((j) => j.jugador_id === id));
-    // ?editar=J012 (desde Posibles duplicados): abre ese jugador en edición
-    const aEditar = query && query.get('editar') && datos.find((j) => j.jugador_id === query.get('editar'));
-    editando = aEditar ? aEditar.jugador_id : null;
-    if (aEditar) filtro = aEditar.apellido;
-    volverA = aEditar && /^#\/admin\//.test(query.get('volver') || '') ? query.get('volver') : null;
     const pendientes = pares ? pares.filter((p) => !p.descartado).length : null;
     const aviso = CDM.admin.tomarAviso();
     return CDM.admin.barra('Jugadores', acceso.admin, { actual: 'jugadores' }) +
@@ -124,10 +113,8 @@ CDM.pantallas.adminJugadores = (function () {
       pintarLista();
     });
     vista.addEventListener('click', async (ev) => {
-      const b = ev.target.closest('[data-editar], [data-accion]');
+      const b = ev.target.closest('[data-accion]');
       if (!b) return;
-      if (b.dataset.editar) { editando = b.dataset.editar; pintarLista(); const i = vista.querySelector('#j-ap'); if (i) i.focus(); return; }
-      if (b.dataset.accion === 'cancelar') { if (volverA) { location.hash = volverA; return; } editando = null; pintarLista(); return; }
       if (b.dataset.accion === 'limpiar') { seleccion = []; pintarLista(); return; }
       if (b.dataset.accion === 'unir') {
         const queda = vista.querySelector('#u-queda').value;
@@ -146,24 +133,6 @@ CDM.pantallas.adminJugadores = (function () {
           b.disabled = false;
           error(err.message);
         }
-      }
-    });
-    vista.addEventListener('submit', async (ev) => {
-      const form = ev.target.closest('[data-form="jugador"]');
-      if (!form) return;
-      ev.preventDefault();
-      const apellido = form.apellido.value.trim();
-      if (!apellido) return error('El apellido no puede quedar vacío.');
-      const campos = {
-        apellido, nombre: form.nombre.value.trim() || null, apodo: form.apodo.value.trim() || null, notas: form.notas.value.trim() || null
-      };
-      try {
-        await CDM.api.admin.editarJugador(form.dataset.id, campos);
-        CDM.admin.avisar('Guardado: ' + apellido + (campos.nombre ? ', ' + campos.nombre : '') + '.');
-        if (volverA) location.hash = volverA;
-        else CDM.router.recargar();
-      } catch (err) {
-        error(err.message);
       }
     });
   }

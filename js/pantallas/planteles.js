@@ -10,7 +10,8 @@ CDM.pantallas.planteles = (function () {
   let actual = null;
 
   async function render(params, query) {
-    const [plantel, campanas, partidos, cuerpos] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos(), CDM.api.cuerposTecnicos()]);
+    const [plantel, campanas, partidos, cuerpos, habituales] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos(),
+      CDM.api.cuerposTecnicos(), CDM.api.posicionesHabituales().catch(() => ({}))]);
     const sel = filtros.elegirTorneo(campanas, query);
     const cat = filtros.categoria(query);
     const categoria = filtros.nombreCategoria(cat);
@@ -28,7 +29,10 @@ CDM.pantallas.planteles = (function () {
       ['partidos', 'titular', 'entro', 'convocado', 'goles', 'amarillas', 'rojas'].forEach((k) => { j[k] += num(x[k]); });
       if (x.minutos != null) { j.minutos += num(x.minutos); j.conMinutos = true; }
     });
-    const lista = [...porJugador.values()].sort((a, b) => b.partidos - a.partidos || b.titular - a.titular || b.goles - a.goles || a.jugador.localeCompare(b.jugador, 'es'));
+    // Por puesto (el del torneo o, si no hay, el habitual) y dentro de cada puesto por apellido
+    const lista = [...porJugador.values()].sort((a, b) => a.jugador.localeCompare(b.jugador, 'es'));
+    lista.forEach((j) => { j.puesto = j.posicion || habituales[j.jugador_id] || ''; });
+    const grupos = ui.porPuesto(lista, (j) => j.puesto);
     const hayMinutos = lista.some((j) => j.conMinutos);
     const hayCamisetas = lista.some((j) => j.camiseta != null);
     const enLista = lista.filter((j) => j.enLista).length;
@@ -42,17 +46,19 @@ CDM.pantallas.planteles = (function () {
       ui.segmentado('cat', 'Categoría', [{ valor: 'P', texto: 'Primera' }, { valor: 'R', texto: 'Reserva' }], cat) + '</section>';
 
     const titulo = (sel.torneo ? sel.torneo.nombre : 'Año ' + sel.anio) + ' · ' + categoria;
-    const filas = lista.map((j) => '<tr><th scope="row">' + (hayCamisetas ? '<span class="lista__camiseta">' + (j.camiseta ?? '') + '</span>' : '') +
+    const filaPc = (j) => '<tr><th scope="row">' + (hayCamisetas ? '<span class="lista__camiseta">' + (j.camiseta ?? '') + '</span>' : '') +
       '<a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' + e(j.jugador) + '</a></th>' +
       '<td class="centro">' + j.partidos + '</td><td class="centro">' + j.titular + '</td><td class="centro">' + j.entro + '</td>' +
       '<td class="centro">' + j.convocado + '</td>' + (hayMinutos ? '<td class="centro">' + (j.conMinutos ? j.minutos : '–') + '</td>' : '') +
-      '<td class="total centro">' + j.goles + '</td><td class="centro">' + j.amarillas + '</td><td class="centro">' + j.rojas + '</td></tr>').join('');
+      '<td class="total centro">' + j.goles + '</td><td class="centro">' + j.amarillas + '</td><td class="centro">' + j.rojas + '</td></tr>';
+    const columnas = 8 + (hayMinutos ? 1 : 0);
+    const filas = grupos.map((g) => '<tr class="tabla__grupo"><th colspan="' + columnas + '" scope="colgroup">' + e(g.titulo) +
+      ' <span class="texto-2">· ' + g.items.length + '</span></th></tr>' + g.items.map(filaPc).join('')).join('');
     // Celular: una fila de dos líneas por jugador; los ceros no se muestran
-    const filasMovil = lista.map((j) => CDM.filas.fila({
+    const filaMovil = (j) => CDM.filas.fila({
       href: '#/jugador/' + encodeURIComponent(j.jugador_id),
       arriba: '<span class="fila__nombre fila__nombre--corto">' + e(j.jugador) + '</span>' +
-        (j.capitan ? '<span class="fila__capitan" title="Capitán">C</span>' : '') +
-        (j.posicion ? '<span class="fila__dato">· ' + e(j.posicion) + '</span>' : ''),
+        (j.capitan ? '<span class="fila__capitan" title="Capitán">C</span>' : ''),
       abajo: CDM.filas.chips([
         j.partidos ? ui.plural(j.partidos, 'jugado', 'jugados') : '',
         j.titular ? j.titular + ' de titular' : '',
@@ -62,7 +68,7 @@ CDM.pantallas.planteles = (function () {
         j.rojas ? ui.plural(j.rojas, 'roja', 'rojas') : ''
       ]),
       claves: { pj: j.partidos, tit: j.titular, goles: j.goles, apellido: j.jugador }
-    }));
+    });
     const nota = (enLista ? 'Lista del torneo cargada (' + ui.plural(enLista, 'jugador', 'jugadores') + '). ' : '') + (conFormacion.size
       ? 'Con formación cargada: PJ, titular, entró y convocado salen de las formaciones.'
       : 'Este torneo todavía no tiene formaciones cargadas: PJ cuenta solo los partidos con gol o tarjeta.');
@@ -77,10 +83,9 @@ CDM.pantallas.planteles = (function () {
       '<p class="nota">' + ui.plural(lista.length, 'jugador', 'jugadores') + ' · ' + ui.plural(jugados.length, 'partido jugado', 'partidos jugados') + '</p>' +
       (lista.length
         ? CDM.filas.bloque({
-          id: 'plantel', titulo: titulo, filas: filasMovil, limite: 16,
-          verMas: (n) => 'Ver los ' + (n - 16) + ' restantes',
-          ordenes: [{ valor: 'pj', texto: 'Jugados' }, { valor: 'tit', texto: 'Titularidades' },
-            { valor: 'goles', texto: 'Goles' }, { valor: 'apellido', texto: 'Apellido', asc: true }],
+          id: 'plantel', titulo: titulo, grupos: grupos.map((g) => ({ titulo: g.titulo, filas: g.items.map(filaMovil) })),
+          ordenes: [{ valor: 'apellido', texto: 'Apellido', asc: true }, { valor: 'pj', texto: 'Jugados' },
+            { valor: 'tit', texto: 'Titularidades' }, { valor: 'goles', texto: 'Goles' }],
           tabla: '<div class="tabla-scroll"><table class="tabla tabla--plantel"><thead><tr><th>Jugador</th>' +
           '<th class="centro" title="Partidos jugados">PJ</th><th class="centro" title="Titular">Tit.</th><th class="centro" title="Suplente que entró">Entró</th>' +
           '<th class="centro" title="Convocado, no se sabe si entró">Conv.</th>' + (hayMinutos ? '<th class="centro">Min.</th>' : '') +

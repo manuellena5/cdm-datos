@@ -1191,3 +1191,58 @@ html.sin-scroll, html.sin-scroll body { overflow: hidden; }
 .hoja__botones .boton { min-height: 48px; }
 .hoja .nota, .hoja .form-error, .hoja .plantel-aviso { margin: 0; }
 .hoja__apellido .sugerencias { left: 0; right: auto; width: min(340px, calc(100vw - 32px)); }
+
+/* ---------- Plantel por puesto (6.6.4) ---------- */
+.tabla .tabla__grupo th { background: var(--fondo-suave); font-family: var(--f-titulo); font-size: 17px; font-weight: 700; color: var(--azul); padding-top: 6px; padding-bottom: 6px; }
+.tabla .tabla__grupo th .texto-2 { font-family: var(--f-texto); font-size: 13px; font-weight: 600; }
+.filas__grupo { display: flex; align-items: baseline; gap: 8px; margin: 8px 0 0; list-style: none; }
+.filas__grupo h3 { margin: 0; font-size: 18px; }
+.filas__grupo span { font-size: 14px; font-weight: 600; color: var(--texto-2); }
+.filas__lista > li.filas__grupo[hidden] { display: none; }
+
+.plantel-grupo__aviso { margin-left: 8px; font-family: var(--f-texto); font-size: 13px; font-weight: 600; color: #7A4300; }
+.plantel-movil__grupo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 8px; }
+.plantel-movil__grupo h3 { margin: 0; font-size: 18px; }
+.plantel-movil__grupo > span:not(.plantel-grupo__aviso) { font-size: 14px; font-weight: 600; color: var(--texto-2); }
+.plantel-movil__grupo .plantel-grupo__aviso { margin-left: 0; width: 100%; }
+
+/* ---------- Jugador en admin: torneos que jugó (6.6.4, mockup 17) ---------- */
+.jugador-admin { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.jugador-admin__datos { display: flex; flex-direction: column; gap: 10px; }
+.jugador-admin__datos .nota, .jugador-admin__datos .migas { margin: 0; }
+.jugador-admin__nombre { margin: 0; font-size: 28px; }
+.jugador-admin__resumen { display: flex; flex-direction: column; gap: 4px; padding-top: 10px; border-top: 1px solid var(--borde-suave); font-size: 14px; color: var(--texto-2); }
+.jugador-admin__resumen strong { color: var(--azul); }
+.jugador-admin__cabeza { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.jugador-admin__cabeza .tarjeta__titulo { margin: 0; }
+.grilla__leyenda { margin: 8px 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--texto-2); }
+.grilla__leyenda li { display: flex; align-items: center; gap: 6px; }
+.grilla__resumen { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0; font-size: 14px; font-weight: 600; }
+.grilla { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
+.grilla th { font-size: 13px; color: var(--texto-2); font-weight: 600; text-align: center; }
+.grilla tbody th { font-family: var(--f-titulo); font-size: 17px; color: var(--azul); width: 52px; }
+.grilla thead th:first-child { width: 52px; }
+.grilla td { padding: 0; vertical-align: top; }
+.grilla__no { display: flex; align-items: center; justify-content: center; min-height: 44px; color: var(--borde); }
+.grilla__sin { vertical-align: middle !important; text-align: center; font-size: 13px; color: var(--texto-2); background: var(--fondo); border-radius: 8px; height: 44px; }
+.casillero {
+  width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;
+  border-radius: 8px; font: 600 13px var(--f-texto); cursor: pointer; padding: 4px; line-height: 1.15;
+  border: 1px solid var(--borde-suave); background: var(--fondo); color: var(--texto-2);
+}
+.casillero + .casillero { margin-top: 4px; }
+.casillero--datos { background: var(--azul); border-color: var(--azul); color: #FFFFFF; cursor: default; }
+.casillero--lista { background: #FFFFFF; border: 2px solid var(--azul); color: var(--azul); }
+.casillero--jugo { background: #FFF8EE; border: 2px dashed #E3A55B; color: #7A4300; }
+.casillero--vacio:hover, .casillero--jugo:hover { border-color: var(--azul); }
+.casillero__torneo { width: 100%; font-size: 11px; font-weight: 600; opacity: 0.85; }
+.casillero--muestra { display: inline-block; width: 22px; min-height: 16px; height: 16px; padding: 0; cursor: default; }
+@media (max-width: 720px) {
+  .jugador-admin { grid-template-columns: minmax(0, 1fr); }
+  .grilla { border-spacing: 3px; }
+  .grilla tbody th, .grilla thead th:first-child { width: 40px; font-size: 15px; }
+  .casillero { font-size: 12px; padding: 3px 2px; }
+  /* en el celular la Copa va angosta: año + Apertura + Clausura ocupan casi todo el ancho */
+  .grilla th.grilla__copa { width: 56px; }
+  .grilla td.grilla__copa .casillero { font-size: 11px; }
+}

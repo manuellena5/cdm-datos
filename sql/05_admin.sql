@@ -130,6 +130,7 @@ create trigger equipos_auditoria after insert or update or delete on equipos
 -- Registro de cambios en lenguaje simple: una fila por guardado.
 drop view if exists v_cambios;
 create view v_cambios with (security_invoker = true) as
+with base as (
 select
   a.transaccion,
   min(a.fecha) as fecha,
@@ -155,8 +156,12 @@ select
   (array_agg(jsonb_build_object('torneo_id', coalesce(a.despues, a.antes) ->> 'torneo_id',
       'categoria', coalesce(a.despues, a.antes) ->> 'categoria')) filter (where a.tabla in ('planteles', 'cuerpos_tecnicos')))[1] as plantel,
   count(*) filter (where a.tabla = 'planteles') as plantel_filas,
+  -- un solo jugador sumado o sacado de una lista (desde la pantalla del jugador o el plantel)
+  (array_agg(coalesce(a.despues, a.antes) ->> 'jugador_id') filter (where a.tabla = 'planteles'))[1] as plantel_jugador,
   case
     when bool_and(a.tabla = 'cuerpos_tecnicos') then 'actualizó el cuerpo técnico de'
+    when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'alta') then 'sumó a'
+    when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'baja') then 'sacó a'
     when max(a.usuario) = 'Importación' then 'importó'
     when bool_or(a.tabla = 'partidos' and a.accion = 'baja') then 'borró'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean
@@ -171,7 +176,11 @@ select
     else 'editó'
   end as accion
 from auditoria a
-group by a.transaccion;
+group by a.transaccion
+)
+select b.*, j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '') as plantel_jugador_nombre
+from base b
+left join jugadores j on j.jugador_id = b.plantel_jugador;
 grant select on v_cambios to authenticated;
 
 -- ---------- Funciones de carga ----------

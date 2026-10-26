@@ -349,7 +349,7 @@ Hacer en este orden, un punto por vez ("Hacé el punto 6.5.1 de docs/PLAN.md").
 
 ## Fase 6.6 — Cuerpo técnico e historial contra cada rival
 
-Referencia visual: mockup **10** (bloque "Cuerpo técnico" en `docs/mockups/AdminPlantel.dc.html`) mockup **12** (`docs/mockups/HistorialRival.dc.html`) y mockups **13 a 16** (celular). Un punto por vez ("Hacé el punto 6.6.1 de docs/PLAN.md").
+Referencia visual: mockup **10** (bloque "Cuerpo técnico" en `docs/mockups/AdminPlantel.dc.html`) mockup **12** (`docs/mockups/HistorialRival.dc.html`) mockups **13 a 16** (celular) y mockup **17** (`docs/mockups/AdminJugadorTorneos.dc.html`). Un punto por vez ("Hacé el punto 6.6.1 de docs/PLAN.md").
 
 ### 6.6.1 Cuerpo técnico de cada plantel
 - Por torneo y categoría: **un técnico** y **hasta 3 integrantes** más, sin función (no se distingue ayudante, preparador físico, etc.).
@@ -380,10 +380,36 @@ Solo debajo de 720 px; en PC las tablas quedan como están. Referencia: `docs/mo
 - **"Ver tabla completa"** (opcional, al lado de "Ordenar por"): abre la tabla original a pantalla completa con la primera columna fija y scroll horizontal dentro de la tabla, botón Cerrar y la nota "Deslizá la tabla hacia el costado". No pide girar el celular.
 - Aplicar lo mismo a cualquier otra tabla ancha que quede (Goleadores, historial contra un rival, ficha de jugador), con el mismo componente.
 
+### 6.6.4 Plantel por puesto y torneos de cada jugador — mockups 14 y 17
+**Un solo dato, dos pantallas:** que un jugador estuvo en un torneo se guarda solo en `planteles` (torneo, categoría, jugador). Planteles y Jugadores leen y escriben esa misma tabla: lo que se marca en una aparece en la otra al instante. No hay "sugerencias" que copiar entre pantallas ni datos duplicados.
+
+**Plantel dividido por puesto**
+- En Planteles (consulta y admin, PC y celular) los jugadores van agrupados: **Arqueros, Defensores, Volantes, Delanteros** y al final **Sin puesto cargado**, con la cantidad de cada grupo. Dentro de cada grupo, el orden que elija "Ordenar por" (por defecto, apellido).
+- El puesto del torneo es `planteles.posicion`; si está vacío se usa el **puesto habitual** (`jugadores.posicion`). Cambiar el puesto en un plantel cambia solo ese torneo.
+- En admin, el grupo "Sin puesto cargado" muestra el aviso "Cargá el puesto para ordenar el plantel".
+
+**Torneos que jugó, en la pantalla del jugador (`#/admin/jugadores/:id`)** — mockup 17
+- A la izquierda, los datos del jugador (apellido, nombre, **puesto habitual**, apodo) y un resumen (goles, tarjetas, partidos con formación, link a la ficha pública).
+- A la derecha, **"Torneos que jugó"**: una grilla con un renglón por año (del más nuevo al más viejo) y columnas **Apertura / Clausura / Copa**, solo con los torneos que existen en `torneos` (2021 torneo único, 2020 sin torneos, 2010 solo Copa Federación). Selector Primera / Reserva.
+- Cada casillero tiene tres estados:
+  - **Con datos** (relleno azul, con "5 goles", "1 roja" o "8 en la lista"): tiene goles, incidencias o formación en ese torneo. Siempre cuenta como que jugó y no se puede quitar desde acá.
+  - **En la lista** (borde azul): marcado a mano, es una fila de `planteles` sin otros datos. Tocar lo saca.
+  - **Vacío**: tocar lo agrega a `planteles`.
+  - Además, los vacíos que quedan **entre el primer y el último torneo con datos** se marcan **"¿Jugó?"** (borde punteado naranja), como sugerencia. Botón "Marcar los N" para sumarlos todos.
+- Resumen arriba de la grilla: "15 con datos · 2 marcados a mano · 6 para confirmar".
+- Guardado automático por casillero, con auditoría ("Manuel sumó a Fosarelli, Adrián al Clausura 2022").
+- En el celular, la grilla queda de 3 columnas angostas (año + 2 casilleros), sin scroll horizontal.
+
+**Planteles (admin) usa lo mismo**
+- Lo marcado desde el jugador ya aparece en la tabla del plantel de ese torneo, en su grupo de puesto.
+- La sección "Sugeridos" del plantel suma también los jugadores marcados **"¿Jugó?"** para ese torneo (además de los del torneo anterior), con "Sumar".
+
 **Criterios de aceptación de la 6.6**
 - Contra Susanense en Primera, todo el período: 25 PJ, 10 G, 4 E, 11 P, 28–32; de local 11 PJ (6-2-3, 15–9); de visitante 14 PJ (4-2-8, 13–23); 2 playoffs perdidos; mayor goleada 4–0 (Clausura 2025 F4) y racha actual de 4 triunfos (con los datos de la base al 26/10/2026).
 - Desde cada partido de la lista se llega al Detalle y "Atrás" vuelve a la lista con los mismos filtros.
 - Se carga el cuerpo técnico de un torneo, aparece en Planteles e Historial, y "Copiar plantel de…" lo trae al torneo siguiente.
+- En el jugador Fosarelli, Adrián (Primera) se ven 15 torneos con datos de 2011 a 2023; marcar el Clausura 2022 lo hace aparecer en el plantel de ese torneo como Delantero, y destildarlo desde el plantel lo saca de la grilla del jugador.
+- El plantel del Clausura 2023 se ve agrupado por puesto, con "Sin puesto cargado" al final.
 - A 390 px no hay ninguna página con scroll horizontal (salvo dentro de "Ver tabla completa"); en PC las tablas no cambian.
 - Todo funciona a 390 px de ancho.
 

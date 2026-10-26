@@ -2,6 +2,14 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.17.0 — Fase 6.6.4 (plantel por puesto y torneos de cada jugador)
+- Que un jugador estuvo en un torneo se guarda solo en la lista del plantel (`planteles`). Planteles y la pantalla del jugador leen y escriben esa misma lista: lo que se marca en una aparece en la otra.
+- **Plantel por puesto** (Planteles de consulta y de admin, en PC y celular): Arqueros, Defensores, Volantes, Delanteros y al final Sin puesto cargado, con la cantidad de cada grupo. Dentro de cada grupo, por apellido (en el celular, lo que elija "Ordenar por"). El puesto es el del torneo; si no tiene, el **puesto habitual** del jugador. En admin el selector de puesto muestra "Habitual (Delantero)" y el grupo Sin puesto avisa "Cargá el puesto para ordenar el plantel".
+- **Pantalla del jugador** (`#/admin/jugadores/:id`; se llega con "Editar" desde Jugadores y desde Posibles duplicados): datos (apellido, nombre, puesto habitual, apodo, notas) que se guardan solos al salir de cada campo, y un resumen (goles por categoría con los años, tarjetas, partidos con formación, link a la ficha pública).
+- **Torneos que jugó**: grilla de un renglón por año, del más nuevo al más viejo, con Apertura / Clausura / Copa (solo los torneos que existen; los años sin torneos dicen "Sin torneos"). Selector Primera / Reserva. Cada casillero: **con datos** (azul, con "5 goles", "1 roja" o "8 en la lista"; no se quita), **en la lista** (borde azul; tocar lo saca), **vacío** (tocar lo suma) y **¿Jugó?** (punteado naranja) para los vacíos entre el primer y el último torneo con datos. Resumen "16 con datos · 0 marcados a mano · 7 para confirmar" y botón "Marcar los N".
+- **Sugeridos** del plantel en admin suma los jugadores "¿Jugó?" de ese torneo ("Estuvo en el Clausura 2015 y el Clausura 2023"), además de los del torneo anterior.
+- Registro de cambios: "Manuel sumó a Fossarelli, Adrián al Clausura 2022 · Primera" y "sacó a … del …" (hay que volver a correr `05_admin.sql`).
+
 ## v0.16.0 — Fase 6.6.3 (tablas en el celular sin scroll horizontal)
 - Solo debajo de 720 px; en PC las tablas no cambian.
 - Cada fila de tabla pasa a una **fila de dos líneas**: arriba lo que identifica, abajo los números. Toda la fila es un link, con una flecha al final. Sin encabezados: arriba de la lista hay un selector **"Ordenar por"** y el botón **"Ver tabla completa"**, que abre la tabla original a pantalla completa con la primera columna fija, scroll hacia el costado dentro de la tabla, botón Cerrar (también con Escape) y la nota "Deslizá la tabla hacia el costado". El orden elegido y "Ver todos" se mantienen al cambiar los filtros.

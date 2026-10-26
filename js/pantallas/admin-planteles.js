@@ -7,7 +7,7 @@ CDM.pantallas = CDM.pantallas || {};
 CDM.pantallas.adminPlanteles = (function () {
   const { ui, filtros } = CDM;
   const e = ui.escaparHtml;
-  const PUESTOS = ['Arquero', 'Defensor', 'Volante', 'Delantero'];
+  const PUESTOS = ui.PUESTOS;
   let ctx = null;
   let vistaActual = null;
 
@@ -34,11 +34,11 @@ CDM.pantallas.adminPlanteles = (function () {
   // ---------- Datos ----------
   // Filas del plantel: los que tienen datos en el torneo y los de la lista.
   function armarFilas() {
-    const filas = new Map();
+    const filas0 = new Map();
     // las estadísticas también traen a los de la lista: sin datos, solo cuentan si siguen en la lista
-    ctx.estadisticas.forEach((x) => { if (num(x.presencias) > 0 || ctx.lista.some((l) => l.jugador_id === x.jugador_id)) filas.set(x.jugador_id, x); });
-    ctx.lista.forEach((l) => { if (!filas.has(l.jugador_id)) filas.set(l.jugador_id, { jugador_id: l.jugador_id, en_lista: true }); });
-    return [...filas.values()].map((x) => {
+    ctx.estadisticas.forEach((x) => { if (num(x.presencias) > 0 || ctx.lista.some((l) => l.jugador_id === x.jugador_id)) filas0.set(x.jugador_id, x); });
+    ctx.lista.forEach((l) => { if (!filas0.has(l.jugador_id)) filas0.set(l.jugador_id, { jugador_id: l.jugador_id, en_lista: true }); });
+    const filas = [...filas0.values()].map((x) => {
       const j = ctx.porId[x.jugador_id] || { apellido: '?', nombre: '' };
       const l = ctx.lista.find((y) => y.jugador_id === x.jugador_id);
       const formacion = num(x.titular) + num(x.entro) + num(x.convocado);
@@ -53,7 +53,20 @@ CDM.pantallas.adminPlanteles = (function () {
         conDatos: num(x.presencias) > 0, enLista: !!l, puesto: l ? l.posicion || '' : '', camiseta: l ? l.camiseta : null,
         motivos: motivos.join(' · ')
       };
-    }).sort((a, b) => b.goles - a.goles || b.rojas - a.rojas || nombre(a.j).localeCompare(nombre(b.j), 'es'));
+    }).map((f) => Object.assign(f, { grupo: f.puesto || f.j.posicion || '' }))
+      .sort((a, b) => nombre(a.j).localeCompare(nombre(b.j), 'es'));
+    // en el orden de los grupos por puesto (6.6.4), así la tabla, la lista y "Guardar y siguiente" coinciden
+    return ui.porPuesto(filas, (f) => f.grupo).flatMap((g) => g.items);
+  }
+
+  // Grupos por puesto (6.6.4): Arqueros, Defensores, Volantes, Delanteros y Sin puesto cargado.
+  const grupos = () => ui.porPuesto(ctx.filas, (f) => f.grupo);
+  const avisoSinPuesto = (g) => (g.puesto ? '' : ' <span class="plantel-grupo__aviso">Cargá el puesto para ordenar el plantel</span>');
+
+  function cuerpoTabla() {
+    const columnas = 9 + (ctx.hayCamisetas ? 1 : 0);
+    return grupos().map((g) => '<tr class="tabla__grupo"><th colspan="' + columnas + '" scope="colgroup">' + e(g.titulo) +
+      ' <span class="texto-2">· ' + g.items.length + '</span>' + avisoSinPuesto(g) + '</th></tr>' + g.items.map(filaHtml).join('')).join('') + filaNuevaHtml();
   }
 
   // Para revisar: sin nombre, o mismo apellido que otro jugador cuando a uno le falta el nombre o tiene solo la inicial.
@@ -73,7 +86,9 @@ CDM.pantallas.adminPlanteles = (function () {
 
   // ---------- HTML ----------
   const opcion = (v, t, actual) => '<option value="' + e(v) + '"' + (String(v) === String(actual ?? '') ? ' selected' : '') + '>' + e(t) + '</option>';
-  const selectorPuesto = (valor, extra) => '<select data-campo="puesto"' + (extra || '') + ' aria-label="Puesto">' + opcion('', '—', valor) +
+  // Vacío = usa el puesto habitual del jugador
+  const selectorPuesto = (valor, extra, habitual) => '<select data-campo="puesto"' + (extra || '') + ' aria-label="Puesto">' +
+    opcion('', habitual ? 'Habitual (' + habitual + ')' : '—', valor) +
     PUESTOS.map((p) => opcion(p, p, valor)).join('') + '</select>';
 
   function filaHtml(f) {
@@ -86,7 +101,7 @@ CDM.pantallas.adminPlanteles = (function () {
       (r ? '<div class="plantel-aviso">' + e(r.texto) + (r.par ? ' <a href="' + enlaceDuplicado(f.jugador_id, r.par) + '">Revisar</a>' : '') + '</div>' : '') +
       '<div class="plantel-estado" role="status"></div></td>' +
       '<td><input data-campo="nombre" value="' + e(f.j.nombre || '') + '" placeholder="Nombre" aria-label="Nombre" autocomplete="off"></td>' +
-      '<td>' + selectorPuesto(f.puesto) + '</td>' +
+      '<td>' + selectorPuesto(f.puesto, '', f.j.posicion) + '</td>' +
       '<td><input data-campo="apodo" value="' + e(f.j.apodo || '') + '" placeholder="Apodo" aria-label="Apodo" autocomplete="off"></td>' +
       '<td class="centro">' + (f.goles || '·') + '</td><td class="centro">' + (f.rojas || '·') + '</td>' +
       '<td><span class="etiqueta etiqueta--' + (f.motivos === 'Nuevo' ? 'ok' : 'info') + '">' + e(f.motivos) + '</span></td>' +
@@ -95,14 +110,19 @@ CDM.pantallas.adminPlanteles = (function () {
 
   // ---------- Celular (6.6.3): lista y hoja desde abajo ----------
   function resumenFila(f) {
-    return [f.puesto || '—', f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : '',
+    return [f.puesto || (f.j.posicion ? f.j.posicion + ' (habitual)' : '—'), f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : '',
       revisar(f.j) ? 'revisar' : ''].filter(Boolean).join(' · ');
   }
 
   function movilHtml() {
-    return ctx.filas.map((f) => '<li><button type="button" class="plantel-item' + (revisar(f.j) ? ' plantel-item--revisar' : '') +
+    return grupos().map((g) => '<li class="plantel-movil__grupo"><h3>' + e(g.titulo) + '</h3><span>' + g.items.length + '</span>' + avisoSinPuesto(g) + '</li>' +
+      g.items.map(itemMovil).join('')).join('');
+  }
+
+  function itemMovil(f) {
+    return '<li><button type="button" class="plantel-item' + (revisar(f.j) ? ' plantel-item--revisar' : '') +
       '" data-hoja-abrir="' + e(f.jugador_id) + '"><span class="plantel-item__texto"><span class="plantel-item__nombre">' + e(nombre(f.j)) + '</span>' +
-      '<span class="plantel-item__resumen">' + e(resumenFila(f)) + '</span></span><span class="plantel-item__editar">Editar</span></button></li>').join('');
+      '<span class="plantel-item__resumen">' + e(resumenFila(f)) + '</span></span><span class="plantel-item__editar">Editar</span></button></li>';
   }
 
   // Hoja para editar (f) o agregar (sin f) un jugador.
@@ -123,7 +143,7 @@ CDM.pantallas.adminPlanteles = (function () {
       (f ? '' : '<div class="sugerencias" role="listbox" aria-label="Jugadores parecidos" hidden></div>') + '</div>' +
       campo('nombre', 'Nombre', j.nombre) + '</div>' +
       '<div class="fila-2"><div class="campo"><label for="hoja-puesto">Puesto</label>' +
-      '<select id="hoja-puesto" name="puesto">' + opcion('', '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
+      '<select id="hoja-puesto" name="puesto">' + opcion('', f && f.j.posicion ? 'Habitual (' + f.j.posicion + ')' : '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
       campo('apodo', 'Apodo', j.apodo, ' placeholder="Opcional"') + '</div>' +
       (f ? '<label class="check hoja__check"><input type="checkbox" name="incluido" checked' + (f.conDatos ? ' disabled' : '') + '> En el plantel de este torneo</label>' +
         (f.conDatos ? '<p class="nota">Tiene datos en este torneo: queda en el plantel.</p>' : '') : '') +
@@ -142,20 +162,44 @@ CDM.pantallas.adminPlanteles = (function () {
       '<td><span class="etiqueta etiqueta--ok">Nuevo</span></td><td></td></tr>';
   }
 
+  // "¿Jugó?" (6.6.4): sin datos en este torneo pero con datos antes y después, en la misma categoría.
+  function calcularJugo(filasCat) {
+    const nombreDe = Object.fromEntries(ctx.torneos.map((t) => [t.orden, t.nombre]));
+    const porJugador = new Map();
+    filasCat.forEach((x) => {
+      if (!porJugador.has(x.jugador_id)) porJugador.set(x.jugador_id, { datos: [], aca: false });
+      const p = porJugador.get(x.jugador_id);
+      if (num(x.presencias) > 0) p.datos.push(x.torneo_orden);
+      if (x.torneo_id === ctx.torneo.torneo_id && (num(x.presencias) > 0 || x.en_lista)) p.aca = true;
+    });
+    const o = ctx.torneo.orden;
+    return [...porJugador].filter(([, p]) => !p.aca && p.datos.some((d) => d < o) && p.datos.some((d) => d > o)).map(([id, p]) => ({
+      jugador_id: id,
+      texto: '¿Jugó? Estuvo en el ' + nombreDe[Math.max(...p.datos.filter((d) => d < o))] + ' y el ' + nombreDe[Math.min(...p.datos.filter((d) => d > o))]
+    }));
+  }
+
   function sugeridosHtml() {
-    if (!ctx.anterior) return '';
     const ids = new Set(ctx.filas.map((f) => f.jugador_id));
-    const sug = ctx.estAnterior.filter((x) => !ids.has(x.jugador_id) && ctx.porId[x.jugador_id])
+    const jugo = Object.fromEntries((ctx.jugo || []).map((x) => [x.jugador_id, x.texto]));
+    const delAnterior = (ctx.anterior ? ctx.estAnterior : []).filter((x) => !ids.has(x.jugador_id) && ctx.porId[x.jugador_id])
       .sort((a, b) => num(b.goles) - num(a.goles) || num(b.partidos) - num(a.partidos));
+    const yaVan = new Set(delAnterior.map((x) => x.jugador_id));
+    const soloJugo = (ctx.jugo || []).filter((x) => !ids.has(x.jugador_id) && !yaVan.has(x.jugador_id) && ctx.porId[x.jugador_id])
+      .sort((a, b) => nombre(ctx.porId[a.jugador_id]).localeCompare(nombre(ctx.porId[b.jugador_id]), 'es'));
+    const sug = delAnterior.concat(soloJugo);
     if (!sug.length) return '';
     const dato = (x) => [num(x.goles) ? ui.plural(num(x.goles), 'gol', 'goles') : '', num(x.rojas) ? ui.plural(num(x.rojas), 'roja', 'rojas') : '',
       num(x.titular) + num(x.entro) + num(x.convocado) ? 'formación' : '', x.en_lista && !num(x.presencias) ? 'lista' : ''].filter(Boolean).join(' · ');
-    return '<h3 class="plantel-sub">Sugeridos · ' + e(ctx.anterior.nombre) + ', sin datos en este torneo</h3>' +
+    const textoDe = (x) => [x.torneo_id ? dato(x) : '', jugo[x.jugador_id] || ''].filter(Boolean).join(' · ');
+    return '<h3 class="plantel-sub">Sugeridos, sin datos en este torneo</h3>' +
+      '<p class="nota">' + (delAnterior.length ? 'Del ' + e(ctx.anterior.nombre) + (sug.some((x) => jugo[x.jugador_id]) ? ' y los' : '.') : 'Los') +
+      (sug.some((x) => jugo[x.jugador_id]) ? ' marcados "¿Jugó?": tienen datos antes y después de este torneo.' : '') + '</p>' +
       '<div class="tabla-scroll"><table class="tabla tabla--sugeridos"><tbody>' + sug.map((x) => {
         const j = ctx.porId[x.jugador_id];
         return '<tr><td class="centro"><input type="checkbox" data-marcar="' + e(x.jugador_id) + '" aria-label="Sumar a ' + e(nombre(j)) + '"></td>' +
           '<td><strong>' + e(j.apellido) + '</strong>' + (j.nombre ? ', ' + e(j.nombre) : '') + '</td>' +
-          '<td class="texto-2">' + e(dato(x)) + '</td>' +
+          '<td class="texto-2">' + e(textoDe(x)) + '</td>' +
           '<td><button type="button" class="boton boton--borde" data-sumar="' + e(x.jugador_id) + '">Sumar</button></td></tr>';
       }).join('') + '</tbody></table></div>' +
       '<button type="button" class="boton boton--borde" data-accion="sumar-marcados">Sumar los marcados</button>';
@@ -232,7 +276,7 @@ CDM.pantallas.adminPlanteles = (function () {
   function pintarTabla() {
     ctx.filas = armarFilas();
     const t = vistaActual.querySelector('#plantel-tabla');
-    if (t) t.innerHTML = ctx.filas.map(filaHtml).join('') + filaNuevaHtml();
+    if (t) t.innerHTML = cuerpoTabla();
     const m = vistaActual.querySelector('#plantel-movil');
     if (m) m.innerHTML = movilHtml();
     const s = vistaActual.querySelector('#plantel-sugeridos');
@@ -249,11 +293,13 @@ CDM.pantallas.adminPlanteles = (function () {
   async function cargar(torneo, categoria) {
     const api = CDM.api.admin;
     const anteriorT = ctx.torneosOrden.filter((t) => t.orden < torneo.orden).pop() || null;
-    const [lista, estadisticas, estAnterior] = await Promise.all([
+    const [lista, estadisticas, estAnterior, filasCat] = await Promise.all([
       api.listaPlantel(torneo.torneo_id, categoria), api.plantelTorneo(torneo.torneo_id, categoria),
-      anteriorT ? api.plantelTorneo(anteriorT.torneo_id, categoria) : Promise.resolve([])
+      anteriorT ? api.plantelTorneo(anteriorT.torneo_id, categoria) : Promise.resolve([]),
+      api.plantelCategoria(categoria).catch(() => [])
     ]);
     Object.assign(ctx, { torneo, categoria, lista, estadisticas, anterior: anteriorT, estAnterior });
+    ctx.jugo = calcularJugo(filasCat);
     ctx.hayCamisetas = lista.some((l) => l.camiseta != null);
     // Cuerpo técnico (6.6.1). Si todavía no se corrió 13_cuerpos_tecnicos.sql, el bloque no aparece.
     const cuerpos = await api.cuerposTecnicos().catch(() => null);
@@ -353,7 +399,7 @@ CDM.pantallas.adminPlanteles = (function () {
       '<div class="tabla-scroll"><table class="tabla tabla--plantel-admin"><thead><tr><th><span class="oculto">En plantel</span></th>' +
       (ctx.hayCamisetas ? '<th>N°</th>' : '') + '<th>Apellido</th><th>Nombre</th><th>Puesto</th><th>Apodo</th><th class="centro">Goles</th><th class="centro">Rojas</th>' +
       '<th>Por qué está</th><th><span class="oculto">Acciones</span></th></tr></thead>' +
-      '<tbody id="plantel-tabla">' + ctx.filas.map(filaHtml).join('') + filaNuevaHtml() + '</tbody></table></div>' +
+      '<tbody id="plantel-tabla">' + cuerpoTabla() + '</tbody></table></div>' +
       '<button type="button" class="boton boton--borde plantel-solo-pc" data-accion="agregar-fila">+ Agregar fila</button>' +
       '<button type="button" class="boton plantel-solo-movil plantel-agregar" data-hoja-abrir="">+ Agregar jugador</button>' +
       '<ul class="plantel-movil plantel-solo-movil" id="plantel-movil">' + movilHtml() + '</ul>' +
@@ -738,7 +784,9 @@ CDM.pantallas.adminPlanteles = (function () {
       }
       ev.target.blur();
       const campo = ev.target.dataset.campo;
-      const sig = tr.nextElementSibling && tr.nextElementSibling.querySelector('[data-campo="' + campo + '"], [data-nuevo="' + campo + '"]');
+      let proxima = tr.nextElementSibling;
+      while (proxima && proxima.classList.contains('tabla__grupo')) proxima = proxima.nextElementSibling;
+      const sig = proxima && proxima.querySelector('[data-campo="' + campo + '"], [data-nuevo="' + campo + '"]');
       if (sig) sig.focus();
     });
 

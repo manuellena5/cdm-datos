@@ -344,6 +344,10 @@ CDM.pantallas.admin = (function () {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '') +
           ' (' + ui.plural(c.plantel_filas, 'cambio', 'cambios') + ')';
+      } else if (c.accion === 'sumó a' || c.accion === 'sacó a') {
+        const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
+        que = c.accion + ' ' + (c.plantel_jugador_nombre || 'un jugador') + (c.accion === 'sumó a' ? ' al ' : ' del ') +
+          (t ? t.nombre : 'torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
       } else if (c.accion === 'actualizó el cuerpo técnico de') {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');

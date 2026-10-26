@@ -30,7 +30,8 @@ CDM.filas = (function () {
 
   // Bloque completo. o = {
   //   id, titulo (de la tabla completa), tabla (HTML de la tabla original, con su .tabla-scroll),
-  //   filas: [fila(...)], ordenes: [{ valor, texto, asc }], limite, verMas: (n) => 'Ver los n rivales' }
+  //   filas: [fila(...)] o grupos: [{ titulo, filas }] (con un título por grupo; el orden se aplica dentro de cada uno),
+  //   ordenes: [{ valor, texto, asc }], limite, verMas: (n) => 'Ver los n rivales' }
   function bloque(o) {
     const ordenes = o.ordenes || [];
     const sel = (elegido.get(o.id) || {}).orden || (ordenes[0] && ordenes[0].valor);
@@ -39,7 +40,11 @@ CDM.filas = (function () {
         '<option value="' + e(x.valor) + '"' + (x.asc ? ' data-asc="1"' : '') + (x.valor === sel ? ' selected' : '') + '>' + e(x.texto) + '</option>').join('') +
         '</select></label>'
       : '<span></span>';
-    const sobran = o.limite && o.filas.length > o.limite ? o.filas.length : 0;
+    const filas = o.grupos
+      ? o.grupos.flatMap((g) => ['<li class="filas__grupo" data-grupo><h3>' + e(g.titulo) + '</h3><span>' + g.filas.length + '</span></li>'].concat(g.filas))
+      : o.filas;
+    const total = o.grupos ? o.grupos.reduce((s, g) => s + g.filas.length, 0) : o.filas.length;
+    const sobran = o.limite && total > o.limite ? total : 0;
     return '<div class="filas" data-filas="' + e(o.id) + '"' + (o.limite ? ' data-limite="' + o.limite + '"' : '') + '>' +
       '<div class="filas__tabla" data-filas-tabla>' +
         '<div class="filas__cabeza"><span class="filas__titulo">' + e(o.titulo) + '</span>' +
@@ -49,7 +54,7 @@ CDM.filas = (function () {
       '<div class="filas__movil">' +
         '<div class="filas__controles">' + control +
         '<button type="button" class="boton boton--borde filas__completa" data-filas-completa>Ver tabla completa</button></div>' +
-        '<ol class="filas__lista">' + o.filas.join('') + '</ol>' +
+        '<ol class="filas__lista">' + filas.join('') + '</ol>' +
         (sobran ? '<button type="button" class="boton boton--borde filas__mas" data-filas-mas>' + e(o.verMas(sobran)) + '</button>' : '') +
       '</div></div>';
   }
@@ -74,11 +79,26 @@ CDM.filas = (function () {
     const sel = caja.querySelector('[data-filas-orden]');
     if (sel) {
       const op = sel.selectedOptions[0];
-      items.sort(comparar(sel.value, op && op.dataset.asc === '1')).forEach((li) => lista.appendChild(li));
+      const cmp = comparar(sel.value, op && op.dataset.asc === '1');
+      // con grupos, se ordena cada tramo entre títulos
+      const orden = [];
+      let tramo = [];
+      const cerrarTramo = () => { orden.push(...tramo.sort(cmp)); tramo = []; };
+      items.forEach((li) => { if (li.hasAttribute('data-grupo')) { cerrarTramo(); orden.push(li); } else tramo.push(li); });
+      cerrarTramo();
+      orden.forEach((li) => lista.appendChild(li));
     }
     const limite = Number(caja.dataset.limite) || 0;
     const todos = estado.todos || !limite;
-    [...lista.children].forEach((li, i) => { li.hidden = !todos && i >= limite; });
+    let n = 0;
+    [...lista.children].forEach((li) => { if (!li.hasAttribute('data-grupo')) li.hidden = !todos && n++ >= limite; });
+    // un título sin filas visibles se esconde
+    [...lista.children].forEach((li) => {
+      if (!li.hasAttribute('data-grupo')) return;
+      let x = li.nextElementSibling, alguna = false;
+      while (x && !x.hasAttribute('data-grupo')) { if (!x.hidden) alguna = true; x = x.nextElementSibling; }
+      li.hidden = !alguna;
+    });
     const mas = caja.querySelector('[data-filas-mas]');
     if (mas) mas.hidden = todos;
   }
@@ -127,7 +147,7 @@ CDM.filas = (function () {
       if (b.matches('[data-filas-mas]')) {
         guardar(caja, { todos: true });
         aplicar(caja);
-        const siguiente = caja.querySelector('.filas__lista > li:nth-child(' + (Number(caja.dataset.limite) + 1) + ') a');
+        const siguiente = [...caja.querySelectorAll('.filas__lista > li:not([data-grupo]) a')][Number(caja.dataset.limite)];
         if (siguiente) siguiente.focus();
       } else if (b.matches('[data-filas-completa]')) {
         abrir(caja, b);

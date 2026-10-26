@@ -146,7 +146,7 @@ CDM.pantallas.adminDuplicados = (function () {
         '<input id="d-motivo" autocomplete="off" placeholder="Por ejemplo: son hermanos"></div>' +
         '<p class="nota">El par no vuelve a aparecer como posible duplicado.</p>' +
         '<button type="button" class="boton boton--borde" data-accion="descartar">Descartar</button></section>';
-    const editar = (j) => '#/admin/jugadores?editar=' + encodeURIComponent(j.jugador_id) + '&volver=' + encodeURIComponent(enlacePar(par, ctx.ver));
+    const editar = (j) => CDM.router.armar('/admin/jugadores/' + encodeURIComponent(j.jugador_id), { volver: enlacePar(par, ctx.ver) });
     return '<section class="tarjeta dup-detalle" aria-label="Par elegido"><h2 class="tarjeta__titulo">¿Son el mismo jugador?</h2>' +
       '<div class="dup-jugadores">' + resumenJugador(a, datosDe(a)) + resumenJugador(b, datosDe(b)) + '</div>' + mensaje +
       '<h3 class="dup-sub">Partidos donde aparece cada uno</h3>' + tablaPartidos(a, b) +

@@ -183,6 +183,10 @@ CDM.api = (function () {
     jugador: (id) => consultar('jugador:' + id, () =>
       cliente.from('jugadores').select('jugador_id,apellido,nombre,apodo,posicion,division').eq('jugador_id', id))
       .then((filas) => filas[0] || null),
+    // Puesto habitual de cada jugador (6.6.4): se usa cuando el plantel del torneo no tiene puesto.
+    posicionesHabituales: () => consultar('posiciones_habituales', () =>
+      cliente.from('jugadores').select('jugador_id,posicion').not('posicion', 'is', null).order('jugador_id'))
+      .then((filas) => Object.fromEntries(filas.map((x) => [x.jugador_id, x.posicion]))),
     jugadorPartidos: (id) => consultar('jugador_partidos:' + id, () =>
       cliente.from('v_jugador_partidos').select('*').eq('jugador_id', id).order('fecha', { ascending: false, nullsFirst: false }).order('partido_id')),
 
@@ -240,6 +244,10 @@ CDM.api = (function () {
         .eq('torneo_id', torneoId).eq('categoria', categoria).order('camiseta', { nullsFirst: false }).order('jugador_id')),
       plantelTorneo: (torneoId, categoria) => todas(() => cliente.from('v_plantel').select('*')
         .eq('torneo_id', torneoId).eq('categoria', categoria)),
+      // Torneos de un jugador (6.6.4) y todos los de una categoría (para los "¿Jugó?" del plantel)
+      plantelJugador: (id) => todas(() => cliente.from('v_plantel').select('*').eq('jugador_id', id).order('torneo_orden')),
+      plantelCategoria: (categoria) => todas(() => cliente.from('v_plantel')
+        .select('jugador_id,torneo_id,torneo_orden,presencias,en_lista').eq('categoria', categoria).order('jugador_id').order('torneo_orden')),
       guardarLista: (filas) => escribir(cliente.from('planteles').upsert(filas, { onConflict: 'torneo_id,categoria,jugador_id' }).select()),
       cuerposTecnicos: () => todas(() => cliente.from('cuerpos_tecnicos').select('torneo_id,categoria,orden,nombre').order('orden')),
       // Guarda el cuerpo técnico entero: nombres[0] = técnico, 1 a 3 = integrantes. Los vacíos se borran.
