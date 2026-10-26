@@ -349,7 +349,7 @@ Hacer en este orden, un punto por vez ("Hacé el punto 6.5.1 de docs/PLAN.md").
 
 ## Fase 6.6 — Cuerpo técnico e historial contra cada rival
 
-Referencia visual: mockup **10** (bloque "Cuerpo técnico" en `docs/mockups/AdminPlantel.dc.html`) y mockup **12** (`docs/mockups/HistorialRival.dc.html`). Un punto por vez ("Hacé el punto 6.6.1 de docs/PLAN.md").
+Referencia visual: mockup **10** (bloque "Cuerpo técnico" en `docs/mockups/AdminPlantel.dc.html`) mockup **12** (`docs/mockups/HistorialRival.dc.html`) y mockups **13 a 16** (celular). Un punto por vez ("Hacé el punto 6.6.1 de docs/PLAN.md").
 
 ### 6.6.1 Cuerpo técnico de cada plantel
 - Por torneo y categoría: **un técnico** y **hasta 3 integrantes** más, sin función (no se distingue ayudante, preparador físico, etc.).
@@ -370,10 +370,21 @@ Hoy "Ver historial completo" lleva a la tabla general de rivales. Pasa a llevar 
 - Incluye borradores solo en modo administrador. Los partidos sin marcador (inferidos) cuentan en PJ y en el resultado, pero no en goles, y se aclara con una nota al pie.
 - En el **Detalle del partido**, el recuadro "Contra Susanense · Primera" suma la línea "De local x · de visitante y" y el link "Ver historial completo" va a esta pantalla.
 
+### 6.6.3 Tablas en el celular sin scroll horizontal — mockups 13 a 16
+Solo debajo de 720 px; en PC las tablas quedan como están. Referencia: `docs/mockups/MovilHistorial.dc.html`, `MovilPlantel.dc.html`, `MovilPlantelEditar.dc.html` y `MovilTablaCompleta.dc.html`.
+- **Regla general:** cada fila de tabla pasa a una **fila de dos líneas** (una tarjeta chica): arriba lo que identifica, abajo los números en una línea corta. Sin encabezados de columna; el orden se elige con un selector **"Ordenar por"** arriba de la lista. Nombres de equipos con `equipos.nombre_corto` y escudo de 30 px. Números en Barlow Condensed. Toda la fila es un link (44 px de alto mínimo) con una flecha al final.
+- **Historial · Contra cada rival:** línea 1 escudo + nombre corto + efectividad con mini barra; línea 2 `PJ 25 · 10-4-11 · goles 28–32`. Lleva al historial contra ese rival (6.6.2). Muestra los primeros 9 y "Ver los N rivales".
+- **Historial · Campañas:** línea 1 torneo + cómo terminó ("10° · Octavos (pen.)", "En curso" con borde punteado); línea 2 `13 pts · PJ 13 · 2-7-4 · goles 9–10`. Lleva a Resultados de ese torneo. Muestra los últimos 6 y "Ver todas las campañas".
+- **Planteles (consulta):** cuerpo técnico arriba. Por jugador: línea 1 apellido, nombre, capitán y puesto; línea 2 chips con lo que tenga (en la lista, de titular, goles, tarjetas). Los ceros no se muestran.
+- **Plantel en admin:** lista de nombre, puesto y resumen; al tocar se abre una **hoja desde abajo** (diálogo accesible, foco atrapado, se cierra con Cancelar o deslizando) con apellido, nombre, puesto, apodo, "En el plantel" y el aviso de posible duplicado. Botones **Cancelar** y **Guardar y siguiente** (pasa al jugador siguiente sin cerrar). "+ Agregar jugador" abre la misma hoja vacía, con las sugerencias de jugadores existentes al escribir el apellido. El cuerpo técnico y "Pegar lista" quedan como bloques arriba de la lista.
+- **"Ver tabla completa"** (opcional, al lado de "Ordenar por"): abre la tabla original a pantalla completa con la primera columna fija y scroll horizontal dentro de la tabla, botón Cerrar y la nota "Deslizá la tabla hacia el costado". No pide girar el celular.
+- Aplicar lo mismo a cualquier otra tabla ancha que quede (Goleadores, historial contra un rival, ficha de jugador), con el mismo componente.
+
 **Criterios de aceptación de la 6.6**
 - Contra Susanense en Primera, todo el período: 25 PJ, 10 G, 4 E, 11 P, 28–32; de local 11 PJ (6-2-3, 15–9); de visitante 14 PJ (4-2-8, 13–23); 2 playoffs perdidos; mayor goleada 4–0 (Clausura 2025 F4) y racha actual de 4 triunfos (con los datos de la base al 26/10/2026).
 - Desde cada partido de la lista se llega al Detalle y "Atrás" vuelve a la lista con los mismos filtros.
 - Se carga el cuerpo técnico de un torneo, aparece en Planteles e Historial, y "Copiar plantel de…" lo trae al torneo siguiente.
+- A 390 px no hay ninguna página con scroll horizontal (salvo dentro de "Ver tabla completa"); en PC las tablas no cambian.
 - Todo funciona a 390 px de ancho.
 
 ---

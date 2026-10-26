@@ -20,9 +20,11 @@ CDM.pantallas.planteles = (function () {
     // Sumar por jugador (si es "Todo el año", junta los torneos del año)
     const porJugador = new Map();
     plantel.filter(enSel).forEach((x) => {
-      if (!porJugador.has(x.jugador_id)) porJugador.set(x.jugador_id, { jugador_id: x.jugador_id, jugador: x.jugador, partidos: 0, titular: 0, entro: 0, convocado: 0, goles: 0, amarillas: 0, rojas: 0, minutos: 0, conMinutos: false, enLista: false, camiseta: null });
+      if (!porJugador.has(x.jugador_id)) porJugador.set(x.jugador_id, { jugador_id: x.jugador_id, jugador: x.jugador, apellido: x.apellido, posicion: null, capitan: 0, partidos: 0, titular: 0, entro: 0, convocado: 0, goles: 0, amarillas: 0, rojas: 0, minutos: 0, conMinutos: false, enLista: false, camiseta: null });
       const j = porJugador.get(x.jugador_id);
       if (x.en_lista) { j.enLista = true; if (x.camiseta != null && j.camiseta == null) j.camiseta = x.camiseta; }
+      if (x.posicion && !j.posicion) j.posicion = x.posicion;
+      j.capitan += num(x.capitan);
       ['partidos', 'titular', 'entro', 'convocado', 'goles', 'amarillas', 'rojas'].forEach((k) => { j[k] += num(x[k]); });
       if (x.minutos != null) { j.minutos += num(x.minutos); j.conMinutos = true; }
     });
@@ -45,6 +47,22 @@ CDM.pantallas.planteles = (function () {
       '<td class="centro">' + j.partidos + '</td><td class="centro">' + j.titular + '</td><td class="centro">' + j.entro + '</td>' +
       '<td class="centro">' + j.convocado + '</td>' + (hayMinutos ? '<td class="centro">' + (j.conMinutos ? j.minutos : '–') + '</td>' : '') +
       '<td class="total centro">' + j.goles + '</td><td class="centro">' + j.amarillas + '</td><td class="centro">' + j.rojas + '</td></tr>').join('');
+    // Celular: una fila de dos líneas por jugador; los ceros no se muestran
+    const filasMovil = lista.map((j) => CDM.filas.fila({
+      href: '#/jugador/' + encodeURIComponent(j.jugador_id),
+      arriba: '<span class="fila__nombre fila__nombre--corto">' + e(j.jugador) + '</span>' +
+        (j.capitan ? '<span class="fila__capitan" title="Capitán">C</span>' : '') +
+        (j.posicion ? '<span class="fila__dato">· ' + e(j.posicion) + '</span>' : ''),
+      abajo: CDM.filas.chips([
+        j.partidos ? ui.plural(j.partidos, 'jugado', 'jugados') : '',
+        j.titular ? j.titular + ' de titular' : '',
+        j.entro ? 'entró ' + ui.plural(j.entro, 'vez', 'veces') : '',
+        j.goles ? ui.plural(j.goles, 'gol', 'goles') : '',
+        j.amarillas ? ui.plural(j.amarillas, 'amarilla', 'amarillas') : '',
+        j.rojas ? ui.plural(j.rojas, 'roja', 'rojas') : ''
+      ]),
+      claves: { pj: j.partidos, tit: j.titular, goles: j.goles, apellido: j.jugador }
+    }));
     const nota = (enLista ? 'Lista del torneo cargada (' + ui.plural(enLista, 'jugador', 'jugadores') + '). ' : '') + (conFormacion.size
       ? 'Con formación cargada: PJ, titular, entró y convocado salen de las formaciones.'
       : 'Este torneo todavía no tiene formaciones cargadas: PJ cuenta solo los partidos con gol o tarjeta.');
@@ -52,20 +70,28 @@ CDM.pantallas.planteles = (function () {
     // Cuerpo técnico arriba de la lista; con "Todo el año", uno por torneo
     const torneosSel = sel.torneo ? [sel.torneo] : filtros.torneos(campanas).filter((t) => t.anio === sel.anio);
     const lineasCuerpo = torneosSel.map((t) => ({ t, c: ui.cuerpoTecnico(cuerpos, t.id, categoria) })).filter((x) => x.c.html)
-      .map((x) => '<p class="cuerpo-tecnico">' + (sel.torneo ? '' : '<span class="texto-2">' + e(ui.torneoSinAnio(x.t.nombre)) + ':</span> ') + x.c.html + '</p>').join('');
+      .map((x) => '<p class="cuerpo-tecnico">' + (sel.torneo ? '' : '<span class="texto-2">' + e(ui.torneoSinAnio(x.t.nombre)) + ':</span> ') + x.c.html + '</p>').join('') ||
+      (sel.torneo ? '<p class="cuerpo-tecnico"><strong>Cuerpo técnico:</strong> <span class="texto-2">sin cargar</span></p>' : '');
 
     return controles + '<section class="tarjeta" aria-label="Plantel"><h1 class="tarjeta__titulo">' + e(titulo) + '</h1>' + lineasCuerpo +
       '<p class="nota">' + ui.plural(lista.length, 'jugador', 'jugadores') + ' · ' + ui.plural(jugados.length, 'partido jugado', 'partidos jugados') + '</p>' +
       (lista.length
-        ? '<div class="tabla-scroll"><table class="tabla tabla--plantel"><thead><tr><th>Jugador</th>' +
+        ? CDM.filas.bloque({
+          id: 'plantel', titulo: titulo, filas: filasMovil, limite: 16,
+          verMas: (n) => 'Ver los ' + (n - 16) + ' restantes',
+          ordenes: [{ valor: 'pj', texto: 'Jugados' }, { valor: 'tit', texto: 'Titularidades' },
+            { valor: 'goles', texto: 'Goles' }, { valor: 'apellido', texto: 'Apellido', asc: true }],
+          tabla: '<div class="tabla-scroll"><table class="tabla tabla--plantel"><thead><tr><th>Jugador</th>' +
           '<th class="centro" title="Partidos jugados">PJ</th><th class="centro" title="Titular">Tit.</th><th class="centro" title="Suplente que entró">Entró</th>' +
           '<th class="centro" title="Convocado, no se sabe si entró">Conv.</th>' + (hayMinutos ? '<th class="centro">Min.</th>' : '') +
           '<th class="centro">Goles</th><th class="centro" title="Amarillas">Am.</th><th class="centro">Rojas</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+        })
         : ui.vacio('Todavía no hay jugadores cargados para este torneo.')) +
       '<p class="nota">' + e(nota) + '</p></section>';
   }
 
   function montar(vista) {
+    CDM.filas.montar(vista);
     const ir = (cambios) => CDM.router.cambiarFiltros('/planteles', Object.assign({}, actual, cambios));
     vista.addEventListener('change', (ev) => {
       const f = ev.target.dataset.filtro;

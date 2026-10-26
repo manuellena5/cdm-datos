@@ -2,6 +2,16 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.16.0 — Fase 6.6.3 (tablas en el celular sin scroll horizontal)
+- Solo debajo de 720 px; en PC las tablas no cambian.
+- Cada fila de tabla pasa a una **fila de dos líneas**: arriba lo que identifica, abajo los números. Toda la fila es un link, con una flecha al final. Sin encabezados: arriba de la lista hay un selector **"Ordenar por"** y el botón **"Ver tabla completa"**, que abre la tabla original a pantalla completa con la primera columna fija, scroll hacia el costado dentro de la tabla, botón Cerrar (también con Escape) y la nota "Deslizá la tabla hacia el costado". El orden elegido y "Ver todos" se mantienen al cambiar los filtros.
+- **Historial · Contra cada rival**: escudo, nombre corto, efectividad con mini barra y "PJ 25 · 10-4-11 · goles 28–32". Lleva al historial contra ese rival. Ordena por efectividad, partidos, goles a favor o nombre. Muestra 9 y "Ver los N rivales".
+- **Historial · Campañas**: torneo y cómo terminó ("10° · Octavos (pen.)", "En curso" con borde punteado); abajo "13 pts · PJ 13 · 2-7-4 · goles 9–10" y el técnico si está cargado. Lleva a Resultados del torneo. Muestra las últimas 6 y "Ver todas las campañas (2010–2026)".
+- **Planteles**: cuerpo técnico arriba ("sin cargar" si falta). Por jugador: apellido, nombre, "C" si fue capitán y puesto; abajo chips con jugados, de titular, entró, goles y tarjetas (los ceros no se muestran). Ordena por jugados, titularidades, goles o apellido. Muestra 16 y "Ver los N restantes".
+- **Goleadores**: puesto, nombre, goles y barra; abajo el detalle por torneo. Muestra 10 por categoría.
+- **Ficha del jugador** (Por torneo) y **Panel de administración** (Últimos cargados) usan el mismo componente.
+- **Administrar → Planteles** en el celular: lista con nombre, puesto y resumen (goles, rojas, "revisar"). Al tocar un jugador se abre una **hoja desde abajo** con apellido, nombre, puesto, apodo, "En el plantel de este torneo" y el aviso de posible duplicado; **Cancelar** y **Guardar y siguiente** (guarda y pasa al jugador siguiente sin cerrar). **"+ Agregar jugador"** abre la hoja vacía, sugiere jugadores existentes al escribir el apellido y queda lista para cargar otro. Se cierra con Cancelar, Escape, tocando afuera o deslizando hacia abajo. El cuerpo técnico y "Pegar lista" quedan como bloques arriba de la lista.
+
 ## v0.15.0 — Fase 6.6.2 (historial contra un rival)
 - Pantalla nueva **Historial contra un rival** (`#/historial/rival/:id?cat=P&periodo=todo`). Se llega desde cada rival de la tabla "Contra cada rival" del Historial, desde el nombre del rival en las tarjetas de Resultados y desde "Ver historial completo" en el Detalle del partido.
 - **Filtros** en la URL: rival, categoría (Primera / Reserva / Las dos) y período (todo o un año).

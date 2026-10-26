@@ -47,13 +47,29 @@ CDM.pantallas.jugador = (function () {
     const linea = [j.apodo ? '"' + j.apodo + '"' : '', j.posicion, j.division ? (j.division === 'Ambas' ? 'Primera y Reserva' : j.division) : '',
       filas.length ? rangos(filas.map((x) => x.anio)) : ''].filter(Boolean).join(' · ');
 
+    const filasMovil = filas.map((x, i) => CDM.filas.fila({
+      href: CDM.router.armar('/planteles', { anio: x.anio, torneo: filtros.sufijo(x.torneo_id), cat: x.categoria === 'Reserva' ? 'R' : 'P' }),
+      arriba: '<span class="fila__nombre fila__nombre--corto">' + e(x.torneo) + '</span><span class="fila__dato">' + e(x.categoria) + '</span>',
+      abajo: CDM.filas.chips([
+        num(x.partidos) ? ui.plural(num(x.partidos), 'jugado', 'jugados') : '',
+        num(x.titular) ? num(x.titular) + ' de titular' : '',
+        num(x.goles) ? ui.plural(num(x.goles), 'gol', 'goles') : '',
+        num(x.amarillas) ? ui.plural(num(x.amarillas), 'amarilla', 'amarillas') : '',
+        num(x.rojas) ? ui.plural(num(x.rojas), 'roja', 'rojas') : ''
+      ]),
+      claves: { reciente: filas.length - i, pj: num(x.partidos), goles: num(x.goles) }
+    }));
     const tabla = filas.length
-      ? '<div class="tabla-scroll"><table class="tabla"><thead><tr><th>Torneo</th><th>Cat.</th><th class="centro" title="Partidos jugados">PJ</th>' +
+      ? CDM.filas.bloque({
+        id: 'ficha-torneos', titulo: 'Por torneo', filas: filasMovil,
+        ordenes: [{ valor: 'reciente', texto: 'Más recientes' }, { valor: 'pj', texto: 'Partidos' }, { valor: 'goles', texto: 'Goles' }],
+        tabla: '<div class="tabla-scroll"><table class="tabla"><thead><tr><th>Torneo</th><th>Cat.</th><th class="centro" title="Partidos jugados">PJ</th>' +
         '<th class="centro" title="Titular">Tit.</th><th class="centro">Goles</th><th class="centro" title="Amarillas">Am.</th><th class="centro">Rojas</th></tr></thead><tbody>' +
         filas.map((x) => '<tr><th scope="row"><a href="' + CDM.router.armar('/planteles', { anio: x.anio, torneo: filtros.sufijo(x.torneo_id), cat: x.categoria === 'Reserva' ? 'R' : 'P' }) + '">' +
           e(x.torneo) + '</a></th><td>' + e(x.categoria) + '</td><td class="centro">' + num(x.partidos) + '</td><td class="centro">' + num(x.titular) + '</td>' +
           '<td class="total centro">' + num(x.goles) + '</td><td class="centro">' + num(x.amarillas) + '</td><td class="centro">' + num(x.rojas) + '</td></tr>').join('') +
         '</tbody></table></div>'
+      })
       : ui.vacio('Todavía no hay partidos cargados de este jugador.');
 
     const lista = partidos.map((p) => {
@@ -78,6 +94,7 @@ CDM.pantallas.jugador = (function () {
   }
 
   function montar(vista) {
+    CDM.filas.montar(vista);
     const h1 = vista.querySelector('h1');
     if (h1) document.title = h1.textContent + ' · Historial Mitre';
   }

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Historial en el celular</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#062F5A}a:hover{color:#2D5BA3}
+select{font:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1900px; box-sizing: border-box; font-family: Barlow, system-ui, sans-serif; color: #1A2233; background: #F2F4F8; display: flex; flex-direction: column; overflow: hidden; position: relative">
+<header style="background: #062F5A; color: #FFFFFF; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; color: #062F5A; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px">CDM</div>
+      <div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">HISTORIAL</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px"><label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #C9D4E8; font-weight: 600">Período
+        <select style="height: 44px; border-radius: 8px; border: 0; padding: 0 10px; font-size: 16px; color: #062F5A; background: #FFFFFF"><option>Todo el historial</option></select></label><div style="display: flex; align-items: flex-end"><div role="group" aria-label="Categoría" style="display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); background: #1E4673; border-radius: 10px; padding: 4px; gap: 4px">
+      <button type="button" aria-pressed="true" style="height: 40px; border: 0; border-radius: 8px; background: #FFFFFF; color: #062F5A; font-weight: 700; font-size: 15px; font-family: inherit">Primera</button>
+      <button type="button" aria-pressed="false" style="height: 40px; border: 0; border-radius: 8px; background: transparent; color: #FFFFFF; font-weight: 600; font-size: 15px; font-family: inherit">Reserva</button>
+    </div></div></div>
+  </header>
+  <section aria-label="Contra cada rival" style="padding: 14px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+    <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #062F5A">Contra cada rival</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #4A5468; font-weight: 600">Ordenar por
+          <select style="height: 40px; border-radius: 8px; border: 1px solid #C7CEDB; padding: 0 8px; font-size: 15px; color: #062F5A; background: #FFFFFF"><option>Efectividad</option><option>Partidos jugados</option><option>Goles a favor</option><option>Nombre</option></select></label>
+        <button type="button" style="height: 40px; padding: 0 10px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 14px Barlow, sans-serif">Ver tabla completa</button>
+      </div>
+    <ol style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+        <li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">JGU</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Juv. Guadalupe</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">63%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 63%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 21 · 12-4-5 · goles 38–28</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">ULC</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Unión (LC)</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">61%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 61%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 19 · 10-5-4 · goles 30–19</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">USA</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Unión (S)</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">56%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 56%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 12 · 6-2-4 · goles 20–19</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">SUS</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Susanense</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">45%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 45%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 25 · 10-4-11 · goles 28–32</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">GSM</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">General</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">42%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 42%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 27 · 9-7-11 · goles 34–36</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">JUR</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Juv. Unida</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">40%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 40%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 28 · 9-7-12 · goles 35–53</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">LEM</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">La Emilia</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">39%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 39%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 24 · 7-7-10 · goles 32–36</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">TRE</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Trebolense</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">36%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 36%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 23 · 5-10-8 · goles 27–34</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="HistorialRival.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span aria-hidden="true" style="flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; background: #E3E7EE; color: #2F3A4D; display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px">EXP</span>
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+            <span style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">El Expreso</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #062F5A">35%</span></span>
+            <span style="display: block; height: 6px; border-radius: 3px; background: #E3E7EE; overflow: hidden"><span style="display: block; width: 35%; height: 6px; background: #062F5A"></span></span>
+            <span style="font-size: 13px; color: #4A5468">PJ 22 · 6-5-11 · goles 30–34</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li>
+    </ol>
+    <button type="button" style="height: 44px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 15px Barlow, sans-serif">Ver los 18 rivales</button>
+  </section>
+  <section aria-label="Campañas" style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+    <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; color: #062F5A">Campañas por torneo</h2>
+    <ol style="margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+        <li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Clausura 2026</span><span style="font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #EEF2F8; color: #062F5A; border: 1px dashed #062F5A">En curso</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">16 pts</strong> · PJ 11 · 5-1-5 · goles 14–16</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Apertura 2026</span><span style="font-size: 14px; color: #4A5468">10° · Octavos (pen.)</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">13 pts</strong> · PJ 13 · 2-7-4 · goles 9–10</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Clausura 2025</span><span style="font-size: 14px; color: #4A5468">Cuartos</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">14 pts</strong> · PJ 8 · 4-2-2 · goles 13–8</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Apertura 2025</span><span style="font-size: 14px; color: #4A5468">Octavos</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">11 pts</strong> · PJ 14 · 2-5-7 · goles 12–22</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Clausura 2024</span><span style="font-size: 14px; color: #4A5468">Cuartos</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">14 pts</strong> · PJ 9 · 4-2-3 · goles 8–9</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li><li style="list-style: none"><a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #FFFFFF; border-radius: 10px; text-decoration: none; color: #1A2233">
+          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap"><span style="font-weight: 700; font-size: 16px">Apertura 2024</span><span style="font-size: 14px; color: #4A5468">Octavos (pen.)</span></span>
+            <span style="font-size: 13px; color: #4A5468"><strong style="color: #062F5A">18 pts</strong> · PJ 14 · 5-3-6 · goles 16–18</span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A93A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a></li>
+    </ol>
+    <button type="button" style="height: 44px; border-radius: 8px; border: 1px solid #C7CEDB; background: #FFFFFF; color: #062F5A; font: 600 15px Barlow, sans-serif">Ver todas las campañas (2010–2026)</button>
+  </section>
+<div style="flex: 1"></div>
+<nav aria-label="Secciones" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #FFFFFF; border-top: 1px solid #DDE2EA"><a href="Main.dc.html" style="height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 600; color: #4A5468; border-top: 3px solid transparent">Resultados</a><a href="Main.dc.html" style="height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 600; color: #4A5468; border-top: 3px solid transparent">Goleadores</a><a href="Main.dc.html" aria-current="page" style="height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 700; color: #062F5A; border-top: 3px solid #062F5A">Historial</a><a href="Main.dc.html" style="height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: 600; color: #4A5468; border-top: 3px solid transparent">Planteles</a></nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

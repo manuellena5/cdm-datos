@@ -213,12 +213,20 @@ CDM.pantallas.admin = (function () {
         return act(b).localeCompare(act(a)) || String(b.base.fecha || '').localeCompare(String(a.base.fecha || ''));
       }).slice(0, 10);
     const res = (p) => (p ? (p.goles_local != null ? p.goles_local + '-' + p.goles_visitante : '–') : '');
+    const filasMovil = [];
     const filas = jugados.map((g) => {
       const faltas = [];
       if (g.partidos.some((p) => p.completitud === 'Resultado' && (p.gf || 0) > 0)) faltas.push('faltan goleadores');
       if (g.partidos.some((p) => !p.arbitro)) faltas.push('falta árbitro');
       const datos = faltas.length ? faltas.join(', ') : 'Completo';
       const borrador = g.partidos.some((p) => !p.publicado);
+      filasMovil.push(CDM.filas.fila({
+        href: '#/admin/partido/' + encodeURIComponent(g.base.partido_id),
+        arriba: '<span class="fila__nombre">' + e(enfrentamiento(g)) + '</span>' +
+          '<span class="estado estado--' + (borrador ? 'borrador' : 'publicado') + '">' + (borrador ? 'Borrador' : 'Publicado') + '</span>',
+        abajo: '<span>' + e([ui.torneoSinAnio(g.base.torneo) + ' ' + g.base.anio + ' ' + ui.instancia(g.base),
+          g.p ? 'Primera ' + res(g.p) : '', g.r ? 'Reserva ' + res(g.r) : '', datos.charAt(0).toUpperCase() + datos.slice(1)].filter(Boolean).join(' · ')) + '</span>'
+      }));
       return '<tr><th scope="row"><span class="ultimos__inst">' + e(ui.instancia(g.base)) + '</span><span class="ultimos__torneo">' +
         e(ui.torneoSinAnio(g.base.torneo) + ' ' + g.base.anio) + '</span></th>' +
         '<td>' + e(enfrentamiento(g)) + '</td><td class="centro"><strong>' + res(g.p) + '</strong></td>' +
@@ -226,9 +234,12 @@ CDM.pantallas.admin = (function () {
         '<td><span class="estado estado--' + (borrador ? 'borrador' : 'publicado') + '">' + (borrador ? 'Borrador' : 'Publicado') + '</span></td>' +
         '<td><a href="#/admin/partido/' + encodeURIComponent(g.base.partido_id) + '" class="enlace-tabla">Editar</a></td></tr>';
     }).join('');
-    return '<div class="tabla-scroll"><table class="tabla tabla--ancha tabla--admin"><thead><tr><th>Fecha</th><th>Partido</th>' +
-      '<th class="centro">Primera</th><th class="centro">Reserva</th><th>Datos</th><th>Estado</th><th><span class="oculto">Acción</span></th></tr></thead>' +
-      '<tbody>' + filas + '</tbody></table></div>';
+    return CDM.filas.bloque({
+      id: 'ultimos', titulo: 'Últimos cargados', filas: filasMovil,
+      tabla: '<div class="tabla-scroll"><table class="tabla tabla--ancha tabla--admin"><thead><tr><th>Fecha</th><th>Partido</th>' +
+        '<th class="centro">Primera</th><th class="centro">Reserva</th><th>Datos</th><th>Estado</th><th><span class="oculto">Acción</span></th></tr></thead>' +
+        '<tbody>' + filas + '</tbody></table></div>'
+    });
   }
 
   // Todo lo que falta cargar, agrupado por torneo (el más reciente primero):
@@ -381,6 +392,7 @@ CDM.pantallas.admin = (function () {
 
   function montar(vista) {
     CDM.admin.montarAcceso(vista);
+    CDM.filas.montar(vista);
     const error = (texto) => {
       const p = vista.querySelector('section[aria-label="Pendientes de carga"] .form-error');
       if (!p) return;

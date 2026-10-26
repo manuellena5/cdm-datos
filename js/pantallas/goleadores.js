@@ -86,12 +86,24 @@ CDM.pantallas.goleadores = (function () {
       e(j.jugador) + '</a></div><div class="barra"><div style="width:' + Math.round(j.total / max * 100) + '%"></div></div></td>' +
       cols.map((t) => '<td class="centro texto-2">' + (j.por[t.letra] || '–') + '</td>').join('') +
       '<td class="total">' + j.total + '</td></tr>').join('');
+    const filasMovil = lista.map((j) => CDM.filas.fila({
+      href: '#/jugador/' + encodeURIComponent(j.jugador_id),
+      arriba: '<span class="fila__puesto">' + j.puesto + '</span><span class="fila__nombre">' + e(j.jugador) + '</span>' + CDM.filas.numero(j.total),
+      medio: CDM.filas.barra(Math.round(j.total / max * 100)),
+      abajo: cols.length ? e(cols.filter((t) => j.por[t.letra]).map((t) => j.por[t.letra] + ' en ' + t.nombre).join(' · ')) : '',
+      claves: { goles: j.total, apellido: j.jugador }
+    }));
     return '<section class="tarjeta" aria-label="Goleadores ' + e(cat) + '"><h2 class="tarjeta__titulo">' +
       e(cat + ' · ' + ui.plural(total, 'gol', 'goles')) + '</h2>' +
       (lista.length
-        ? '<div class="tabla-scroll"><table class="tabla tabla--goleadores"><thead><tr><th class="num-chico">#</th><th>Jugador</th>' +
-          cols.map((t) => '<th class="centro" title="' + e(t.nombre) + '">' + e(abreviar(t.nombre)) + '</th>').join('') +
-          '<th class="derecha">Total</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+        ? CDM.filas.bloque({
+          id: 'goleadores-' + cat, titulo: 'Goleadores · ' + cat, filas: filasMovil, limite: 10,
+          verMas: (n) => 'Ver los ' + n + ' goleadores',
+          ordenes: [{ valor: 'goles', texto: 'Goles' }, { valor: 'apellido', texto: 'Apellido', asc: true }],
+          tabla: '<div class="tabla-scroll"><table class="tabla tabla--goleadores"><thead><tr><th class="num-chico">#</th><th>Jugador</th>' +
+            cols.map((t) => '<th class="centro" title="' + e(t.nombre) + '">' + e(abreviar(t.nombre)) + '</th>').join('') +
+            '<th class="derecha">Total</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+        })
         : ui.vacio('Todavía no hay goles cargados.')) +
       (notas.length ? '<p class="nota">' + e(notas.join(' · ')) + '</p>' : '') + '</section>';
   }
@@ -131,6 +143,7 @@ CDM.pantallas.goleadores = (function () {
   }
 
   function montar(vista) {
+    CDM.filas.montar(vista);
     const ir = (cambios) => CDM.router.cambiarFiltros('/goleadores', Object.assign({}, actual, cambios));
     vista.addEventListener('change', (ev) => {
       const f = ev.target.dataset.filtro;

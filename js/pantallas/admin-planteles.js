@@ -16,6 +16,7 @@ CDM.pantallas.adminPlanteles = (function () {
   const soloInicial = (n) => !n || /^\p{L}\.?$/u.test(String(n).trim()) || /^(\p{L}\.\s*)+$/u.test(String(n).trim());
   const tituloCaso = (t) => (t === t.toUpperCase() ? t.toLowerCase().replace(/(^|[\s-])\p{L}/gu, (m) => m.toUpperCase()) : t);
   const num = (v) => Number(v || 0);
+  const conPunto = (t) => (/[.!?]$/.test(t) ? t : t + '.');
 
   // [2011, 2012, 2013, 2016] → '2011–2013, 2016'
   function rangos(anios) {
@@ -90,6 +91,45 @@ CDM.pantallas.adminPlanteles = (function () {
       '<td class="centro">' + (f.goles || '·') + '</td><td class="centro">' + (f.rojas || '·') + '</td>' +
       '<td><span class="etiqueta etiqueta--' + (f.motivos === 'Nuevo' ? 'ok' : 'info') + '">' + e(f.motivos) + '</span></td>' +
       '<td>' + (f.conDatos ? '' : '<button type="button" class="boton-icono boton-icono--chico" data-quitar="' + e(f.jugador_id) + '" aria-label="Quitar a ' + e(nombre(f.j)) + ' del plantel">✕</button>') + '</td></tr>';
+  }
+
+  // ---------- Celular (6.6.3): lista y hoja desde abajo ----------
+  function resumenFila(f) {
+    return [f.puesto || '—', f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : '',
+      revisar(f.j) ? 'revisar' : ''].filter(Boolean).join(' · ');
+  }
+
+  function movilHtml() {
+    return ctx.filas.map((f) => '<li><button type="button" class="plantel-item' + (revisar(f.j) ? ' plantel-item--revisar' : '') +
+      '" data-hoja-abrir="' + e(f.jugador_id) + '"><span class="plantel-item__texto"><span class="plantel-item__nombre">' + e(nombre(f.j)) + '</span>' +
+      '<span class="plantel-item__resumen">' + e(resumenFila(f)) + '</span></span><span class="plantel-item__editar">Editar</span></button></li>').join('');
+  }
+
+  // Hoja para editar (f) o agregar (sin f) un jugador.
+  function hojaHtml(f) {
+    const j = f ? f.j : { apellido: '', nombre: '', apodo: '' };
+    const r = f ? revisar(j) : null;
+    const datos = f ? [f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : ''].filter(Boolean).join(' · ') : '';
+    const campo = (k, etiqueta, valor, extra) => '<div class="campo"><label for="hoja-' + k + '">' + etiqueta + '</label>' +
+      '<input id="hoja-' + k + '" name="' + k + '" value="' + e(valor || '') + '" autocomplete="off"' + (extra || '') + '></div>';
+    return '<div class="hoja-fondo" data-hoja-cancelar></div>' +
+      '<section class="hoja" role="dialog" aria-modal="true" aria-labelledby="hoja-titulo"' + (f ? ' data-id="' + e(f.jugador_id) + '"' : '') + '>' +
+      '<div class="hoja__asa" data-hoja-asa aria-hidden="true"></div>' +
+      '<div class="hoja__cabeza"><h2 id="hoja-titulo" class="hoja__titulo">' + (f ? e(nombre(j)) : 'Agregar jugador') + '</h2>' +
+      (datos ? '<span class="texto-2">' + e(datos) + ' en este torneo</span>' : '') + '</div>' +
+      (r ? '<div class="plantel-aviso">' + e(r.texto) + (r.par ? ' <a href="' + enlaceDuplicado(f.jugador_id, r.par) + '">Revisar</a>' : '') + '</div>' : '') +
+      '<div class="fila-2"><div class="campo hoja__apellido"><label for="hoja-apellido">Apellido</label>' +
+      '<input id="hoja-apellido" name="apellido" value="' + e(j.apellido) + '" autocomplete="off">' +
+      (f ? '' : '<div class="sugerencias" role="listbox" aria-label="Jugadores parecidos" hidden></div>') + '</div>' +
+      campo('nombre', 'Nombre', j.nombre) + '</div>' +
+      '<div class="fila-2"><div class="campo"><label for="hoja-puesto">Puesto</label>' +
+      '<select id="hoja-puesto" name="puesto">' + opcion('', '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
+      campo('apodo', 'Apodo', j.apodo, ' placeholder="Opcional"') + '</div>' +
+      (f ? '<label class="check hoja__check"><input type="checkbox" name="incluido" checked' + (f.conDatos ? ' disabled' : '') + '> En el plantel de este torneo</label>' +
+        (f.conDatos ? '<p class="nota">Tiene datos en este torneo: queda en el plantel.</p>' : '') : '') +
+      '<p class="form-error hoja__error" role="alert" hidden></p><p class="hoja__estado" role="status"></p>' +
+      '<div class="hoja__botones"><button type="button" class="boton boton--borde" data-hoja-cancelar>Cancelar</button>' +
+      '<button type="button" class="boton" data-hoja-guardar>' + (f ? 'Guardar y siguiente' : 'Agregar') + '</button></div></section>';
   }
 
   function filaNuevaHtml() {
@@ -193,6 +233,8 @@ CDM.pantallas.adminPlanteles = (function () {
     ctx.filas = armarFilas();
     const t = vistaActual.querySelector('#plantel-tabla');
     if (t) t.innerHTML = ctx.filas.map(filaHtml).join('') + filaNuevaHtml();
+    const m = vistaActual.querySelector('#plantel-movil');
+    if (m) m.innerHTML = movilHtml();
     const s = vistaActual.querySelector('#plantel-sugeridos');
     if (s) s.innerHTML = sugeridosHtml();
     const c = vistaActual.querySelector('#plantel-cuenta');
@@ -312,7 +354,9 @@ CDM.pantallas.adminPlanteles = (function () {
       (ctx.hayCamisetas ? '<th>N°</th>' : '') + '<th>Apellido</th><th>Nombre</th><th>Puesto</th><th>Apodo</th><th class="centro">Goles</th><th class="centro">Rojas</th>' +
       '<th>Por qué está</th><th><span class="oculto">Acciones</span></th></tr></thead>' +
       '<tbody id="plantel-tabla">' + ctx.filas.map(filaHtml).join('') + filaNuevaHtml() + '</tbody></table></div>' +
-      '<button type="button" class="boton boton--borde" data-accion="agregar-fila">+ Agregar fila</button>' +
+      '<button type="button" class="boton boton--borde plantel-solo-pc" data-accion="agregar-fila">+ Agregar fila</button>' +
+      '<button type="button" class="boton plantel-solo-movil plantel-agregar" data-hoja-abrir="">+ Agregar jugador</button>' +
+      '<ul class="plantel-movil plantel-solo-movil" id="plantel-movil">' + movilHtml() + '</ul>' +
       '<div id="plantel-sugeridos">' + sugeridosHtml() + '</div></section>' +
       '<aside class="tarjeta pegar" aria-label="Pegar lista"><h2 class="tarjeta__titulo tarjeta__titulo--chico">Pegar lista o CSV</h2>' +
       '<p class="nota">Un jugador por línea: apellido, nombre y puesto (opcional). También sirve copiar columnas desde Excel o subir un .txt/.csv.</p>' +
@@ -442,10 +486,190 @@ CDM.pantallas.adminPlanteles = (function () {
     }
   }
 
+  // ---------- Hoja: abrir, guardar y cerrar ----------
+  let hoja = null;   // { volver: botón que la abrió, caja }
+  let tecladoListo = false;
+
+  function abrirHoja(id) {
+    cerrarHoja(true);
+    const f = id ? ctx.filas.find((x) => x.jugador_id === id) : null;
+    const caja = document.createElement('div');
+    caja.className = 'hoja-capa';
+    caja.innerHTML = hojaHtml(f);
+    vistaActual.appendChild(caja);
+    document.documentElement.classList.add('sin-scroll');
+    hoja = { volver: hoja ? hoja.volver : document.activeElement, caja };
+    caja.querySelector('#hoja-apellido').focus();
+  }
+
+  function cerrarHoja(paraAbrirOtra) {
+    if (!hoja || !hoja.caja) return;
+    hoja.caja.remove();
+    hoja.caja = null;
+    if (paraAbrirOtra) return;
+    document.documentElement.classList.remove('sin-scroll');
+    const id = hoja.volver && hoja.volver.dataset ? hoja.volver.dataset.hojaAbrir : null;
+    // la lista se repinta al guardar: volver al botón del mismo jugador
+    const destino = id != null ? vistaActual.querySelector('[data-hoja-abrir="' + CSS.escape(id) + '"]') : null;
+    hoja = null;
+    if (destino) destino.focus();
+  }
+
+  function errorHoja(texto) {
+    const p = hoja && hoja.caja && hoja.caja.querySelector('.hoja__error');
+    if (!p) return;
+    p.textContent = texto;
+    p.hidden = !texto;
+  }
+
+  async function guardarHoja(boton) {
+    const s = hoja.caja.querySelector('.hoja');
+    const v = (k) => { const el = s.querySelector('[name="' + k + '"]'); return el ? el.value.trim() : ''; };
+    if (!v('apellido')) return errorHoja('Escribí el apellido.');
+    boton.disabled = true;
+    try {
+      if (!s.dataset.id) {
+        // Nuevo: si coincide exacto con un jugador existente, se suma ese
+        const exacto = ctx.jugadores.find((j) => norm(j.apellido) === norm(v('apellido')) && norm(j.nombre) === norm(v('nombre')));
+        await agregarDesdeHoja(exacto ? exacto.jugador_id : null);
+        return;
+      }
+      const id = s.dataset.id;
+      const f = ctx.filas.find((x) => x.jugador_id === id);
+      const i = ctx.filas.indexOf(f);
+      const siguiente = ctx.filas[i + 1] ? ctx.filas[i + 1].jugador_id : null;
+      const cambios = {};
+      ['apellido', 'nombre', 'apodo'].forEach((k) => { if ((f.j[k] || '') !== v(k)) cambios[k] = v(k) || null; });
+      if (Object.keys(cambios).length) {
+        await CDM.api.admin.editarJugador(id, cambios);
+        Object.assign(f.j, cambios);
+      }
+      const incluido = s.querySelector('[name="incluido"]');
+      if (incluido && !incluido.checked) {
+        await CDM.api.admin.quitarDeLista(ctx.torneo.torneo_id, ctx.categoria, id);
+        ctx.lista = ctx.lista.filter((l) => l.jugador_id !== id);
+      } else if ((f.puesto || '') !== v('puesto')) {
+        const extra = { posicion: v('puesto') || null };
+        await CDM.api.admin.guardarLista([filaLista(id, extra)]);
+        const l = ctx.lista.find((x) => x.jugador_id === id);
+        if (l) Object.assign(l, extra); else ctx.lista.push(Object.assign({ jugador_id: id, camiseta: null }, extra));
+      }
+      error('');
+      pintarTabla();
+      if (siguiente && ctx.filas.some((x) => x.jugador_id === siguiente)) {
+        abrirHoja(siguiente);
+        hoja.volver = vistaActual.querySelector('[data-hoja-abrir="' + CSS.escape(siguiente) + '"]');
+        hoja.caja.querySelector('.hoja__estado').textContent = conPunto('Guardado ' + nombre(f.j));
+      } else {
+        cerrarHoja();
+      }
+    } catch (err) {
+      boton.disabled = false;
+      errorHoja(err.message);
+    }
+  }
+
+  // Agrega desde la hoja: un jugador existente (id) o uno nuevo con lo escrito. La hoja queda vacía para el siguiente.
+  async function agregarDesdeHoja(id) {
+    const s = hoja.caja.querySelector('.hoja');
+    const v = (k) => s.querySelector('[name="' + k + '"]').value.trim();
+    if (id && ctx.filas.some((f) => f.jugador_id === id)) {
+      s.querySelector('[data-hoja-guardar]').disabled = false;
+      return errorHoja(nombre(ctx.porId[id]) + ' ya está en el plantel.');
+    }
+    if (!id) {
+      id = await CDM.api.admin.crearJugador(tituloCaso(v('apellido')), tituloCaso(v('nombre')), ctx.categoria);
+      const j = { jugador_id: id, apellido: tituloCaso(v('apellido')), nombre: tituloCaso(v('nombre')) || null, apodo: v('apodo') || null, anios: [] };
+      if (j.apodo) await CDM.api.admin.editarJugador(id, { apodo: j.apodo });
+      ctx.jugadores.push(j);
+      ctx.porId[id] = j;
+      ctx.nuevos.add(id);
+    }
+    await sumar([id], { [id]: { posicion: v('puesto') || null } });
+    error('');
+    pintarTabla();
+    abrirHoja('');
+    hoja.caja.querySelector('.hoja__estado').textContent = conPunto('Agregado ' + nombre(ctx.porId[id])) + ' Podés agregar otro.';
+  }
+
+  function montarHoja(vista) {
+    vista.addEventListener('click', (ev) => {
+      const abrir = ev.target.closest('[data-hoja-abrir]');
+      if (abrir) return abrirHoja(abrir.dataset.hojaAbrir);
+      if (ev.target.closest('[data-hoja-cancelar]')) return cerrarHoja();
+      const g = ev.target.closest('[data-hoja-guardar]');
+      if (g) return guardarHoja(g);
+      const elegir = ev.target.closest('[data-hoja-elegir]');
+      if (elegir) {
+        agregarDesdeHoja(elegir.dataset.hojaElegir).catch((err) => errorHoja(err.message));
+        return;
+      }
+      if (ev.target.closest('[data-hoja-crear]')) {
+        agregarDesdeHoja(null).catch((err) => errorHoja(err.message));
+      }
+    });
+    // Sugerencias al escribir el apellido de un jugador nuevo
+    vista.addEventListener('input', (ev) => {
+      if (ev.target.id !== 'hoja-apellido' || !hoja || !hoja.caja || hoja.caja.querySelector('.hoja').dataset.id) return;
+      const caja = hoja.caja.querySelector('.sugerencias');
+      const t = norm(ev.target.value);
+      if (t.length < 2) { caja.hidden = true; return; }
+      const ids = new Set(ctx.filas.map((f) => f.jugador_id));
+      const lista = ctx.jugadores.filter((j) => !ids.has(j.jugador_id) && (norm(j.apellido).startsWith(t) || norm(j.apellido + ' ' + (j.nombre || '')).includes(t))).slice(0, 6);
+      caja.innerHTML = lista.map((j) => '<button type="button" role="option" class="sugerencia" data-hoja-elegir="' + e(j.jugador_id) + '">' + e(nombre(j)) +
+        ' <span class="texto-2">· ' + e(ctx.anios[j.jugador_id] || 'sin partidos') + '</span></button>').join('') +
+        '<button type="button" role="option" class="sugerencia sugerencia--nuevo" data-hoja-crear>+ Crear jugador nuevo "' + e(ev.target.value.trim()) + '"</button>';
+      caja.hidden = false;
+    });
+    // Deslizar hacia abajo desde el asa o la cabeza cierra la hoja
+    let inicio = null;
+    vista.addEventListener('touchstart', (ev) => {
+      if (!ev.target.closest('.hoja__asa, .hoja__cabeza')) return;
+      inicio = ev.touches[0].clientY;
+    }, { passive: true });
+    vista.addEventListener('touchmove', (ev) => {
+      if (inicio == null || !hoja || !hoja.caja) return;
+      const d = Math.max(0, ev.touches[0].clientY - inicio);
+      hoja.caja.querySelector('.hoja').style.transform = 'translateY(' + d + 'px)';
+    }, { passive: true });
+    vista.addEventListener('touchend', (ev) => {
+      if (inicio == null || !hoja || !hoja.caja) { inicio = null; return; }
+      const d = ev.changedTouches[0].clientY - inicio;
+      inicio = null;
+      if (d > 80) cerrarHoja();
+      else hoja.caja.querySelector('.hoja').style.transform = '';
+    });
+    // Escape cierra; Tab queda dentro de la hoja; Enter guarda (en el documento, una sola vez)
+    if (tecladoListo) return;
+    tecladoListo = true;
+    document.addEventListener('keydown', (ev) => {
+      if (!hoja || !hoja.caja || !hoja.caja.isConnected) return;
+      if (ev.key === 'Escape') { ev.preventDefault(); cerrarHoja(); return; }
+      if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && ev.target.type !== 'checkbox') {
+        ev.preventDefault();
+        const g = hoja.caja.querySelector('[data-hoja-guardar]');
+        if (!g.disabled) guardarHoja(g);
+        return;
+      }
+      if (ev.key !== 'Tab') return;
+      const focos = [...hoja.caja.querySelectorAll('.hoja a[href], .hoja button:not([disabled]), .hoja input:not([disabled]), .hoja select')].filter((x) => x.offsetParent !== null);
+      const primero = focos[0], ultimo = focos[focos.length - 1];
+      if (ev.shiftKey && document.activeElement === primero) { ev.preventDefault(); ultimo.focus(); }
+      else if (!ev.shiftKey && document.activeElement === ultimo) { ev.preventDefault(); primero.focus(); }
+      else if (!hoja.caja.contains(document.activeElement)) { ev.preventDefault(); primero.focus(); }
+    });
+  }
+  window.addEventListener('hashchange', () => {
+    if (hoja) { hoja.volver = null; cerrarHoja(); }
+  });
+
   function montar(vista) {
     vistaActual = vista;
     CDM.admin.montarAcceso(vista);
     if (!ctx) return;
+    hoja = null;
+    document.documentElement.classList.remove('sin-scroll');
+    montarHoja(vista);
     const ir = (cambios) => CDM.router.cambiarFiltros('/admin/planteles', Object.assign({ anio: ctx.anio, torneo: ctx.letra, cat: ctx.cat }, cambios));
 
     vista.addEventListener('change', async (ev) => {

@@ -1085,3 +1085,109 @@ details[disabled] summary { cursor: default; }
   .rival-partido__cat { min-width: 54px; }
   .tarjeta__cabeza .segmentado { flex-wrap: wrap; }
 }
+
+/* ---------- Tablas en el celular (6.6.3) ---------- */
+.filas__movil { display: none; }
+.filas__cabeza, .filas__nota { display: none; }
+@media (max-width: 720px) {
+  .filas__movil { display: flex; flex-direction: column; gap: 8px; }
+  .filas__tabla { display: none; }
+  .filas__controles { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+  .filas__controles .filas__completa { margin-left: auto; }
+  .filas__orden { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; font-weight: 600; color: var(--texto-2); }
+  .filas__orden select { min-height: 40px; border: 1px solid var(--borde); border-radius: 8px; padding: 0 8px; font: 15px var(--f-texto); color: var(--azul); background: #FFFFFF; max-width: 150px; }
+  .filas__completa { min-height: 40px; padding: 0 8px; font-size: 14px; }
+  .filas__lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .filas__lista > li[hidden] { display: none; }
+  .filas__mas { width: 100%; }
+  /* Como en los mockups: la lista va directo sobre el fondo, sin la tarjeta blanca */
+  .tarjeta:has(> .filas) { background: transparent; box-shadow: none; border: 0; padding: 4px 0 0; }
+  .filas__orden select { max-width: 120px; }
+}
+.fila {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 12px;
+  background: var(--tarjeta); border-radius: 10px; text-decoration: none; color: var(--texto);
+}
+.fila:hover { color: var(--texto); background: var(--fondo-suave); }
+.fila .escudo { width: 30px; height: 30px; }
+.fila__cuerpo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.fila__arriba { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.fila__nombre { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fila__nombre--corto { flex: 0 1 auto; }
+.fila__dato { font-size: 14px; color: var(--texto-2); }
+.fila__num { margin-left: auto; font-family: var(--f-titulo); font-weight: 700; font-size: 18px; color: var(--azul); }
+.fila__barra { display: block; height: 6px; border-radius: 3px; background: var(--e-fondo); overflow: hidden; }
+.fila__barra span { display: block; height: 100%; background: var(--azul); }
+.fila__abajo { font-size: 13px; color: var(--texto-2); display: flex; flex-wrap: wrap; gap: 4px 6px; }
+.fila__abajo strong { color: var(--azul); }
+.fila__chip { padding: 1px 8px; border-radius: 999px; background: var(--fondo-suave); color: var(--texto); font-size: 13px; }
+.fila__puesto { font-family: var(--f-titulo); font-weight: 700; font-size: 16px; color: var(--texto-2); min-width: 18px; }
+.fila__flecha { flex: none; color: #8A93A6; }
+.fila .chip-curso { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #EEF2F8; color: var(--azul); border: 1px dashed var(--azul); }
+.fila__capitan { font-size: 11px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; background: var(--azul); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+
+/* Tabla completa: la original, a pantalla completa, con la primera columna fija */
+.filas__tabla--abierta {
+  display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 60;
+  background: var(--tarjeta); padding: 0 0 12px;
+}
+.filas__tabla--abierta .filas__cabeza {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--azul); color: #FFFFFF; padding: 10px 16px;
+}
+.filas__titulo { font-family: var(--f-titulo); font-weight: 700; font-size: 20px; }
+.filas__tabla--abierta [data-filas-cerrar] { background: #FFFFFF; min-height: 40px; }
+.filas__tabla--abierta .filas__nota { display: block; margin: 8px 16px; font-size: 13px; color: var(--texto-2); }
+.filas__tabla--abierta .tabla-scroll { flex: 1; overflow: auto; padding: 0 0 0 0; }
+.filas__tabla--abierta .tabla { width: max-content; min-width: 100%; }
+.filas__tabla--abierta .tabla tr > :first-child { position: sticky; left: 0; background: var(--tarjeta); z-index: 1; box-shadow: 1px 0 0 var(--borde-suave); padding-left: 16px; }
+.filas__tabla--abierta .tabla thead th { position: sticky; top: 0; background: var(--tarjeta); z-index: 2; }
+.filas__tabla--abierta .tabla thead tr > :first-child { z-index: 3; }
+html.sin-scroll, html.sin-scroll body { overflow: hidden; }
+
+/* Plantel en admin en el celular: lista y hoja desde abajo (6.6.3) */
+.plantel-solo-movil { display: none; }
+.plantel-movil { margin: 0; padding: 0; list-style: none; width: 100%; flex-direction: column; gap: 6px; }
+.plantel-item {
+  width: 100%; min-height: 52px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; text-align: left;
+  background: var(--tarjeta); border: 1px solid var(--borde-suave); border-radius: 10px; font: inherit; color: var(--texto); cursor: pointer;
+}
+.plantel-item--revisar { border-color: #F0C48A; box-shadow: inset 4px 0 0 #E3A55B; }
+.plantel-item__texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.plantel-item__nombre { font-weight: 700; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plantel-item__resumen { font-size: 13px; color: var(--texto-2); }
+.plantel-item__editar { font-weight: 600; font-size: 14px; color: var(--acento); }
+@media (max-width: 720px) {
+  .plantel-solo-movil { display: flex; }
+  .plantel-solo-pc, .plantel > .tabla-scroll:has(.tabla--plantel-admin) { display: none; }
+  .plantel-agregar { width: 100%; }
+  .plantel-layout { flex-direction: column; align-items: stretch; }
+  .plantel-layout .pegar { order: -1; flex-basis: auto; }
+  .plantel { flex-basis: auto; }
+  /* Sugeridos: cada fila en dos líneas */
+  .tabla--sugeridos tr { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; border-bottom: 1px solid var(--fondo-suave); }
+  .tabla--sugeridos td { border: 0; padding: 4px 6px; }
+  .tabla--sugeridos td:nth-child(3) { grid-column: 2; grid-row: 2; padding-top: 0; }
+  .tabla--sugeridos td:nth-child(4) { grid-column: 3; grid-row: 1 / span 2; }
+}
+.hoja-capa { position: fixed; inset: 0; z-index: 70; }
+.hoja-fondo { position: absolute; inset: 0; background: rgba(6, 47, 90, 0.45); }
+.hoja {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 92vh; overflow-y: auto;
+  background: var(--tarjeta); border-radius: 16px 16px 0 0; padding: 8px 16px 16px;
+  display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -4px 20px rgba(6, 47, 90, 0.2); transition: transform 0.15s;
+}
+@media (min-width: 721px) {
+  .hoja { left: 50%; right: auto; width: 520px; transform: translateX(-50%); bottom: auto; top: 10vh; border-radius: 16px; }
+}
+.hoja__asa { width: 40px; height: 5px; border-radius: 3px; background: var(--borde); margin: 4px auto 2px; flex: none; }
+.hoja__cabeza { display: flex; flex-direction: column; gap: 2px; }
+.hoja__titulo { margin: 0; font-size: 24px; }
+.hoja__apellido { position: relative; }
+.hoja__check { color: var(--texto); font-size: 15px; }
+.hoja__estado { margin: 0; font-size: 14px; color: var(--verde); min-height: 0; }
+.hoja__estado:empty { display: none; }
+.hoja__botones { display: grid; grid-template-columns: 1fr 1.6fr; gap: 10px; position: sticky; bottom: -16px; background: var(--tarjeta); padding: 8px 0 0; }
+.hoja__botones .boton { min-height: 48px; }
+.hoja .nota, .hoja .form-error, .hoja .plantel-aviso { margin: 0; }
+.hoja__apellido .sugerencias { left: 0; right: auto; width: min(340px, calc(100vw - 32px)); }

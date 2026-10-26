@@ -29,11 +29,38 @@ CDM.pantallas.historial = (function () {
     return texto.charAt(0).toUpperCase() + texto.slice(1);
   }
 
+  // Versión corta para la fila del celular: "10° · Octavos (pen.)"; null si está en curso.
+  function terminoCorto(c) {
+    if (c.programados > 0) return null;
+    const partes = [];
+    if (c.ultima_posicion != null && c.ultima_posicion_fecha >= c.pj) partes.push(c.ultima_posicion + '°');
+    if (c.zona) partes.push('Zona ' + c.zona);
+    if (c.llego_a) {
+      const pen = c.playoff_por_penales ? ' (pen.)' : '';
+      if (c.llego_a === 'Final' && c.playoff_gano === true) partes.push('Campeón' + pen);
+      else if (c.llego_a === 'Final' && c.playoff_gano === false) partes.push('Subcampeón' + pen);
+      else partes.push(c.llego_a + pen);
+    }
+    return partes.join(' · ');
+  }
+
   function campanas(lista, cat, cuerpos) {
     const categoria = filtros.nombreCategoria(cat);
     const tecnico = (c) => ui.cuerpoTecnico(cuerpos, c.torneo_id, categoria).tecnico;
     const hayTecnicos = lista.some((c) => tecnico(c));
-    const filas = lista.slice().sort((a, b) => b.torneo_orden - a.torneo_orden).map((c) => {
+    const ordenadas = lista.slice().sort((a, b) => b.torneo_orden - a.torneo_orden);
+    const filasMovil = ordenadas.map((c) => {
+      const corto = terminoCorto(c);
+      return CDM.filas.fila({
+        href: CDM.router.armar('/resultados', { anio: c.anio, torneo: filtros.sufijo(c.torneo_id), cat }),
+        arriba: '<span class="fila__nombre fila__nombre--corto">' + e(c.torneo) + '</span>' +
+          (corto === null ? '<span class="chip-curso">En curso</span>' : corto ? '<span class="fila__dato">' + e(corto) + '</span>' : ''),
+        abajo: '<span><strong>' + e(ui.plural(c.pts, 'pt', 'pts')) + '</strong> · PJ ' + c.pj + ' · ' + c.g + '-' + c.e + '-' + c.p +
+          ' · goles ' + c.gf + '–' + c.gc + (tecnico(c) ? ' · ' + e(tecnico(c)) : '') + '</span>'
+      });
+    });
+    const anios = ordenadas.map((c) => c.anio);
+    const filas = ordenadas.map((c) => {
       const href = CDM.router.armar('/resultados', { anio: c.anio, torneo: filtros.sufijo(c.torneo_id), cat });
       return '<tr><th scope="row"><a href="' + href + '">' + e(c.torneo) + '</a></th>' +
         ['pj', 'g', 'e', 'p', 'gf', 'gc'].map((k) => '<td class="centro">' + c[k] + '</td>').join('') +
@@ -43,9 +70,13 @@ CDM.pantallas.historial = (function () {
     return '<section class="tarjeta" aria-label="Campañas por torneo"><h2 class="tarjeta__titulo">Campañas · ' +
       e(filtros.nombreCategoria(cat)) + '</h2>' +
       (filas
-        ? '<div class="tabla-scroll"><table class="tabla tabla--ancha"><thead><tr><th>Torneo</th>' +
-          ['PJ', 'G', 'E', 'P', 'GF', 'GC', 'Pts'].map((k) => '<th class="centro">' + k + '</th>').join('') +
-          '<th>Cómo terminó</th>' + (hayTecnicos ? '<th>Técnico</th>' : '') + '</tr></thead><tbody>' + filas + '</tbody></table></div>'
+        ? CDM.filas.bloque({
+          id: 'campanas', titulo: 'Campañas · ' + categoria, filas: filasMovil, limite: 6,
+          verMas: () => 'Ver todas las campañas (' + Math.min(...anios) + '–' + Math.max(...anios) + ')',
+          tabla: '<div class="tabla-scroll"><table class="tabla tabla--ancha"><thead><tr><th>Torneo</th>' +
+            ['PJ', 'G', 'E', 'P', 'GF', 'GC', 'Pts'].map((k) => '<th class="centro">' + k + '</th>').join('') +
+            '<th>Cómo terminó</th>' + (hayTecnicos ? '<th>Técnico</th>' : '') + '</tr></thead><tbody>' + filas + '</tbody></table></div>'
+        })
         : ui.vacio('Todavía no hay campañas cargadas.')) +
       '<p class="nota">Fase regular (con zonas e interzonales). Tocá un torneo para ver sus partidos.</p></section>';
   }
@@ -81,6 +112,20 @@ CDM.pantallas.historial = (function () {
   }
 
   function tablaRivales(rivales, cat, etiquetaPeriodo, equipos, periodo) {
+    const ordenados = rivales.slice().sort((a, b) => Number(b.porcentaje_puntos) - Number(a.porcentaje_puntos) || b.pj - a.pj ||
+      a.rival.localeCompare(b.rival, 'es'));
+    const filasMovil = ordenados.map((r) => {
+      const pct = Math.round(Number(r.porcentaje_puntos));
+      const nombre = (equipos[r.rival_id] && equipos[r.rival_id].nombre_corto) || r.rival;
+      return CDM.filas.fila({
+        href: CDM.router.armar('/historial/rival/' + encodeURIComponent(r.rival_id), { cat, periodo }),
+        escudo: ui.escudo(equipos[r.rival_id], 30),
+        arriba: '<span class="fila__nombre">' + e(nombre) + '</span>' + CDM.filas.numero(pct + '%'),
+        medio: CDM.filas.barra(pct),
+        abajo: '<span>PJ ' + r.pj + ' · ' + r.g + '-' + r.e + '-' + r.p + ' · goles ' + r.gf + '–' + r.gc + '</span>',
+        claves: { efect: Number(r.porcentaje_puntos), pj: r.pj, gf: r.gf, nombre }
+      });
+    });
     const filas = rivales.slice().sort((a, b) => Number(b.porcentaje_puntos) - Number(a.porcentaje_puntos) || b.pj - a.pj ||
       a.rival.localeCompare(b.rival, 'es')).map((r) => {
       const pct = Math.round(Number(r.porcentaje_puntos));
@@ -93,9 +138,15 @@ CDM.pantallas.historial = (function () {
     return '<section class="tarjeta" aria-label="Contra cada rival"><h2 class="tarjeta__titulo">Contra cada rival · ' +
       e(filtros.nombreCategoria(cat)) + ' · ' + e(etiquetaPeriodo.toLowerCase() === 'todo el historial' ? 'todo el historial' : etiquetaPeriodo) + '</h2>' +
       (filas
-        ? '<div class="tabla-scroll"><table class="tabla tabla--ancha"><thead><tr><th>Rival</th>' +
-          ['PJ', 'G', 'E', 'P', 'GF', 'GC', 'Pts'].map((k) => '<th class="centro">' + k + '</th>').join('') +
-          '<th>Rendimiento</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+        ? CDM.filas.bloque({
+          id: 'rivales', titulo: 'Contra cada rival · ' + filtros.nombreCategoria(cat), filas: filasMovil, limite: 9,
+          verMas: (n) => 'Ver los ' + n + ' rivales',
+          ordenes: [{ valor: 'efect', texto: 'Efectividad' }, { valor: 'pj', texto: 'Partidos' },
+            { valor: 'gf', texto: 'Goles a favor' }, { valor: 'nombre', texto: 'Nombre', asc: true }],
+          tabla: '<div class="tabla-scroll"><table class="tabla tabla--ancha"><thead><tr><th>Rival</th>' +
+            ['PJ', 'G', 'E', 'P', 'GF', 'GC', 'Pts'].map((k) => '<th class="centro">' + k + '</th>').join('') +
+            '<th>Rendimiento</th></tr></thead><tbody>' + filas + '</tbody></table></div>'
+        })
         : ui.vacio('No hay partidos con resultado en este período.')) +
       '<p class="nota">Rendimiento = puntos obtenidos sobre puntos en juego. Incluye playoffs.</p></section>';
   }
@@ -128,6 +179,7 @@ CDM.pantallas.historial = (function () {
   }
 
   function montar(vista) {
+    CDM.filas.montar(vista);
     const ir = (cambios) => CDM.router.cambiarFiltros('/historial', Object.assign({}, actual, cambios));
     vista.addEventListener('change', (ev) => {
       if (ev.target.dataset.filtro === 'periodo') ir({ periodo: ev.target.value });
