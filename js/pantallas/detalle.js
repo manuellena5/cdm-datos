@@ -45,13 +45,14 @@ CDM.pantallas.detalle = (function () {
     if (p.estado !== 'Jugado') estado = item('Estado', p.estado);
     return '<section class="tarjeta datos" aria-label="Datos del partido">' +
       item('Fecha', ui.fechaLarga(p.fecha) + (p.estado === 'Programado' && p.hora ? ' · ' + ui.hora(p.hora) : '')) +
-      item('Estadio', p.cancha) + item('Árbitro', p.arbitro) +
+      item('Estadio', p.cancha) +
       (pos ? item('Tabla después', pos.posicion + '° · ' + ui.plural(pos.pts, 'pt', 'pts')) : '') +
       estado + '</section>';
   }
 
-  // Goles de una categoría: los del local a la izquierda y los del visitante a la derecha.
-  function goles(p, lista) {
+  // Una categoría (6.7.4): marcador, árbitro, goles (los del local a la izquierda y los del visitante
+  // a la derecha) y debajo sus incidencias, así no hay dudas de si son de Primera o de Reserva.
+  function categoria(p, lista, listaInc, propio) {
     const propios = lista.filter((g) => g.partido_id === p.partido_id);
     const enLocal = (g) => (g.lado === 'propio') === (p.condicion === 'L');
     const cuando = (g) => (g.minuto != null ? g.minuto + "'" : g.tiempo && g.tiempo !== 'Sin dato' ? g.tiempo : '');
@@ -75,25 +76,24 @@ CDM.pantallas.detalle = (function () {
       const faltan = total - propios.length;
       nota = '<p class="nota">' + (faltan === 1 ? 'Falta cargar 1 goleador.' : 'Falta cargar ' + faltan + ' goleadores.') + '</p>';
     }
-    return '<section class="tarjeta" aria-label="Goles ' + e(p.categoria) + '"><h2 class="tarjeta__titulo">' +
-      e(p.categoria + (p.goles_local != null ? ' · ' + ui.marcador(p) : '')) +
-      '</h2><div class="goles">' + filas + '</div>' + nota + '</section>';
+    const arbitro = '<p class="categoria__arbitro"><span class="texto-2">Árbitro:</span> ' +
+      (p.arbitro ? e(p.arbitro) : '<span class="texto-2">sin dato</span>') + '</p>';
+    return '<section class="tarjeta" aria-label="' + e(p.categoria) + '"><h2 class="tarjeta__titulo">' +
+      e(p.categoria + (p.goles_local != null ? ' · ' + ui.marcador(p) : '')) + '</h2>' + arbitro +
+      '<div class="goles">' + filas + '</div>' + nota + incidencias(listaInc.filter((i) => i.partido_id === p.partido_id), p, propio) + '</section>';
   }
 
-  function incidencias(lista, partidos, propio) {
+  function incidencias(lista, p, propio) {
     if (!lista.length) return '';
-    const varias = new Set(lista.map((i) => i.categoria)).size > 1;
-    const porId = Object.fromEntries(partidos.map((p) => [p.partido_id, p]));
     const items = lista.map((i) => {
-      const equipo = i.lado === 'propio' ? propio.nombre_corto : i.lado === 'rival' ? porId[i.partido_id].rival : '';
+      const equipo = i.lado === 'propio' ? propio.nombre_corto : i.lado === 'rival' ? p.rival : '';
       const quien = [i.quien, equipo && i.quien ? '(' + equipo + ')' : equipo].filter(Boolean).join(' ');
       return '<li class="incidencia">' + ui.icono(i.tipo) + '<div><div class="incidencia__titulo">' +
         (i.minuto != null ? '<span class="incidencia__min">' + i.minuto + "'</span> " : '') +
-        e(i.tipo) + (quien ? ' · ' + e(quien) : '') + (varias ? ' <span class="incidencia__cat">' + e(i.categoria) + '</span>' : '') +
+        e(i.tipo) + (quien ? ' · ' + e(quien) : '') +
         '</div>' + (i.descripcion ? '<div class="incidencia__desc">' + e(i.descripcion) + '</div>' : '') + '</div></li>';
     }).join('');
-    return '<section class="tarjeta" aria-label="Incidencias"><h2 class="tarjeta__titulo">Incidencias</h2>' +
-      '<ul class="incidencias">' + items + '</ul></section>';
+    return '<h3 class="categoria__sub">Incidencias</h3><ul class="incidencias">' + items + '</ul>';
   }
 
   // Formación de cada categoría y, debajo, el cuerpo técnico del torneo (6.6.1).
@@ -177,8 +177,7 @@ CDM.pantallas.detalle = (function () {
     return encabezado(p, equipos) +
       '<div class="detalle">' +
       '<div class="detalle__principal">' + datos(p, posiciones) +
-      ambos.map((x) => goles(x, listaGoles)).join('') +
-      incidencias(listaInc, ambos, propio) + formacion(listaForm, ambos, cuerpos) + '</div>' +
+      ambos.map((x) => categoria(x, listaGoles, listaInc, propio)).join('') + formacion(listaForm, ambos, cuerpos) + '</div>' +
       '<aside class="detalle__lateral">' + contraRival(p, partidos, historial) + fuentes(listaFuentes, p) + '</aside>' +
       '</div>';
   }

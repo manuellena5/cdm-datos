@@ -2,6 +2,9 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.18.0 — Fase 6.7.4 (detalle del partido por categoría)
+- En el **Detalle del partido**, cada categoría (Primera y Reserva) muestra su **árbitro** ("Árbitro: sin dato" si falta) y, debajo de los goles, sus **incidencias**. Desaparece el bloque "Incidencias" suelto y el árbitro del recuadro de arriba, que queda con fecha, estadio y la posición en la tabla.
+
 ## v0.17.0 — Fase 6.6.4 (plantel por puesto y torneos de cada jugador)
 - Que un jugador estuvo en un torneo se guarda solo en la lista del plantel (`planteles`). Planteles y la pantalla del jugador leen y escriben esa misma lista: lo que se marca en una aparece en la otra.
 - **Plantel por puesto** (Planteles de consulta y de admin, en PC y celular): Arqueros, Defensores, Volantes, Delanteros y al final Sin puesto cargado, con la cantidad de cada grupo. Dentro de cada grupo, por apellido (en el celular, lo que elija "Ordenar por"). El puesto es el del torneo; si no tiene, el **puesto habitual** del jugador. En admin el selector de puesto muestra "Habitual (Delantero)" y el grupo Sin puesto avisa "Cargá el puesto para ordenar el plantel".

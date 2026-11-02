@@ -415,6 +415,49 @@ Solo debajo de 720 px; en PC las tablas quedan como están. Referencia: `docs/mo
 
 ---
 
+## Fase 6.7 — Datos de cada club, estadios, árbitros y detalle por categoría
+
+Pedido de M (02/11/2026), después de usar la página. Un punto por vez ("Hacé el punto 6.7.1 de docs/PLAN.md").
+
+**Lo que ya existe y no cambia:** `equipos` ya tiene `localidad` y `cancha` (estadio), pero están vacíos y no hay dónde cargarlos. `partidos.cancha` y `partidos.arbitro` son texto, **uno por categoría** (Primera y Reserva son filas distintas), y la carga ya tiene un campo Árbitro en cada categoría. Las incidencias ya se guardan por categoría. Hoy hay 12 estadios y 28 árbitros distintos escritos en los partidos; solo 1 partido de Reserva tiene árbitro.
+
+### 6.7.1 Datos de cada club (Administrar → Equipos)
+- Cada equipo con **nombre, nombre corto, localidad y estadio**, editables en la misma pantalla de los escudos, con guardado al salir de cada campo.
+- El estadio sugiere el que más se usó en los partidos de ese equipo como local (por ejemplo "Oscar Amado Giordana" para Mitre), con "Usar este".
+- "+ Equipo" para sumar un rival nuevo (nombre, nombre corto, localidad, estadio). El ID se arma solo.
+- Sin cambios en el modelo de datos.
+
+### 6.7.2 Estadio en la carga del partido
+- Al elegir rival y condición, el estadio se completa solo con el **estadio del local** (ya funciona si el equipo lo tiene cargado; con 6.7.1 deja de estar vacío).
+- El campo pasa a ser un **desplegable con búsqueda** (el mismo componente que la formación): todos los estadios de los equipos y los que ya se usaron en partidos, cada uno con su equipo ("Centenario · Trebolense"). Se puede elegir otro para cancha neutral o escribir uno nuevo.
+- En el Detalle, si el estadio no es el del local, se marca "(neutral)".
+
+### 6.7.3 Árbitros en una lista
+- **Tabla nueva `arbitros`** con código propio (`arbitro_id` 'A001', 'A002'…, como los jugadores), nombre y notas. Se carga al correr el SQL con los 28 nombres que ya están en los partidos, en formato "Nombre Apellido" con mayúscula inicial ("PARIANI AGUSTÍN" → "Agustín Pariani").
+- `partidos.arbitro` (texto) se reemplaza por **`partidos.arbitro_id`**, que apunta a `arbitros`. Renombrar un árbitro cambia el nombre en todos sus partidos de una vez, y dos formas de escribirlo se **unen** en un solo código (como los jugadores duplicados).
+- Las vistas (`v_partidos` y las que salen de ella) siguen dando la columna `arbitro` con el nombre, y suman `arbitro_id`: Resultados, Detalle y los avisos de "falta árbitro" no cambian.
+- **Qué hay que cambiar** (nada se pierde: el SQL pasa cada texto a su código antes de borrar la columna vieja):
+  - `14_arbitros.sql` (nuevo): tabla, auditoría, permisos, carga de los 28, `arbitro_id` en partidos, `v_partidos` con el nombre y recién ahí se borra `partidos.arbitro`. Se corre una vez; después `02` y `05` actualizados (para una base nueva el orden queda 01 → 14).
+  - `guardar_partido` (`05`): recibe `arbitro_id`, o un nombre nuevo y crea el árbitro.
+  - Importación del Excel (`scripts/importar_excel.py`): crea los árbitros y guarda el código.
+  - Exportar a Excel: la hoja Partidos sigue teniendo la columna Árbitro con el nombre, y se suma la hoja Árbitros.
+  - Carga del partido, Panel y Resultados en admin: leen y guardan el código.
+- En la carga, el campo Árbitro de **cada categoría** es un desplegable con búsqueda: primero los que dirigieron a Mitre más recientemente; si se escribe uno que no está, "+ Agregar árbitro nuevo".
+- **Administrar → Árbitros**: lista con cantidad de partidos y último partido, **renombrar** y **unir** dos códigos (el que se borra pasa todos sus partidos al que queda).
+
+### 6.7.4 Detalle del partido por categoría
+- El árbitro sale del recuadro de arriba y va **dentro de cada categoría** ("Primera · 0 - 0 · Árbitro: …"). Arriba quedan fecha y estadio.
+- Las **incidencias** van dentro de la categoría donde ocurrieron, debajo de los goles; desaparece el bloque "Incidencias" suelto.
+- Si una categoría no tiene goles ni incidencias: "Sin goles." como hoy.
+
+**Criterios de aceptación de la 6.7**
+- Se carga el estadio de Trebolense y, al crear un partido de local contra Trebolense, el estadio viene completo; se puede cambiar a otro de la lista o escribir uno nuevo.
+- Al cargar un partido, el árbitro se elige de la lista en Primera y en Reserva por separado; un nombre nuevo aparece en la lista del partido siguiente.
+- En el Detalle del 30/10/2026, la roja de Ñañez aparece dentro de la categoría que corresponde y cada categoría muestra su árbitro.
+- Todo funciona a 390 px de ancho.
+
+---
+
 ## Fase 7 — Usuarios, roles y publicación (más adelante)
 
 - Más usuarios con rol (`admin`, `cargador`, `lector`), en una tabla `perfiles` y con políticas RLS por rol.
