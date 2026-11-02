@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.19.0 — Fase 6.7.1 (datos de cada club)
+- **Administrar → Equipos**: cada equipo con **nombre, nombre corto, localidad y estadio** (además del escudo), que se guardan solos al salir de cada campo. Mitre primero y los rivales por nombre corto.
+- Si un equipo no tiene estadio, sugiere el que más usó de local ("Jugó de local en Centenario (24 partidos) · Usar este"), y arriba hay un botón para usar todos los sugeridos.
+- **"+ Equipo"**: nombre, nombre corto, localidad y estadio; el código se arma solo con el nombre corto. Avisa si el nombre corto ya existe.
+- La carga del partido completa el estadio con el del equipo local (Mitre de local, el rival de visitante).
+- Registro de cambios: "agregó el equipo …", "actualizó los datos de …" o "cambió el escudo de …".
+
 ## v0.18.0 — Fase 6.7.4 (detalle del partido por categoría)
 - En el **Detalle del partido**, cada categoría (Primera y Reserva) muestra su **árbitro** ("Árbitro: sin dato" si falta) y, debajo de los goles, sus **incidencias**. Desaparece el bloque "Incidencias" suelto y el árbitro del recuadro de arriba, que queda con fecha, estadio y la posición en la tabla.
 

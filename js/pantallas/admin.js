@@ -351,7 +351,7 @@ CDM.pantallas.admin = (function () {
       } else if (c.accion === 'actualizó el cuerpo técnico de') {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
-      } else if (c.accion === 'cambió el escudo de') {
+      } else if (['cambió el escudo de', 'agregó el equipo', 'actualizó los datos de'].includes(c.accion)) {
         que = c.accion + ' ' + (c.equipo || 'un equipo');
       } else {
         que = c.accion + ' ' + nombrePartido(c, porId, equipos);

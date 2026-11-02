@@ -1249,3 +1249,20 @@ html.sin-scroll, html.sin-scroll body { overflow: hidden; }
 /* ---------- Detalle por categoría (6.7.4) ---------- */
 .categoria__arbitro { margin: -4px 0 8px; font-size: 15px; }
 .categoria__sub { margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid var(--fondo-suave); font-size: 17px; }
+
+/* ---------- Datos de cada club (6.7.1) ---------- */
+.equipo--datos { align-items: flex-start; padding: 14px 0; }
+.equipo--datos > .escudo { margin-top: 22px; }
+.equipo__campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px 10px; }
+.equipo__campos .campo { margin: 0; }
+.equipo__sugerencia { margin: 6px 0 0; font-size: 14px; color: var(--texto-2); }
+.equipo--datos .equipo__acciones { flex-direction: column; align-items: flex-end; margin-top: 22px; }
+.equipo-nuevo summary { cursor: pointer; list-style: none; }
+.equipo-nuevo summary::-webkit-details-marker { display: none; }
+.equipo-nuevo__form { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; margin-top: 12px; }
+.equipo-nuevo__form .equipo__campos { width: 100%; }
+@media (max-width: 720px) {
+  .equipo--datos { flex-wrap: wrap; }
+  .equipo--datos .equipo__datos { flex: 1 1 calc(100% - 64px); }
+  .equipo--datos .equipo__acciones { flex-direction: row; margin: 0 0 0 60px; align-items: center; }
+}

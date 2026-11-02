@@ -236,7 +236,10 @@ CDM.api = (function () {
     admin: {
       partidos: () => todas(() => cliente.from('v_partidos')
         .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en,observaciones').order('partido_id')),
-      equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,cancha,escudo,es_propio').order('nombre_corto')),
+      equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,localidad,cancha,escudo,es_propio').order('nombre_corto')),
+      // Datos de cada club (6.7.1)
+      editarEquipo: (id, campos) => escribir(cliente.from('equipos').update(campos).eq('equipo_id', id).select()),
+      crearEquipo: (fila) => escribir(cliente.from('equipos').insert(fila).select()),
       // Una tabla completa (para exportar a Excel)
       tabla: (nombre, orden) => todas(() => cliente.from(nombre).select('*').order(orden)),
       // Lista de jugadores de un torneo y categoría (planteles)

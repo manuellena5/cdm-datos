@@ -172,7 +172,9 @@ select
     when bool_or(a.tabla in ('partidos', 'goles', 'incidencias', 'formaciones')) then 'editó'
     when bool_or(a.tabla = 'jugadores' and a.accion = 'alta') then 'agregó al jugador'
     when bool_or(a.tabla = 'jugadores') then 'corrigió al jugador'
-    when bool_or(a.tabla = 'equipos') then 'cambió el escudo de'
+    when bool_or(a.tabla = 'equipos' and a.accion = 'alta') then 'agregó el equipo'
+    when bool_or(a.tabla = 'equipos' and (a.antes ->> 'escudo') is distinct from (a.despues ->> 'escudo')) then 'cambió el escudo de'
+    when bool_or(a.tabla = 'equipos') then 'actualizó los datos de'
     else 'editó'
   end as accion
 from auditoria a
