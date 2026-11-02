@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.23.0 — Fase 6.8.2 (precarga del puesto en los planteles)
+- Al sumar a un plantel un jugador que ya existe, entra con su puesto **precargado**: el del último torneo que jugó o, si nunca tuvo uno en un plantel, el primero de sus puestos. Vale para la fila nueva, los sugeridos, "Pegar lista" (si la línea no trae puesto) y la grilla de torneos del jugador. Si se elige otro puesto, queda el elegido.
+- "Copiar plantel de…" copia el puesto que tenía en ese torneo; si allá no tenía, usa el precargado.
+- Si el jugador tiene más de un puesto, al lado del selector aparecen **botones rápidos** con sus puestos para elegir con un toque: abreviados en la tabla de la PC (VOL, DEL; el nombre completo aparece al pasar el mouse) y completos en la hoja del celular. El selector sigue ofreciendo los cuatro.
+- Jugador nuevo: el puesto que se elige al crearlo desde el plantel queda en sus puestos y viene precargado en el próximo plantel.
+- Los planteles ya cargados no cambian.
+
 ## v0.22.0 — Fase 6.8.1 (puestos del jugador)
 - Cada jugador tiene **todos sus puestos** (Arquero, Defensor, Volante, Delantero) en lugar de un solo "puesto habitual". Se cargaron con los puestos de sus planteles más el que tenía; ninguno se perdió.
 - Cuando un plantel le pone un puesto a un jugador (tabla, hoja del celular, Pegar lista, Copiar plantel, grilla del jugador…), ese puesto se **suma solo** a sus puestos. Nunca se quita uno: cambiarlo en un torneo no borra lo que jugó en otros.

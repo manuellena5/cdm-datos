@@ -17,6 +17,8 @@ CDM.pantallas.adminPlanteles = (function () {
   const tituloCaso = (t) => (t === t.toUpperCase() ? t.toLowerCase().replace(/(^|[\s-])\p{L}/gu, (m) => m.toUpperCase()) : t);
   const num = (v) => Number(v || 0);
   const conPunto = (t) => (/[.!?]$/.test(t) ? t : t + '.');
+  // Puesto con el que entra un jugador a un plantel (6.8.2): el de su último torneo o, si no tiene, el primero de sus puestos
+  const precargado = (id) => ui.ultimoPuesto(ctx.puestos[id]) || null;
 
   // [2011, 2012, 2013, 2016] → '2011–2013, 2016'
   function rangos(anios) {
@@ -92,6 +94,20 @@ CDM.pantallas.adminPlanteles = (function () {
     opcion('', ultimo ? 'Último (' + ultimo + ')' : '—', valor) +
     PUESTOS.map((p) => opcion(p, p, valor)).join('') + '</select>';
 
+  // Botones rápidos (6.8.2): solo si el jugador tiene más de un puesto. El selector sigue ofreciendo los cuatro.
+  // En la tabla van abreviados (ARQ, DEF, VOL, DEL) para no agrandar la fila; en la hoja del celular, completos.
+  function botonesPuesto(id, valor, corto) {
+    const lista = ctx.puestos[id] || [];
+    if (lista.length < 2) return '';
+    return '<span class="puestos-rapidos" role="group" aria-label="Sus puestos">' + lista.map((x) => '<button type="button" class="puesto-rapido" data-puesto-rapido="' +
+      e(x.puesto) + '" aria-pressed="' + (x.puesto === valor) + '"' + (corto ? ' title="' + e(x.puesto) + '" aria-label="' + e(x.puesto) + '"' : '') + '>' +
+      e(corto ? x.puesto.slice(0, 3).toUpperCase() : x.puesto) + '</button>').join('') + '</span>';
+  }
+
+  function marcarRapidos(caja, valor) {
+    caja.querySelectorAll('[data-puesto-rapido]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.puestoRapido === valor)));
+  }
+
   function filaHtml(f) {
     const r = revisar(f.j);
     return '<tr data-id="' + e(f.jugador_id) + '"' + (r ? ' class="plantel-fila--revisar"' : '') + '>' +
@@ -102,7 +118,7 @@ CDM.pantallas.adminPlanteles = (function () {
       (r ? '<div class="plantel-aviso">' + e(r.texto) + (r.par ? ' <a href="' + enlaceDuplicado(f.jugador_id, r.par) + '">Revisar</a>' : '') + '</div>' : '') +
       '<div class="plantel-estado" role="status"></div></td>' +
       '<td><input data-campo="nombre" value="' + e(f.j.nombre || '') + '" placeholder="Nombre" aria-label="Nombre" autocomplete="off"></td>' +
-      '<td>' + selectorPuesto(f.puesto, '', f.ultimo) + '</td>' +
+      '<td>' + selectorPuesto(f.puesto, '', f.ultimo) + botonesPuesto(f.jugador_id, f.puesto, true) + '</td>' +
       '<td><input data-campo="apodo" value="' + e(f.j.apodo || '') + '" placeholder="Apodo" aria-label="Apodo" autocomplete="off"></td>' +
       '<td class="centro">' + (f.goles || '·') + '</td><td class="centro">' + (f.rojas || '·') + '</td>' +
       '<td><span class="etiqueta etiqueta--' + (f.motivos === 'Nuevo' ? 'ok' : 'info') + '">' + e(f.motivos) + '</span></td>' +
@@ -144,7 +160,8 @@ CDM.pantallas.adminPlanteles = (function () {
       (f ? '' : '<div class="sugerencias" role="listbox" aria-label="Jugadores parecidos" hidden></div>') + '</div>' +
       campo('nombre', 'Nombre', j.nombre) + '</div>' +
       '<div class="fila-2"><div class="campo"><label for="hoja-puesto">Puesto</label>' +
-      '<select id="hoja-puesto" name="puesto">' + opcion('', f && f.ultimo ? 'Último (' + f.ultimo + ')' : '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
+      '<select id="hoja-puesto" name="puesto">' + opcion('', f && f.ultimo ? 'Último (' + f.ultimo + ')' : '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select>' +
+      (f ? botonesPuesto(f.jugador_id, f.puesto) : '') + '</div>' +
       campo('apodo', 'Apodo', j.apodo, ' placeholder="Opcional"') + '</div>' +
       (f ? '<label class="check hoja__check"><input type="checkbox" name="incluido" checked' + (f.conDatos ? ' disabled' : '') + '> En el plantel de este torneo</label>' +
         (f.conDatos ? '<p class="nota">Tiene datos en este torneo: queda en el plantel.</p>' : '') : '') +
@@ -435,12 +452,20 @@ CDM.pantallas.adminPlanteles = (function () {
   async function sumar(ids, extra) {
     const nuevos = ids.filter((id) => !ctx.lista.some((l) => l.jugador_id === id));
     if (nuevos.length) {
+      // sin puesto elegido, entra con el precargado
+      extra = Object.fromEntries(nuevos.map((id) => [id, Object.assign({}, (extra && extra[id]) || {}, { posicion: (extra && extra[id] && extra[id].posicion) || precargado(id) })]));
       // Todas las filas con las mismas columnas (la carga en lote lo necesita)
       const claves = [...new Set(nuevos.flatMap((id) => Object.keys((extra && extra[id]) || {})))];
       await CDM.api.admin.guardarLista(nuevos.map((id) => filaLista(id, Object.fromEntries(claves.map((k) => [k, extra && extra[id] && extra[id][k] != null ? extra[id][k] : null])))));
-      nuevos.forEach((id) => ctx.lista.push({ jugador_id: id, camiseta: extra && extra[id] && extra[id].camiseta != null ? extra[id].camiseta : null, posicion: (extra && extra[id] && extra[id].posicion) || null }));
+      nuevos.forEach((id) => ctx.lista.push({ jugador_id: id, camiseta: extra[id].camiseta != null ? extra[id].camiseta : null, posicion: extra[id].posicion || null }));
+      await refrescarPuestos();
     }
     return nuevos.length;
+  }
+
+  // Los puestos que la base le sumó al jugador (6.8.1), para la precarga y los botones rápidos
+  async function refrescarPuestos() {
+    ctx.puestos = await CDM.api.puestosJugadores().catch(() => ctx.puestos);
   }
 
   // Guarda un campo de una fila: apellido, nombre y apodo corrigen al jugador; puesto y camiseta, la lista del torneo.
@@ -462,6 +487,10 @@ CDM.pantallas.adminPlanteles = (function () {
         await CDM.api.admin.guardarLista([filaLista(id, extra)]);
         const l = ctx.lista.find((x) => x.jugador_id === id);
         if (l) Object.assign(l, extra); else ctx.lista.push(Object.assign({ jugador_id: id, camiseta: null, posicion: null }, extra));
+        if (campo === 'puesto') {
+          marcarRapidos(tr, valor);
+          await refrescarPuestos();
+        }
         estadoFila(tr, 'Guardado');
       }
       error('');
@@ -601,6 +630,7 @@ CDM.pantallas.adminPlanteles = (function () {
         await CDM.api.admin.guardarLista([filaLista(id, extra)]);
         const l = ctx.lista.find((x) => x.jugador_id === id);
         if (l) Object.assign(l, extra); else ctx.lista.push(Object.assign({ jugador_id: id, camiseta: null }, extra));
+        await refrescarPuestos();
       }
       error('');
       pintarTabla();
@@ -647,6 +677,11 @@ CDM.pantallas.adminPlanteles = (function () {
       if (ev.target.closest('[data-hoja-cancelar]')) return cerrarHoja();
       const g = ev.target.closest('[data-hoja-guardar]');
       if (g) return guardarHoja(g);
+      const rapido = ev.target.closest('.hoja [data-puesto-rapido]');
+      if (rapido) {
+        hoja.caja.querySelector('#hoja-puesto').value = rapido.dataset.puestoRapido;
+        return marcarRapidos(hoja.caja, rapido.dataset.puestoRapido);
+      }
       const elegir = ev.target.closest('[data-hoja-elegir]');
       if (elegir) {
         agregarDesdeHoja(elegir.dataset.hojaElegir).catch((err) => errorHoja(err.message));
@@ -655,6 +690,9 @@ CDM.pantallas.adminPlanteles = (function () {
       if (ev.target.closest('[data-hoja-crear]')) {
         agregarDesdeHoja(null).catch((err) => errorHoja(err.message));
       }
+    });
+    vista.addEventListener('change', (ev) => {
+      if (ev.target.id === 'hoja-puesto' && hoja && hoja.caja) marcarRapidos(hoja.caja, ev.target.value);
     });
     // Sugerencias al escribir el apellido de un jugador nuevo
     vista.addEventListener('input', (ev) => {
@@ -795,6 +833,14 @@ CDM.pantallas.adminPlanteles = (function () {
     vista.addEventListener('click', async (ev) => {
       const seg = ev.target.closest('[data-seg="cat"]');
       if (seg) return ir({ cat: seg.dataset.valor });
+      const rapido = ev.target.closest('tr[data-id] [data-puesto-rapido]');
+      if (rapido) {
+        const sel = rapido.closest('td').querySelector('[data-campo="puesto"]');
+        if (sel.value === rapido.dataset.puestoRapido) return;
+        sel.value = rapido.dataset.puestoRapido;
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
+      }
       const b = ev.target.closest('[data-accion], [data-quitar], [data-sumar], [data-elegir]');
       if (!b) return;
       if (b.dataset.elegir) return elegirExistente(b.dataset.elegir);

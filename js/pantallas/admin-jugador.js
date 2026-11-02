@@ -191,7 +191,7 @@ CDM.pantallas.adminJugador = (function () {
         ctx.filas = ctx.filas.filter((x) => !(x.torneo_id === t.torneo_id && x.categoria === ctx.categoria));
         estado('grilla-estado', 'Sacado del ' + t.nombre + '.');
       } else {
-        await CDM.api.admin.guardarLista([{ torneo_id: t.torneo_id, categoria: ctx.categoria, jugador_id: id }]);
+        await CDM.api.admin.guardarLista([{ torneo_id: t.torneo_id, categoria: ctx.categoria, jugador_id: id, posicion: ui.ultimoPuesto(ctx.puestos) || null }]);
         ctx.filas.push(filaNueva(t));
         estado('grilla-estado', 'Sumado al ' + t.nombre + '.');
       }
@@ -209,7 +209,8 @@ CDM.pantallas.adminJugador = (function () {
     if (!ts.length) return;
     boton.disabled = true;
     try {
-      await CDM.api.admin.guardarLista(ts.map((t) => ({ torneo_id: t.torneo_id, categoria: ctx.categoria, jugador_id: ctx.jugador.jugador_id })));
+      await CDM.api.admin.guardarLista(ts.map((t) => ({ torneo_id: t.torneo_id, categoria: ctx.categoria, jugador_id: ctx.jugador.jugador_id,
+        posicion: ui.ultimoPuesto(ctx.puestos) || null })));
       ts.forEach((t) => ctx.filas.push(filaNueva(t)));
       error('');
       pintarGrilla();
