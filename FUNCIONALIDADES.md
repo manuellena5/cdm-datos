@@ -2,6 +2,11 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.20.0 — Fase 6.7.2 (estadio en la carga del partido)
+- En la carga del partido, el **Estadio** viene del equipo local (Mitre de local, el rival de visitante); un partido nuevo arranca con el de Mitre.
+- El campo es un **desplegable con búsqueda**: primero el estadio del local, después los de cada equipo ("Centenario · Trebolense") y los que se usaron en otros partidos. Para una cancha neutral se elige otro o se escribe uno nuevo ("Usar …").
+- En el **Detalle del partido**, si el estadio no es el del equipo local, dice "(neutral)".
+
 ## v0.19.0 — Fase 6.7.1 (datos de cada club)
 - **Administrar → Equipos**: cada equipo con **nombre, nombre corto, localidad y estadio** (además del escudo), que se guardan solos al salir de cada campo. Mitre primero y los rivales por nombre corto.
 - Si un equipo no tiene estadio, sugiere el que más usó de local ("Jugó de local en Centenario (24 partidos) · Usar este"), y arriba hay un botón para usar todos los sugeridos.

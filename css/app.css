@@ -1266,3 +1266,6 @@ html.sin-scroll, html.sin-scroll body { overflow: hidden; }
   .equipo--datos .equipo__datos { flex: 1 1 calc(100% - 64px); }
   .equipo--datos .equipo__acciones { flex-direction: row; margin: 0 0 0 60px; align-items: center; }
 }
+
+/* Campo de texto con lista (6.7.2): estadio y, después, árbitros */
+.buscador__opcion--texto { display: block; line-height: 1.3; }

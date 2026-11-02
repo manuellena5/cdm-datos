@@ -36,7 +36,14 @@ CDM.pantallas.detalle = (function () {
       '</div></section>';
   }
 
-  function datos(p, posiciones) {
+  // Cancha neutral (6.7.2): el estadio no es el del equipo local (si el local tiene uno cargado)
+  function neutral(p, equipos) {
+    const local = equipos[p.local_id];
+    const norm = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    return !!(local && local.cancha && p.cancha && norm(local.cancha) !== norm(p.cancha));
+  }
+
+  function datos(p, posiciones, equipos) {
     const pos = p.fase_orden === 0 && p.fecha_nro != null &&
       posiciones.find((x) => x.categoria === p.categoria && x.tras_fecha === p.fecha_nro && x.posicion != null);
     const item = (k, v) => '<div><div class="datos__k">' + k + '</div><div class="datos__v' + (v ? '' : ' datos__v--sin') + '">' +
@@ -45,7 +52,7 @@ CDM.pantallas.detalle = (function () {
     if (p.estado !== 'Jugado') estado = item('Estado', p.estado);
     return '<section class="tarjeta datos" aria-label="Datos del partido">' +
       item('Fecha', ui.fechaLarga(p.fecha) + (p.estado === 'Programado' && p.hora ? ' · ' + ui.hora(p.hora) : '')) +
-      item('Estadio', p.cancha) +
+      item('Estadio', p.cancha ? p.cancha + (neutral(p, equipos) ? ' (neutral)' : '') : '') +
       (pos ? item('Tabla después', pos.posicion + '° · ' + ui.plural(pos.pts, 'pt', 'pts')) : '') +
       estado + '</section>';
   }
@@ -176,7 +183,7 @@ CDM.pantallas.detalle = (function () {
 
     return encabezado(p, equipos) +
       '<div class="detalle">' +
-      '<div class="detalle__principal">' + datos(p, posiciones) +
+      '<div class="detalle__principal">' + datos(p, posiciones, equipos) +
       ambos.map((x) => categoria(x, listaGoles, listaInc, propio)).join('') + formacion(listaForm, ambos, cuerpos) + '</div>' +
       '<aside class="detalle__lateral">' + contraRival(p, partidos, historial) + fuentes(listaFuentes, p) + '</aside>' +
       '</div>';

@@ -120,6 +120,8 @@ CDM.pantallas.adminPartido = (function () {
     const planteles = await Promise.all(CATEGORIAS.map((cat) => CDM.api.admin.plantelTorneo(torneoId, cat).catch(() => [])));
     ctx.plantel = Object.fromEntries(CATEGORIAS.map((cat, i) => [cat, new Set(planteles[i].map((x) => x.jugador_id))]));
     ctx.s = s;
+    // Partido nuevo: arranca con el estadio del local (6.7.2)
+    if (!s.existe && !s.cancha) s.cancha = canchaAutomatica();
     ctx.recuperable = leerGuardado(s, filas);
     await cargarNombresRival();
   }
@@ -274,6 +276,103 @@ CDM.pantallas.adminPartido = (function () {
       .sort((a, b) => clave(b).localeCompare(clave(a)))[0];
   }
 
+  // ---------- Campo de texto con lista (6.7.2): se elige de la lista o se escribe uno nuevo ----------
+  function buscadorTexto(id, k, lista, valor, etiqueta) {
+    return '<div class="buscador"><input type="text" id="' + id + '" class="buscador__texto" data-k="' + k + '" data-lista="' + lista + '" value="' + e(valor || '') + '"' +
+      ' placeholder="Escribí o elegí…" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="lista-' + id + '"' +
+      ' aria-label="' + e(etiqueta) + '"><ul class="buscador__lista" id="lista-' + id + '" role="listbox" hidden></ul></div>';
+  }
+
+  // Estadios: primero el del local, después los de cada equipo y al final los que se usaron en otros partidos.
+  function opcionesEstadio(texto) {
+    const buscado = sinAcentos(texto).split(/\s+/).filter(Boolean);
+    const coincide = (t) => buscado.every((b) => sinAcentos(t).split(/\s+/).some((p) => p.startsWith(b)));
+    const auto = canchaAutomatica();
+    const deEquipos = ctx.equipos.filter((x) => x.cancha).map((x) => ({ valor: x.cancha, detalle: x.nombre_corto }));
+    const conEquipo = new Set(deEquipos.map((x) => sinAcentos(x.valor)));
+    const usados = [...new Set(ctx.partidos.map((p) => (p.cancha || '').trim()).filter((c) => c && !conEquipo.has(sinAcentos(c))))]
+      .map((c) => ({ valor: c, detalle: '' }));
+    const grupos = [
+      ['Del equipo local', deEquipos.filter((x) => x.valor === auto)],
+      ['Estadios de los equipos', deEquipos.filter((x) => x.valor !== auto).sort((a, b) => a.valor.localeCompare(b.valor, 'es'))],
+      ['Otros usados', usados.sort((a, b) => a.valor.localeCompare(b.valor, 'es'))]
+    ].map(([t, l]) => [t, l.filter((x) => coincide(x.valor + ' ' + x.detalle))]).filter(([, l]) => l.length);
+    let html = grupos.map(([t, l]) => '<li class="buscador__grupo" role="presentation">' + e(t) + '</li>' +
+      l.map((x) => '<li role="option" class="buscador__opcion buscador__opcion--texto" data-valor="' + e(x.valor) + '">' + e(x.valor) +
+        (x.detalle ? ' <span class="texto-2">· ' + e(x.detalle) + '</span>' : '') + '</li>').join('')).join('');
+    const escrito = texto.trim();
+    const existe = escrito && [...deEquipos, ...usados].some((x) => sinAcentos(x.valor) === sinAcentos(escrito));
+    if (escrito && !existe) html += '<li role="option" class="buscador__opcion buscador__opcion--texto buscador__opcion--nuevo" data-valor="' + e(escrito) + '">Usar "' + e(escrito) + '"</li>';
+    return html || '<li class="buscador__grupo" role="presentation">No hay estadios cargados</li>';
+  }
+
+  const OPCIONES_LISTA = { estadios: opcionesEstadio };
+
+  function montarListas(vista) {
+    const ul = (input) => input.parentElement.querySelector('.buscador__lista');
+    const opciones = (input) => [...ul(input).querySelectorAll('[role="option"]')];
+    const marcar = (input, i) => {
+      const ops = opciones(input);
+      ops.forEach((o, n) => o.classList.toggle('buscador__opcion--activa', n === i));
+      input.dataset.activa = String(i);
+      if (ops[i]) { ops[i].scrollIntoView({ block: 'nearest' }); input.setAttribute('aria-activedescendant', ops[i].id = input.getAttribute('aria-controls') + '-' + i); }
+    };
+    const mostrar = (input, texto) => {
+      ul(input).innerHTML = OPCIONES_LISTA[input.dataset.lista](texto);
+      ul(input).hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      marcar(input, texto.trim() ? 0 : -1);
+    };
+    const cerrar = (input) => {
+      ul(input).hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+    };
+    // Elegir = poner el texto y avisar al formulario como si se hubiera escrito
+    const elegir = (input, valor) => {
+      input.value = valor;
+      cerrar(input);
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    vista.addEventListener('focusin', (ev) => {
+      const input = ev.target.closest('[data-lista]');
+      if (!input) return;
+      input.select();
+      mostrar(input, '');
+    });
+    vista.addEventListener('input', (ev) => {
+      const input = ev.target.closest('[data-lista]');
+      if (input) mostrar(input, input.value);
+    });
+    vista.addEventListener('keydown', (ev) => {
+      const input = ev.target.closest('[data-lista]');
+      if (!input) return;
+      const ops = opciones(input);
+      const activa = Number(input.dataset.activa ?? -1);
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        if (ul(input).hidden) mostrar(input, '');
+        marcar(input, Math.max(0, Math.min(ops.length - 1, activa + (ev.key === 'ArrowDown' ? 1 : -1))));
+      } else if (ev.key === 'Enter') {
+        ev.preventDefault();
+        if (ops[activa] && !ul(input).hidden) elegir(input, ops[activa].dataset.valor);
+        else cerrar(input);
+      } else if (ev.key === 'Escape') {
+        cerrar(input);
+      }
+    });
+    vista.addEventListener('mousedown', (ev) => {
+      const op = ev.target.closest('.buscador__opcion[data-valor]');
+      if (!op) return;
+      ev.preventDefault();
+      elegir(op.closest('.buscador').querySelector('[data-lista]'), op.dataset.valor);
+    });
+    vista.addEventListener('focusout', (ev) => {
+      const input = ev.target.closest('[data-lista]');
+      if (input) setTimeout(() => { if (input.isConnected && document.activeElement !== input) cerrar(input); }, 0);
+    });
+  }
+
   // Buscador de jugador para un lugar de la formación: se escribe para filtrar o se elige de la lista.
   function buscadorJugador(k, ci, lugar, valor) {
     const j = valor && ctx.jugadores.find((x) => x.jugador_id === valor);
@@ -393,9 +492,9 @@ CDM.pantallas.adminPartido = (function () {
       '<select id="c-rival" data-k="rival_id" data-repinta="1" data-cancha="1">' + opcion('', 'Elegí rival…', s.rival_id) +
       ctx.equipos.filter((x) => !x.es_propio).map((x) => opcion(x.equipo_id, x.nombre_corto, s.rival_id)).join('') + '</select></div></div>' +
       ui.segmentado('condicion', propio().nombre_corto + ' juega de', [{ valor: 'L', texto: 'Local' }, { valor: 'V', texto: 'Visitante' }], s.condicion) +
-      '<div class="fila-2"><div class="campo"><label for="c-dia">Día</label><input id="c-dia" type="date" data-k="fecha" value="' + e(s.fecha) + '"></div>' +
-      '<div class="campo"><label for="c-cancha">Cancha</label><input id="c-cancha" data-k="cancha" value="' + e(s.cancha) + '" autocomplete="off"></div></div>' +
-      (s.existe ? '<p class="nota">Rival, condición y cancha salen del fixture. Se pueden corregir.</p>' : '') + '</section>' +
+      '<div class="campo"><label for="c-dia">Día</label><input id="c-dia" type="date" data-k="fecha" value="' + e(s.fecha) + '"></div>' +
+      '<div class="campo"><label for="c-cancha">Estadio</label>' + buscadorTexto('c-cancha', 'cancha', 'estadios', s.cancha, 'Estadio') + '</div>' +
+      '<p class="nota">El estadio viene del equipo local. Para una cancha neutral, elegí otro de la lista o escribilo.</p>' + '</section>' +
       cats + seccionIncidencias(numero++) +
       '<section class="tarjeta carga" aria-label="Extras"><h2 class="tarjeta__titulo">' + numero + ' · Extras (opcional)</h2>' +
       '<div class="campo"><label for="c-fuente">Link de la fuente</label><input id="c-fuente" type="url" data-k="fuente_url" value="' + e(s.fuente_url) + '" placeholder="Posteo del club, crónica…" autocomplete="off"></div>' +
@@ -729,6 +828,7 @@ CDM.pantallas.adminPartido = (function () {
       if (d.dataset && d.dataset.formacion != null && ctx.s.cats[Number(d.dataset.formacion)]) ctx.s.cats[Number(d.dataset.formacion)].verFormacion = d.open;
     }, true);
     montarBuscador(vista);
+    montarListas(vista);
   }
 
   // ---------- Buscador de jugador de la formación (6.5.4) ----------

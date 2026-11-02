@@ -162,7 +162,7 @@ CDM.api = (function () {
 
     // Equipos con su escudo (para mostrar escudos o iniciales)
     equipos: () => consultar('equipos', () =>
-      cliente.from('equipos').select('equipo_id,nombre,nombre_corto,escudo,es_propio').order('nombre_corto')),
+      cliente.from('equipos').select('equipo_id,nombre,nombre_corto,localidad,cancha,escudo,es_propio').order('nombre_corto')),
 
     clubPropio: () => CDM.api.equipos()
       .then((filas) => filas.find((x) => x.es_propio) || { nombre: '', nombre_corto: '' }),
