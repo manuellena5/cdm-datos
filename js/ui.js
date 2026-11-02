@@ -185,6 +185,10 @@ CDM.ui = (function () {
       .filter((g) => g.items.length);
   }
 
+  // Puestos de un jugador (lista de api.puestosJugadores): 'Defensor · Volante', el más reciente primero
+  const textoPuestos = (lista) => (lista || []).map((x) => x.puesto).join(' · ');
+  const ultimoPuesto = (lista) => ((lista || [])[0] || {}).puesto || '';
+
   // Cuerpo técnico de un torneo y categoría (filas de cuerpos_tecnicos: orden 0 = técnico).
   // → { tecnico: 'Jorge Falappa', integrantes: ['A', 'B'], html: '<strong>Técnico:</strong> … · <strong>Cuerpo técnico:</strong> …' }
   function cuerpoTecnico(cuerpos, torneoId, categoria) {
@@ -199,6 +203,6 @@ CDM.ui = (function () {
   return {
     plural, fechaCorta, fechaLarga, hora, escaparHtml, chipResultado, torneoSinAnio, instancia, instanciaLarga,
     marcador, penales, tituloChip, icono, rojas, selector, segmentado, cargando, errorCarga, avisoGuardados,
-    vacio, unir, escudo, iniciales, cuerpoTecnico, PUESTOS, porPuesto
+    vacio, unir, escudo, iniciales, cuerpoTecnico, PUESTOS, porPuesto, textoPuestos, ultimoPuesto
   };
 })();

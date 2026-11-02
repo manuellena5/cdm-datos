@@ -3,7 +3,7 @@ Plan de desarrollo por fases para trabajar con Claude Code.
 
 > Cómo usar este documento: pedile a Claude Code **una fase por vez** ("Hacé la Fase 1 de docs/PLAN.md").
 > Cada fase tiene alcance, entregables y criterios de aceptación. No avanzar a la siguiente sin cerrar los criterios de la anterior.
-> **Estado (26/10/2026):** Fases 0 a 6.5 hechas. Sigue la **Fase 6.6**; después, la 7.
+> **Estado (02/11/2026):** Fases 0 a 6.7 hechas. Sigue la **Fase 6.8**; después, la 7.
 
 ---
 
@@ -455,6 +455,43 @@ Pedido de M (02/11/2026), después de usar la página. Un punto por vez ("Hacé 
 - Al cargar un partido, el árbitro se elige de la lista en Primera y en Reserva por separado; un nombre nuevo aparece en la lista del partido siguiente.
 - En el Detalle del 30/10/2026, la roja de Ñañez aparece dentro de la categoría que corresponde y cada categoría muestra su árbitro.
 - Todo funciona a 390 px de ancho.
+
+---
+
+## Fase 6.8 — Puestos del jugador, compartidos con los planteles
+
+Hoy el jugador tiene un solo puesto (`jugadores.posicion`) y cada plantel el suyo (`planteles.posicion`), sin conexión entre los dos. Objetivo: lo que se carga en un plantel queda en el jugador, y lo del jugador viene precargado en cualquier plantel.
+
+**Antes de tocar nada:** es un cambio al modelo de datos. Explicar qué se rompería (vistas, `unir_jugadores`, pantallas, exportación a Excel, importador) y recién después hacerlo. Script nuevo `sql/15_puestos.sql`, que se pueda volver a correr.
+
+### 6.8.1 Modelo
+- `jugadores.puestos text[]` con los valores de la lista controlada (Arquero, Defensor, Volante, Delantero). No usar el nombre `posiciones`: es la tabla de posiciones de la liga.
+- **Carga inicial:** `puestos` = puestos distintos que el jugador ya tiene en `planteles` + su `jugadores.posicion` actual. No se pierde ningún dato.
+- `jugadores.posicion` deja de editarse. Se mantiene un tiempo como columna calculada o se reemplaza en vistas y pantallas (decidirlo al explicar el impacto).
+- **Trigger en `planteles`** (insert y update de `posicion`): si el puesto no está en `jugadores.puestos`, se agrega. **Nunca se quita uno**, porque cambiar a Juan Pérez de Defensor a Volante en un torneo no borra lo que jugó en otros. Al estar en la base, funciona igual desde la tabla del plantel, la hoja del celular, "Pegar lista", "Copiar plantel de…", la grilla del jugador y cualquier carga futura.
+- `unir_jugadores` junta los `puestos` de los dos.
+- Vista o función para la pantalla del jugador: por cada puesto, en cuántos torneos lo jugó y el último torneo.
+
+### 6.8.2 Precarga en los planteles
+- Al agregar un jugador que ya existe a un plantel (fila nueva, sugeridos, "Pegar lista", grilla del jugador), el puesto viene **precargado con el del último torneo que jugó**; si no tiene ninguno en planteles, el primero de `puestos`.
+- Si el jugador tiene más de un puesto, al lado del selector aparecen **botones rápidos** con sus puestos ("Defensor · Volante") para elegir con un toque. El selector sigue ofreciendo los cuatro.
+- Jugador nuevo: se elige el puesto al crearlo y queda en su lista.
+- "Copiar plantel de…" copia el puesto que tenía en ese torneo.
+- Los planteles ya cargados no cambian: el agrupado por puesto (6.6.4) sigue usando `planteles.posicion`; si está vacío, el último puesto conocido del jugador.
+
+### 6.8.3 Puestos en la pantalla del jugador y en la consulta
+- En `#/admin/jugadores/:id`, "Puesto habitual" pasa a **"Puestos"**: chips de selección múltiple, cada uno con su uso ("Volante · 6 torneos", "Defensor · 2 torneos"). Se puede agregar uno a mano.
+- Quitar un puesto que algún plantel usa: avisar en cuáles ("Lo usa en Apertura 2018 y Clausura 2019") y no dejar quitarlo hasta cambiarlo ahí. Uno sin uso se quita directo.
+- Cambios con auditoría ("Manuel sumó Volante a Pérez, Juan desde el plantel del Clausura 2024").
+- Ficha pública, planteles y exportación a Excel muestran todos los puestos ("Defensor · Volante"), el más reciente primero.
+
+**Criterios de aceptación de la 6.8**
+- Después de la carga inicial, ningún jugador perdió el puesto que tenía, y cada uno tiene todos los puestos que figuran en sus planteles.
+- Un jugador con Defensor en un plantel, puesto como Volante en otro, queda con los dos puestos; volver a ponerlo como Defensor en el segundo no le quita Volante.
+- Al agregarlo a un torneo nuevo, viene precargado con el puesto del último torneo y muestra los dos botones rápidos.
+- Un jugador nuevo cargado con puesto aparece con ese puesto precargado en el siguiente plantel donde se lo agrega.
+- Unir dos jugadores deja la suma de sus puestos.
+- Funciona igual en PC y en el celular (hoja de edición del plantel).
 
 ---
 

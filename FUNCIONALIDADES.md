@@ -2,6 +2,15 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.22.0 — Fase 6.8.1 (puestos del jugador)
+- Cada jugador tiene **todos sus puestos** (Arquero, Defensor, Volante, Delantero) en lugar de un solo "puesto habitual". Se cargaron con los puestos de sus planteles más el que tenía; ninguno se perdió.
+- Cuando un plantel le pone un puesto a un jugador (tabla, hoja del celular, Pegar lista, Copiar plantel, grilla del jugador…), ese puesto se **suma solo** a sus puestos. Nunca se quita uno: cambiarlo en un torneo no borra lo que jugó en otros.
+- El puesto de un plantel solo puede ser uno de los 4.
+- Unir dos jugadores deja la suma de los puestos de los dos.
+- Planteles: si el torneo no tiene puesto cargado para un jugador, se usa su **último puesto conocido** (el de su último plantel); en admin el selector lo muestra como "Último (Delantero)".
+- Ficha pública: "Defensor · Volante", el más reciente primero. Administrar → jugador: los puestos con la cantidad de torneos de cada uno.
+- Exportar a Excel: la hoja Jugadores trae la columna puestos. La importación del Excel suma los puestos sin quitar los que ya están.
+
 ## v0.21.0 — Fase 6.7.3 (árbitros con código propio)
 - Cada árbitro tiene un **código** (A001, A002…) y los partidos guardan el código, no el nombre: corregir el nombre lo cambia en todos sus partidos, y dos formas de escribir al mismo se unen en uno. Los nombres que estaban en los partidos pasaron a la lista ("PARIANI AGUSTÍN" quedó "Agustín Pariani").
 - En la **carga del partido**, el Árbitro de **cada categoría** es un desplegable con búsqueda: primero los que dirigieron hace poco (con la fecha), después todos. Si se escribe uno que no está, "+ Agregar árbitro nuevo …" y se crea al guardar.

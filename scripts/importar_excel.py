@@ -299,7 +299,8 @@ def leer_excel(ruta, club_propio):
 
     d['jugadores'] = [dict(
         jugador_id=lx.texto(r, 'jugador_id', True), apellido=lx.texto(r, 'apellido', True),
-        nombre=lx.texto(r, 'nombre'), apodo=lx.texto(r, 'apodo'), posicion=lx.texto(r, 'posicion'),
+        nombre=lx.texto(r, 'nombre'), apodo=lx.texto(r, 'apodo'),
+        puestos=lx.texto(r, 'puestos') or lx.texto(r, 'posicion'),
         division=lx.de_lista(r, 'division', DIVISIONES), fuente_ids=lx.lista_ids(r, 'fuente_id'),
         notas=lx.texto(r, 'notas'),
     ) for r in lx.hoja('Jugadores')]
@@ -504,6 +505,19 @@ def nombre_arbitro(texto):
             return f'{partes[1].capitalize()} {partes[0].capitalize()}'
         return t.title()
     return t
+
+
+PUESTOS = ['Arquero', 'Defensor', 'Volante', 'Delantero']
+
+
+def combinar_puestos(d, base):
+    """Puestos del jugador (sql/15_puestos.sql): el Excel trae 'posicion' (uno) o 'puestos' ("Defensor, Volante").
+    Se suman a los que ya tiene en la base; nunca se quita uno."""
+    en_base = {j['jugador_id']: j.get('puestos') or [] for j in base.leer('jugadores', 'jugador_id,puestos')}
+    for j in d['jugadores']:
+        del_excel = [x.strip().capitalize() for x in (j.get('puestos') or '').replace(';', ',').split(',') if x.strip()]
+        todos = set(en_base.get(j['jugador_id'], [])) | {x for x in del_excel if x in PUESTOS}
+        j['puestos'] = [x for x in PUESTOS if x in todos]
 
 
 def resolver_arbitros(d, base):
@@ -711,6 +725,7 @@ def main():
     print('Validación OK.')
 
     resolver_arbitros(d, base)
+    combinar_puestos(d, base)
     plan = planificar(d, base)
     mostrar_plan(plan)
 

@@ -10,8 +10,8 @@ CDM.pantallas.planteles = (function () {
   let actual = null;
 
   async function render(params, query) {
-    const [plantel, campanas, partidos, cuerpos, habituales] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos(),
-      CDM.api.cuerposTecnicos(), CDM.api.posicionesHabituales().catch(() => ({}))]);
+    const [plantel, campanas, partidos, cuerpos, puestos] = await Promise.all([CDM.api.plantel(), CDM.api.campanas(), CDM.api.partidos(),
+      CDM.api.cuerposTecnicos(), CDM.api.puestosJugadores().catch(() => ({}))]);
     const sel = filtros.elegirTorneo(campanas, query);
     const cat = filtros.categoria(query);
     const categoria = filtros.nombreCategoria(cat);
@@ -29,9 +29,9 @@ CDM.pantallas.planteles = (function () {
       ['partidos', 'titular', 'entro', 'convocado', 'goles', 'amarillas', 'rojas'].forEach((k) => { j[k] += num(x[k]); });
       if (x.minutos != null) { j.minutos += num(x.minutos); j.conMinutos = true; }
     });
-    // Por puesto (el del torneo o, si no hay, el habitual) y dentro de cada puesto por apellido
+    // Por puesto (el del torneo o, si no hay, el último puesto conocido del jugador) y dentro de cada puesto por apellido
     const lista = [...porJugador.values()].sort((a, b) => a.jugador.localeCompare(b.jugador, 'es'));
-    lista.forEach((j) => { j.puesto = j.posicion || habituales[j.jugador_id] || ''; });
+    lista.forEach((j) => { j.puesto = j.posicion || ui.ultimoPuesto(puestos[j.jugador_id]); });
     const grupos = ui.porPuesto(lista, (j) => j.puesto);
     const hayMinutos = lista.some((j) => j.conMinutos);
     const hayCamisetas = lista.some((j) => j.camiseta != null);

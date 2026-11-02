@@ -181,12 +181,18 @@ CDM.api = (function () {
     plantel: () => consultar('plantel', () =>
       cliente.from('v_plantel').select('*').order('torneo_orden').order('categoria').order('jugador_id')),
     jugador: (id) => consultar('jugador:' + id, () =>
-      cliente.from('jugadores').select('jugador_id,apellido,nombre,apodo,posicion,division').eq('jugador_id', id))
+      cliente.from('jugadores').select('jugador_id,apellido,nombre,apodo,puestos,division').eq('jugador_id', id))
       .then((filas) => filas[0] || null),
-    // Puesto habitual de cada jugador (6.6.4): se usa cuando el plantel del torneo no tiene puesto.
-    posicionesHabituales: () => consultar('posiciones_habituales', () =>
-      cliente.from('jugadores').select('jugador_id,posicion').not('posicion', 'is', null).order('jugador_id'))
-      .then((filas) => Object.fromEntries(filas.map((x) => [x.jugador_id, x.posicion]))),
+    // Puestos de cada jugador (6.8.1), el más reciente primero: { J060: [{ puesto, torneos, ultimo_torneo }] }.
+    // El primero es el "último puesto conocido": se usa cuando el plantel del torneo no tiene puesto.
+    puestosJugadores: () => consultar('puestos_jugadores', () =>
+      cliente.from('v_puestos_jugador').select('jugador_id,puesto,torneos,ultimo_torneo,ultimo_orden').order('jugador_id'))
+      .then((filas) => {
+        const r = {};
+        filas.sort((a, b) => (b.ultimo_orden ?? -1) - (a.ultimo_orden ?? -1) || CDM.ui.PUESTOS.indexOf(a.puesto) - CDM.ui.PUESTOS.indexOf(b.puesto))
+          .forEach((x) => { (r[x.jugador_id] = r[x.jugador_id] || []).push(x); });
+        return r;
+      }),
     jugadorPartidos: (id) => consultar('jugador_partidos:' + id, () =>
       cliente.from('v_jugador_partidos').select('*').eq('jugador_id', id).order('fecha', { ascending: false, nullsFirst: false }).order('partido_id')),
 

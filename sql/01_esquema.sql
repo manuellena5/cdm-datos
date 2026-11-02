@@ -49,7 +49,8 @@ create table if not exists jugadores (
   apellido    text not null,
   nombre      text,
   apodo       text,
-  posicion    text,
+  puestos     text[] not null default '{}'               -- Arquero, Defensor, Volante, Delantero (6.8.1)
+              constraint jugadores_puestos_chk check (puestos <@ array['Arquero', 'Defensor', 'Volante', 'Delantero']::text[]),
   division    text constraint jugadores_division_chk check (division in ('Primera', 'Reserva', 'Ambas')),
   fuente_ids  text[] not null default '{}',
   notas       text

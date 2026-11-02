@@ -53,7 +53,8 @@ CDM.pantallas.adminPlanteles = (function () {
         conDatos: num(x.presencias) > 0, enLista: !!l, puesto: l ? l.posicion || '' : '', camiseta: l ? l.camiseta : null,
         motivos: motivos.join(' · ')
       };
-    }).map((f) => Object.assign(f, { grupo: f.puesto || f.j.posicion || '' }))
+    }).map((f) => Object.assign(f, { ultimo: ui.ultimoPuesto(ctx.puestos[f.jugador_id]) }))
+      .map((f) => Object.assign(f, { grupo: f.puesto || f.ultimo || '' }))
       .sort((a, b) => nombre(a.j).localeCompare(nombre(b.j), 'es'));
     // en el orden de los grupos por puesto (6.6.4), así la tabla, la lista y "Guardar y siguiente" coinciden
     return ui.porPuesto(filas, (f) => f.grupo).flatMap((g) => g.items);
@@ -86,9 +87,9 @@ CDM.pantallas.adminPlanteles = (function () {
 
   // ---------- HTML ----------
   const opcion = (v, t, actual) => '<option value="' + e(v) + '"' + (String(v) === String(actual ?? '') ? ' selected' : '') + '>' + e(t) + '</option>';
-  // Vacío = usa el puesto habitual del jugador
-  const selectorPuesto = (valor, extra, habitual) => '<select data-campo="puesto"' + (extra || '') + ' aria-label="Puesto">' +
-    opcion('', habitual ? 'Habitual (' + habitual + ')' : '—', valor) +
+  // Vacío = usa el último puesto conocido del jugador
+  const selectorPuesto = (valor, extra, ultimo) => '<select data-campo="puesto"' + (extra || '') + ' aria-label="Puesto">' +
+    opcion('', ultimo ? 'Último (' + ultimo + ')' : '—', valor) +
     PUESTOS.map((p) => opcion(p, p, valor)).join('') + '</select>';
 
   function filaHtml(f) {
@@ -101,7 +102,7 @@ CDM.pantallas.adminPlanteles = (function () {
       (r ? '<div class="plantel-aviso">' + e(r.texto) + (r.par ? ' <a href="' + enlaceDuplicado(f.jugador_id, r.par) + '">Revisar</a>' : '') + '</div>' : '') +
       '<div class="plantel-estado" role="status"></div></td>' +
       '<td><input data-campo="nombre" value="' + e(f.j.nombre || '') + '" placeholder="Nombre" aria-label="Nombre" autocomplete="off"></td>' +
-      '<td>' + selectorPuesto(f.puesto, '', f.j.posicion) + '</td>' +
+      '<td>' + selectorPuesto(f.puesto, '', f.ultimo) + '</td>' +
       '<td><input data-campo="apodo" value="' + e(f.j.apodo || '') + '" placeholder="Apodo" aria-label="Apodo" autocomplete="off"></td>' +
       '<td class="centro">' + (f.goles || '·') + '</td><td class="centro">' + (f.rojas || '·') + '</td>' +
       '<td><span class="etiqueta etiqueta--' + (f.motivos === 'Nuevo' ? 'ok' : 'info') + '">' + e(f.motivos) + '</span></td>' +
@@ -110,7 +111,7 @@ CDM.pantallas.adminPlanteles = (function () {
 
   // ---------- Celular (6.6.3): lista y hoja desde abajo ----------
   function resumenFila(f) {
-    return [f.puesto || (f.j.posicion ? f.j.posicion + ' (habitual)' : '—'), f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : '',
+    return [f.puesto || (f.ultimo ? f.ultimo + ' (último)' : '—'), f.goles ? ui.plural(f.goles, 'gol', 'goles') : '', f.rojas ? ui.plural(f.rojas, 'roja', 'rojas') : '',
       revisar(f.j) ? 'revisar' : ''].filter(Boolean).join(' · ');
   }
 
@@ -143,7 +144,7 @@ CDM.pantallas.adminPlanteles = (function () {
       (f ? '' : '<div class="sugerencias" role="listbox" aria-label="Jugadores parecidos" hidden></div>') + '</div>' +
       campo('nombre', 'Nombre', j.nombre) + '</div>' +
       '<div class="fila-2"><div class="campo"><label for="hoja-puesto">Puesto</label>' +
-      '<select id="hoja-puesto" name="puesto">' + opcion('', f && f.j.posicion ? 'Habitual (' + f.j.posicion + ')' : '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
+      '<select id="hoja-puesto" name="puesto">' + opcion('', f && f.ultimo ? 'Último (' + f.ultimo + ')' : '—', f ? f.puesto : '') + PUESTOS.map((p) => opcion(p, p, f ? f.puesto : '')).join('') + '</select></div>' +
       campo('apodo', 'Apodo', j.apodo, ' placeholder="Opcional"') + '</div>' +
       (f ? '<label class="check hoja__check"><input type="checkbox" name="incluido" checked' + (f.conDatos ? ' disabled' : '') + '> En el plantel de este torneo</label>' +
         (f.conDatos ? '<p class="nota">Tiene datos en este torneo: queda en el plantel.</p>' : '') : '') +
@@ -293,11 +294,12 @@ CDM.pantallas.adminPlanteles = (function () {
   async function cargar(torneo, categoria) {
     const api = CDM.api.admin;
     const anteriorT = ctx.torneosOrden.filter((t) => t.orden < torneo.orden).pop() || null;
-    const [lista, estadisticas, estAnterior, filasCat] = await Promise.all([
+    const [lista, estadisticas, estAnterior, filasCat, puestos] = await Promise.all([
       api.listaPlantel(torneo.torneo_id, categoria), api.plantelTorneo(torneo.torneo_id, categoria),
       anteriorT ? api.plantelTorneo(anteriorT.torneo_id, categoria) : Promise.resolve([]),
-      api.plantelCategoria(categoria).catch(() => [])
+      api.plantelCategoria(categoria).catch(() => []), CDM.api.puestosJugadores().catch(() => ({}))
     ]);
+    ctx.puestos = puestos;
     Object.assign(ctx, { torneo, categoria, lista, estadisticas, anterior: anteriorT, estAnterior });
     ctx.jugo = calcularJugo(filasCat);
     ctx.hayCamisetas = lista.some((l) => l.camiseta != null);

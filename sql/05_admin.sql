@@ -170,8 +170,11 @@ select
   (array_agg(coalesce(a.despues, a.antes) ->> 'jugador_id') filter (where a.tabla = 'planteles'))[1] as plantel_jugador,
   case
     when bool_and(a.tabla = 'cuerpos_tecnicos') then 'actualizó el cuerpo técnico de'
-    when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'alta') then 'sumó a'
-    when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'baja') then 'sacó a'
+    -- un solo jugador en una lista (el mismo guardado puede sumarle un puesto: 15_puestos.sql)
+    when bool_and(a.tabla in ('planteles', 'jugadores')) and count(*) filter (where a.tabla = 'planteles') = 1
+         and bool_or(a.tabla = 'planteles' and a.accion = 'alta') then 'sumó a'
+    when bool_and(a.tabla in ('planteles', 'jugadores')) and count(*) filter (where a.tabla = 'planteles') = 1
+         and bool_or(a.tabla = 'planteles' and a.accion = 'baja') then 'sacó a'
     when max(a.usuario) = 'Importación' then 'importó'
     when bool_or(a.tabla = 'arbitros' and a.accion = 'baja') then 'unió árbitros'
     when bool_and(a.tabla = 'arbitros') and bool_and(a.accion = 'alta') then 'agregó al árbitro'

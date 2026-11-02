@@ -29,8 +29,8 @@ CDM.pantallas.jugador = (function () {
   }
 
   async function render(params) {
-    const [j, partidos, plantel] = await Promise.all([
-      CDM.api.jugador(params.id), CDM.api.jugadorPartidos(params.id), CDM.api.plantel()
+    const [j, partidos, plantel, puestos] = await Promise.all([
+      CDM.api.jugador(params.id), CDM.api.jugadorPartidos(params.id), CDM.api.plantel(), CDM.api.puestosJugadores().catch(() => ({}))
     ]);
     if (!j) {
       return '<section class="tarjeta vacio"><h2 class="vacio__titulo">No encontramos este jugador</h2>' +
@@ -44,7 +44,7 @@ CDM.pantallas.jugador = (function () {
     const conFormacion = partidos.filter((p) => p.rol).length;
     const nombreCompleto = (j.nombre ? j.nombre + ' ' : '') + j.apellido;
     const dato = (k, v) => '<div class="dato"><div class="dato__k">' + k + '</div><div class="dato__v">' + v + '</div></div>';
-    const linea = [j.apodo ? '"' + j.apodo + '"' : '', j.posicion, j.division ? (j.division === 'Ambas' ? 'Primera y Reserva' : j.division) : '',
+    const linea = [j.apodo ? '"' + j.apodo + '"' : '', ui.textoPuestos(puestos[j.jugador_id]), j.division ? (j.division === 'Ambas' ? 'Primera y Reserva' : j.division) : '',
       filas.length ? rangos(filas.map((x) => x.anio)) : ''].filter(Boolean).join(' · ');
 
     const filasMovil = filas.map((x, i) => CDM.filas.fila({

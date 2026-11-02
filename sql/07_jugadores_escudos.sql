@@ -5,6 +5,8 @@
 -- Qué se rompe: nada.
 -- - equipos.escudo es una columna nueva (vacía = se muestran las iniciales).
 -- - unir_jugadores y v_jugadores_resumen son nuevas.
+-- - Desde 15_puestos.sql (6.8.1): el resumen trae puestos (no posicion) y unir junta los
+--   puestos de los dos. Volver a correr este archivo después de 15.
 -- - El bucket "escudos" de Storage es nuevo y público (solo lectura para todos;
 --   subir o cambiar archivos, solo administradores).
 -- =====================================================================
@@ -49,7 +51,7 @@ select
   j.apellido,
   j.nombre,
   j.apodo,
-  j.posicion,
+  j.puestos,      -- 6.8.1: todos sus puestos (antes, un solo puesto en "posicion")
   j.division,
   j.notas,
   coalesce(array_agg(distinct a.anio order by a.anio) filter (where a.anio is not null), '{}') as anios,
@@ -118,7 +120,7 @@ begin
   update public.jugadores set
     nombre = coalesce(nullif(trim(q.nombre), ''), s.nombre),
     apodo = coalesce(nullif(trim(q.apodo), ''), s.apodo),
-    posicion = coalesce(nullif(trim(q.posicion), ''), s.posicion),
+    puestos = public.ordenar_puestos(q.puestos || s.puestos),   -- 6.8.1: la suma de los puestos de los dos
     division = case when q.division is null then s.division
                     when s.division is null or s.division = q.division then q.division
                     else 'Ambas' end,
