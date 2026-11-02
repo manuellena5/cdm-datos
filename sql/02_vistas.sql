@@ -95,19 +95,21 @@ select
   coalesce(inc.rojas, 0) as rojas,
   coalesce(inc.rojas, 0) > 0 as tiene_rojas,
   c.cancha,
-  c.arbitro,
+  ar.nombre       as arbitro,
   c.estado,
   c.completitud,
   c.fuente_ids,
   c.observaciones,
   c.publicado,
   c.creado_en,
-  c.actualizado_en
+  c.actualizado_en,
+  c.arbitro_id
 from calc c
 join torneos t  on t.torneo_id  = c.torneo_id
 join equipos el on el.equipo_id = c.local_id
 join equipos ev on ev.equipo_id = c.visitante_id
 join equipos er on er.equipo_id = c.rival_id
+left join arbitros ar on ar.arbitro_id = c.arbitro_id   -- 6.7.3: el nombre sale del código
 -- Goles del club propio: "Ruiz Díaz G. ×2, Villarruel D., en contra"
 left join lateral (
   select string_agg(x.etiqueta || case when x.n > 1 then ' ×' || x.n else '' end, ', ' order by x.primero, x.primer_id) as texto

@@ -15,8 +15,9 @@ Scripts para correr en el **SQL Editor** de Supabase, siempre en este orden:
 11. `11_fechas_libres_quien.sql` — `fechas_libres.creado_por` (quién marcó la fecha libre), completado solo por un trigger.
 12. `12_duplicados.sql` — posibles duplicados de jugadores: tabla `jugadores_distintos` (pares descartados), vistas `v_posibles_duplicados` y `v_datos_jugador`, y función `pasar_dato`.
 13. `13_cuerpos_tecnicos.sql` — tabla `cuerpos_tecnicos` (técnico e integrantes de cada torneo y categoría), con los datos que había en las observaciones. Después volver a correr `05` (el registro de cambios suma el cuerpo técnico).
+14. `14_arbitros.sql` — árbitros con código propio: tabla `arbitros`, `partidos.arbitro_id` en lugar del texto (pasa cada nombre a su código antes de borrar la columna vieja), `v_partidos` con el nombre, y funciones `crear_arbitro` y `unir_arbitros`. **Enseguida volver a correr `05`** (guardar un partido usa el código).
 
-En una base nueva el orden es 01 → 10, después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`), y al final `11`, `12`, `13` y otra vez `05`.
+En una base nueva el orden es 01 → 10, después `05`, `07` y `09` otra vez (`09` usa la tabla `planteles`), y al final `11`, `12`, `13`, `14` y otra vez `05`. En una base nueva `01` ya trae la tabla `arbitros` y `partidos.arbitro_id`: `14` solo suma permisos y funciones.
 
 En una base nueva, `01` ya incluye lo de `04` y `06`.
 

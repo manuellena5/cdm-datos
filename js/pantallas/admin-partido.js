@@ -262,7 +262,7 @@ CDM.pantallas.adminPartido = (function () {
           opcion('', 'No se sabe', c.inf) + opcion('G', 'Ganó', c.inf) + opcion('E', 'Empató', c.inf) + opcion('P', 'Perdió', c.inf) + '</select></div>'
         : '') + '</div>' +
       '<div class="fila-2"><div class="campo"><label for="hora-' + ci + '">Hora</label><input id="hora-' + ci + '" type="time" data-k="cats.' + ci + '.hora" value="' + e(c.hora) + '"></div>' +
-      '<div class="campo"><label for="arb-' + ci + '">Árbitro</label><input id="arb-' + ci + '" data-k="cats.' + ci + '.arbitro" value="' + e(c.arbitro) + '" autocomplete="off"></div></div>' +
+      '<div class="campo"><label for="arb-' + ci + '">Árbitro</label>' + buscadorTexto('arb-' + ci, 'cats.' + ci + '.arbitro', 'arbitros', c.arbitro, 'Árbitro de ' + c.categoria) + '</div></div>' +
       '</section>';
   }
 
@@ -306,7 +306,30 @@ CDM.pantallas.adminPartido = (function () {
     return html || '<li class="buscador__grupo" role="presentation">No hay estadios cargados</li>';
   }
 
-  const OPCIONES_LISTA = { estadios: opcionesEstadio };
+  // Árbitros (6.7.3): primero los que dirigieron a Mitre más recientemente, después todos.
+  const arbitroDe = (nombre) => {
+    const n = sinAcentos(nombre).replace(/\s+/g, ' ');
+    return n ? ctx.arbitros.find((a) => sinAcentos(a.nombre).replace(/\s+/g, ' ') === n) : null;
+  };
+
+  function opcionesArbitro(texto) {
+    const buscado = sinAcentos(texto).split(/\s+/).filter(Boolean);
+    const coincide = (t) => buscado.every((b) => sinAcentos(t).replace(/[.,]/g, ' ').split(/\s+/).some((p) => p.startsWith(b)));
+    const ultimo = {};
+    ctx.partidos.filter((p) => p.arbitro_id && p.fecha).forEach((p) => { if (!ultimo[p.arbitro_id] || p.fecha > ultimo[p.arbitro_id]) ultimo[p.arbitro_id] = p.fecha; });
+    const lista = ctx.arbitros.filter((a) => coincide(a.nombre));
+    const recientes = lista.filter((a) => ultimo[a.arbitro_id]).sort((a, b) => ultimo[b.arbitro_id].localeCompare(ultimo[a.arbitro_id])).slice(0, 6);
+    const ids = new Set(recientes.map((a) => a.arbitro_id));
+    const opcion = (a) => '<li role="option" class="buscador__opcion buscador__opcion--texto" data-valor="' + e(a.nombre) + '">' + e(a.nombre) +
+      (ultimo[a.arbitro_id] ? ' <span class="texto-2">· ' + e(ui.fechaCorta(ultimo[a.arbitro_id]) + '/' + ultimo[a.arbitro_id].slice(2, 4)) + '</span>' : '') + '</li>';
+    let html = (recientes.length ? '<li class="buscador__grupo" role="presentation">Dirigieron hace poco</li>' + recientes.map(opcion).join('') : '') +
+      (lista.length > recientes.length ? '<li class="buscador__grupo" role="presentation">Todos</li>' + lista.filter((a) => !ids.has(a.arbitro_id)).map(opcion).join('') : '');
+    const escrito = texto.trim();
+    if (escrito && !arbitroDe(escrito)) html += '<li role="option" class="buscador__opcion buscador__opcion--texto buscador__opcion--nuevo" data-valor="' + e(escrito) + '">+ Agregar árbitro nuevo "' + e(escrito) + '"</li>';
+    return html || '<li class="buscador__grupo" role="presentation">Todavía no hay árbitros cargados</li>';
+  }
+
+  const OPCIONES_LISTA = { estadios: opcionesEstadio, arbitros: opcionesArbitro };
 
   function montarListas(vista) {
     const ul = (input) => input.parentElement.querySelector('.buscador__lista');
@@ -565,7 +588,10 @@ CDM.pantallas.adminPartido = (function () {
       fuente_url: s.fuente_url.trim() || null, observaciones: s.observaciones.trim() || null,
       publicado: publicar, prueba: !!ctx.prueba,
       categorias: cats.map((c) => ({
-        categoria: c.categoria, partido_id: c.partido_id || null, hora: c.hora || null, arbitro: c.arbitro.trim() || null,
+        categoria: c.categoria, partido_id: c.partido_id || null, hora: c.hora || null,
+        // 6.7.3: el código del árbitro; si se escribió uno que no está, el nombre (la base lo crea)
+        arbitro_id: arbitroDe(c.arbitro) ? arbitroDe(c.arbitro).arbitro_id : null,
+        arbitro: arbitroDe(c.arbitro) ? null : (c.arbitro || '').trim() || null,
         estado: c.estado || null, resultado_informado: c.gf == null ? (c.inf || null) : null,
         gf: c.gf, gc: c.gc,
         penales_favor: c.gf != null && c.gf === c.gc ? c.pf : null, penales_contra: c.gf != null && c.gf === c.gc ? c.pc : null,
@@ -773,10 +799,11 @@ CDM.pantallas.adminPartido = (function () {
     const acceso = await CDM.admin.verificarAcceso();
     if (!acceso.admin) { ctx = null; return acceso.html; }
     const api = CDM.api.admin;
-    const [partidos, equipos, torneos, jugadores, recientes, conFormacion] = await Promise.all([
-      api.partidos(), api.equipos(), api.torneos(), api.jugadores(), api.goleadoresRecientes(), api.partidosConFormacion()
+    const [partidos, equipos, torneos, jugadores, recientes, conFormacion, arbitros] = await Promise.all([
+      api.partidos(), api.equipos(), api.torneos(), api.jugadores(), api.goleadoresRecientes(), api.partidosConFormacion(),
+      api.arbitros().catch(() => [])
     ]);
-    ctx = { admin: acceso.admin, partidos, equipos, torneos, jugadores, recientes, conFormacion: new Set(conFormacion),
+    ctx = { admin: acceso.admin, partidos, equipos, torneos, jugadores, recientes, conFormacion: new Set(conFormacion), arbitros,
       nombresRival: {}, prueba: query.get('prueba') === '1' };
 
     let torneoId, instancia, serie = '';

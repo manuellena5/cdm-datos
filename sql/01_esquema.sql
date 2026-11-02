@@ -55,6 +55,15 @@ create table if not exists jugadores (
   notas       text
 );
 
+-- ---------- Árbitros (6.7.3) ----------
+create table if not exists arbitros (
+  arbitro_id  text primary key,                          -- 'A001'
+  nombre      text not null constraint arbitros_nombre_chk check (trim(nombre) <> ''),
+  notas       text,
+  creado_en   timestamptz not null default now()
+);
+create unique index if not exists arbitros_nombre_unico on arbitros (lower(trim(nombre)));
+
 -- ---------- Partidos ----------
 create table if not exists partidos (
   partido_id           text primary key,                -- '2026C-F07-P'
@@ -78,7 +87,7 @@ create table if not exists partidos (
   penales_visitante    int  check (penales_visitante >= 0),
   resultado_informado  text constraint partidos_resultado_informado_chk check (resultado_informado in ('G', 'E', 'P')),
   cancha               text,
-  arbitro              text,
+  arbitro_id           text references arbitros (arbitro_id) on update cascade,
   estado               text not null default 'Jugado'
                        constraint partidos_estado_chk check (estado in (
                          'Jugado', 'Programado', 'Suspendido', 'Postergado', 'Ganado por mesa', 'Sin dato')),

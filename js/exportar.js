@@ -10,7 +10,7 @@ CDM.exportar = (function () {
     ['Partidos', 'partidos', 'partido_id', [
       ['partido_id'], ['torneo_id'], ['fase'], ['fecha_nro'], ['fecha_partido', 'fecha'], ['hora'], ['categoria'], ['local_id'], ['visitante_id'],
       ['goles_local'], ['goles_visitante'], ['resultado_informado'], ['penales_local'], ['penales_visitante'], ['zona'], ['serie'],
-      ['cancha'], ['arbitro'], ['estado'], ['completitud'], ['fuente_id', 'fuente_ids'], ['observaciones'], ['publicado']]],
+      ['cancha'], ['arbitro_id'], ['arbitro', '@arbitro'], ['estado'], ['completitud'], ['fuente_id', 'fuente_ids'], ['observaciones'], ['publicado']]],
     ['Goles', 'goles', 'gol_id', [['gol_id'], ['partido_id'], ['equipo_id'], ['jugador_id'], ['nombre_en_fuente'], ['minuto'], ['tiempo'], ['tipo'], ['observaciones']]],
     ['Incidencias', 'incidencias', 'id', [['partido_id'], ['equipo_id'], ['jugador_id'], ['nombre_en_fuente'], ['tipo'], ['minuto'], ['tiempo'], ['descripcion']]],
     ['Formaciones', 'formaciones', 'partido_id', [['partido_id'], ['jugador_id'], ['rol'], ['nro_lista'], ['camiseta'], ['minuto_entra'], ['minuto_sale'], ['capitan'], ['observaciones']]],
@@ -22,6 +22,7 @@ CDM.exportar = (function () {
     ['Fechas_libres', 'fechas_libres', 'torneo_id', [['torneo_id'], ['fecha_nro'], ['motivo']]],
     ['Posiciones', 'posiciones', 'id', [['torneo_id'], ['categoria'], ['tras_fecha'], ['posicion'], ['pts'], ['PJ', 'pj'], ['G', 'g'], ['E', 'e'], ['P', 'p'], ['DG', 'dg'], ['fuente_id', 'fuente_ids'], ['observaciones']]],
     ['Goleadores_Liga', 'goleadores_liga', 'id', [['torneo_id'], ['categoria'], ['jugador_id'], ['nombre_en_boletin'], ['goles'], ['puesto_liga', 'puesto'], ['actualizado'], ['fuente_id', 'fuente_ids']]],
+    ['Arbitros', 'arbitros', 'arbitro_id', [['arbitro_id'], ['nombre'], ['notas']]],
     ['Fuentes', 'fuentes', 'fuente_id', [['fuente_id'], ['medio'], ['fecha_publicacion'], ['que_cubre'], ['url']]]
   ];
   const FECHAS = new Set(['fecha', 'fecha_resolucion', 'fecha_publicacion', 'actualizado']);
@@ -55,6 +56,14 @@ CDM.exportar = (function () {
   async function excel(avance) {
     await cargarLibreria();
     const libro = window.XLSX.utils.book_new();
+    // La hoja Partidos lleva también el nombre del árbitro (en la base se guarda su código)
+    let arbitros = {};
+    try {
+      arbitros = Object.fromEntries((await CDM.api.admin.arbitros()).map((a) => [a.arbitro_id, a.nombre]));
+    } catch (err) {
+      throw new Error('Sin conexión. No se pudo armar el Excel; probá de nuevo.');
+    }
+    const calculadas = { '@arbitro': (f) => arbitros[f.arbitro_id] || null };
     for (const [hoja, tabla, orden, columnas] of HOJAS) {
       if (avance) avance(hoja);
       let filas;
@@ -63,7 +72,8 @@ CDM.exportar = (function () {
       } catch (err) {
         throw new Error('Sin conexión. No se pudo armar el Excel; probá de nuevo.');
       }
-      const datos = filas.map((f) => Object.fromEntries(columnas.map(([excelCol, baseCol]) => [excelCol, valor(baseCol || excelCol, f[baseCol || excelCol])])));
+      const datos = filas.map((f) => Object.fromEntries(columnas.map(([excelCol, baseCol]) => [excelCol,
+        calculadas[baseCol] ? calculadas[baseCol](f) : valor(baseCol || excelCol, f[baseCol || excelCol])])));
       const ws = window.XLSX.utils.json_to_sheet(datos, { header: columnas.map((c) => c[0]), cellDates: true, dateNF: 'dd/mm/yyyy' });
       ws['!cols'] = columnas.map(([c]) => ({ wch: Math.max(10, Math.min(40, c.length + 4)) }));
       window.XLSX.utils.book_append_sheet(libro, ws, hoja);

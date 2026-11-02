@@ -317,7 +317,7 @@ def leer_excel(ruta, club_propio):
             goles_local=lx.entero(r, 'goles_local', minimo=0), goles_visitante=lx.entero(r, 'goles_visitante', minimo=0),
             penales_local=lx.entero(r, 'penales_local', minimo=0), penales_visitante=lx.entero(r, 'penales_visitante', minimo=0),
             resultado_informado=lx.de_lista(r, 'resultado_informado', RESULTADOS),
-            cancha=lx.texto(r, 'cancha'), arbitro=lx.texto(r, 'arbitro'),
+            cancha=lx.texto(r, 'cancha'), arbitro=lx.texto(r, 'arbitro'), arbitro_id=lx.texto(r, 'arbitro_id'),
             estado=lx.de_lista(r, 'estado', ESTADOS, defecto='Jugado'),
             completitud=lx.de_lista(r, 'completitud', COMPLETITUDES, defecto='Resultado'),
             fuente_ids=lx.lista_ids(r, 'fuente_id'), observaciones=lx.texto(r, 'observaciones'),
@@ -493,6 +493,40 @@ def normalizar(v):
     return v
 
 
+def nombre_arbitro(texto):
+    """Igual que nombre_arbitro() de sql/14_arbitros.sql: 'PARIANI AGUSTÍN' → 'Agustín Pariani'."""
+    t = ' '.join((texto or '').split())
+    if not t:
+        return None
+    if t == t.upper():
+        partes = t.split(' ')
+        if len(partes) == 2:
+            return f'{partes[1].capitalize()} {partes[0].capitalize()}'
+        return t.title()
+    return t
+
+
+def resolver_arbitros(d, base):
+    """El Excel trae el nombre del árbitro (o su código, si salió de "Exportar a Excel"); en la base va el código.
+    Los nombres que no están se crean con el código siguiente (A001, A002…)."""
+    existentes = base.leer('arbitros', 'arbitro_id,nombre')
+    por_nombre = {a['nombre'].strip().lower(): a['arbitro_id'] for a in existentes}
+    numeros = [int(a['arbitro_id'][1:]) for a in existentes if a['arbitro_id'][1:].isdigit()]
+    siguiente = max(numeros, default=0) + 1
+    nuevos = []
+    for p in d['partidos']:
+        nombre = nombre_arbitro(p.pop('arbitro'))
+        if p.get('arbitro_id') or not nombre:
+            continue
+        clave = nombre.lower()
+        if clave not in por_nombre:
+            por_nombre[clave] = f'A{siguiente:03d}'
+            siguiente += 1
+            nuevos.append(dict(arbitro_id=por_nombre[clave], nombre=nombre))
+        p['arbitro_id'] = por_nombre[clave]
+    d['arbitros'] = nuevos
+
+
 def igual(excel, base):
     return all(normalizar(excel[k]) == normalizar(base.get(k)) for k in excel)
 
@@ -544,11 +578,15 @@ def planificar(d, base):
     plan['sanciones'] = dict(reemplazar=cambia, filas=d['sanciones'], borradas=len(en_base) if cambia else 0)
 
     plan['_borradores'] = [p['partido_id'] for p in base.leer('partidos', 'partido_id', {'publicado': 'eq.false'})]
+    plan['_arbitros_nuevos'] = d.get('arbitros', [])
     return plan
 
 
 def mostrar_plan(plan):
     print('\nQué cambiaría en la base:')
+    if plan['_arbitros_nuevos']:
+        print(f'  árbitros nuevos: {len(plan["_arbitros_nuevos"])} ('
+              + ', '.join(a['nombre'] for a in plan['_arbitros_nuevos'][:5]) + ')')
     print(f'  {"tabla":<17}{"nuevas":>8}{"cambian":>9}{"iguales":>9}   solo en la base (no se borran)')
     for tabla in TABLAS_PRINCIPALES:
         p = plan[tabla]
@@ -568,6 +606,9 @@ def mostrar_plan(plan):
 # Escritura
 # ---------------------------------------------------------------------
 def aplicar(plan, base):
+    if plan['_arbitros_nuevos']:
+        base.upsert('arbitros', plan['_arbitros_nuevos'], ('arbitro_id',))
+        print(f'  arbitros: {len(plan["_arbitros_nuevos"])} nuevos')
     for tabla in TABLAS_PRINCIPALES:
         filas = plan[tabla]['nuevas'] + plan[tabla]['cambian']
         if filas:
@@ -669,6 +710,7 @@ def main():
         sys.exit(1)
     print('Validación OK.')
 
+    resolver_arbitros(d, base)
     plan = planificar(d, base)
     mostrar_plan(plan)
 

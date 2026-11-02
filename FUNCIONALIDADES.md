@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.21.0 — Fase 6.7.3 (árbitros con código propio)
+- Cada árbitro tiene un **código** (A001, A002…) y los partidos guardan el código, no el nombre: corregir el nombre lo cambia en todos sus partidos, y dos formas de escribir al mismo se unen en uno. Los nombres que estaban en los partidos pasaron a la lista ("PARIANI AGUSTÍN" quedó "Agustín Pariani").
+- En la **carga del partido**, el Árbitro de **cada categoría** es un desplegable con búsqueda: primero los que dirigieron hace poco (con la fecha), después todos. Si se escribe uno que no está, "+ Agregar árbitro nuevo …" y se crea al guardar.
+- **Administrar → Árbitros**: lista con cantidad de partidos y último partido; el nombre se corrige ahí mismo (se guarda al salir del campo). **Unir**: tildar dos (o tocar "Unir" en un par **parecido**, como "Gastón Ebel / Gastón Evel"), elegir cuál queda, y los partidos del otro pasan a ese. "+ Árbitro" para sumar uno nuevo.
+- Exportar a Excel: la hoja Partidos lleva el código y el nombre del árbitro, y hay una hoja Arbitros. La importación del Excel crea los árbitros que falten.
+- Registro de cambios: "agregó al árbitro …", "corrigió al árbitro …" y "unió al árbitro … con …".
+
 ## v0.20.0 — Fase 6.7.2 (estadio en la carga del partido)
 - En la carga del partido, el **Estadio** viene del equipo local (Mitre de local, el rival de visitante); un partido nuevo arranca con el de Mitre.
 - El campo es un **desplegable con búsqueda**: primero el estadio del local, después los de cada equipo ("Centenario · Trebolense") y los que se usaron en otros partidos. Para una cancha neutral se elige otro o se escribe uno nuevo ("Usar …").

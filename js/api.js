@@ -235,7 +235,7 @@ CDM.api = (function () {
     },
     admin: {
       partidos: () => todas(() => cliente.from('v_partidos')
-        .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en,observaciones').order('partido_id')),
+        .select(COLUMNAS_PARTIDO + ',publicado,actualizado_en,observaciones,arbitro_id').order('partido_id')),
       equipos: () => todas(() => cliente.from('equipos').select('equipo_id,nombre,nombre_corto,localidad,cancha,escudo,es_propio').order('nombre_corto')),
       // Datos de cada club (6.7.1)
       editarEquipo: (id, campos) => escribir(cliente.from('equipos').update(campos).eq('equipo_id', id).select()),
@@ -275,6 +275,11 @@ CDM.api = (function () {
       jugadoresResumen: () => todas(() => cliente.from('v_jugadores_resumen').select('*').order('apellido').order('nombre')),
       editarJugador: (id, campos) => escribir(cliente.from('jugadores').update(campos).eq('jugador_id', id).select()),
       unirJugadores: (queda, sobra) => llamar('unir_jugadores', { p_queda: queda, p_sobra: sobra }),
+      // Árbitros con código (6.7.3)
+      arbitros: () => todas(() => cliente.from('arbitros').select('arbitro_id,nombre,notas').order('nombre')),
+      editarArbitro: (id, campos) => escribir(cliente.from('arbitros').update(campos).eq('arbitro_id', id).select()),
+      crearArbitro: (nombre) => llamar('crear_arbitro', { p_nombre: nombre }),
+      unirArbitros: (queda, sobra) => llamar('unir_arbitros', { p_queda: queda, p_sobra: sobra }),
       // Posibles duplicados (6.5.3): pares con el mismo apellido, pendientes y descartados
       posiblesDuplicados: () => todas(() => cliente.from('v_posibles_duplicados').select('*').order('jugador_a').order('jugador_b')),
       datosJugadores: (ids) => todas(() => cliente.from('v_datos_jugador').select('*').in('jugador_id', ids).order('partido_id')),

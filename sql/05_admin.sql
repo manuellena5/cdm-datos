@@ -97,7 +97,8 @@ begin
     auth.uid(),
     coalesce(v_usuario, 'Importación'),
     tg_table_name,
-    coalesce(v_fila ->> 'gol_id', v_fila ->> 'id', v_fila ->> 'partido_id', v_fila ->> 'jugador_id', v_fila ->> 'equipo_id'),
+    coalesce(v_fila ->> 'gol_id', v_fila ->> 'id', v_fila ->> 'partido_id', v_fila ->> 'jugador_id', v_fila ->> 'equipo_id',
+             v_fila ->> 'arbitro_id'),
     v_fila ->> 'partido_id',
     case tg_op when 'INSERT' then 'alta' when 'UPDATE' then 'cambio' else 'baja' end,
     v_antes,
@@ -126,6 +127,9 @@ create trigger jugadores_auditoria after insert or update or delete on jugadores
 drop trigger if exists equipos_auditoria on equipos;
 create trigger equipos_auditoria after insert or update or delete on equipos
   for each row execute function registrar_cambio();
+drop trigger if exists arbitros_auditoria on arbitros;
+create trigger arbitros_auditoria after insert or update or delete on arbitros
+  for each row execute function registrar_cambio();
 
 -- Registro de cambios en lenguaje simple: una fila por guardado.
 drop view if exists v_cambios;
@@ -152,6 +156,12 @@ select
       'nombre', coalesce(a.despues, a.antes) ->> 'nombre')
     order by a.accion, a.id) filter (where a.tabla = 'jugadores'), '[]'::jsonb) as jugadores,
   (array_agg(coalesce(a.despues, a.antes) ->> 'nombre_corto') filter (where a.tabla = 'equipos'))[1] as equipo,
+  -- árbitros tocados (alta, cambio de nombre o unión), con el nombre como quedó
+  coalesce(jsonb_agg(jsonb_build_object('accion', a.accion, 'nombre', coalesce(a.despues, a.antes) ->> 'nombre')
+    order by a.accion, a.id) filter (where a.tabla = 'arbitros'), '[]'::jsonb) as arbitros,
+  -- al unir árbitros: el código que quedó en los partidos
+  (array_agg(a.despues ->> 'arbitro_id') filter (where a.tabla = 'partidos'
+    and (a.antes ->> 'arbitro_id') is distinct from (a.despues ->> 'arbitro_id')))[1] as arbitro_destino,
   -- lista de jugadores o cuerpo técnico tocados (planteles, cuerpos_tecnicos): torneo y categoría
   (array_agg(jsonb_build_object('torneo_id', coalesce(a.despues, a.antes) ->> 'torneo_id',
       'categoria', coalesce(a.despues, a.antes) ->> 'categoria')) filter (where a.tabla in ('planteles', 'cuerpos_tecnicos')))[1] as plantel,
@@ -163,6 +173,9 @@ select
     when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'alta') then 'sumó a'
     when bool_and(a.tabla = 'planteles') and count(*) = 1 and bool_and(a.accion = 'baja') then 'sacó a'
     when max(a.usuario) = 'Importación' then 'importó'
+    when bool_or(a.tabla = 'arbitros' and a.accion = 'baja') then 'unió árbitros'
+    when bool_and(a.tabla = 'arbitros') and bool_and(a.accion = 'alta') then 'agregó al árbitro'
+    when bool_and(a.tabla = 'arbitros') then 'corrigió al árbitro'
     when bool_or(a.tabla = 'partidos' and a.accion = 'baja') then 'borró'
     when bool_or(a.tabla = 'partidos' and (a.despues ->> 'publicado')::boolean
                  and coalesce((a.antes ->> 'publicado')::boolean, false) = false) then 'publicó'
@@ -180,9 +193,11 @@ select
 from auditoria a
 group by a.transaccion
 )
-select b.*, j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '') as plantel_jugador_nombre
+select b.*, j.apellido || coalesce(', ' || nullif(trim(j.nombre), ''), '') as plantel_jugador_nombre,
+  ar.nombre as arbitro_destino_nombre
 from base b
-left join jugadores j on j.jugador_id = b.plantel_jugador;
+left join jugadores j on j.jugador_id = b.plantel_jugador
+left join arbitros ar on ar.arbitro_id = b.arbitro_destino;
 grant select on v_cambios to authenticated;
 
 -- ---------- Funciones de carga ----------
@@ -233,7 +248,8 @@ $$;
 -- Guarda Primera y Reserva de un partido en una sola transacción.
 -- payload: { torneo_id, fase, fecha_nro, serie, zona, rival_id, condicion ('L'/'V'), fecha, cancha,
 --            fuente_url, observaciones, publicado, prueba,
---            categorias: [ { categoria, partido_id?, hora, arbitro, estado?, gf, gc, penales_favor, penales_contra,
+--            categorias: [ { categoria, partido_id?, hora, arbitro_id (o arbitro: nombre nuevo, se crea), estado?, gf, gc,
+--                            penales_favor, penales_contra,
 --                            goles: [ { lado ('propio'/'rival'), jugador_id, nombre, minuto, tiempo, tipo } ],
 --                            incidencias: [ { lado, jugador_id, nombre, tipo, minuto, descripcion } ] } ] }
 -- Si gf y gc vienen vacíos, el partido queda Programado (sirve para editar la programación).
@@ -319,7 +335,7 @@ begin
 
     insert into public.partidos as p (
       partido_id, torneo_id, fase, zona, serie, fecha_nro, fecha, hora, categoria, local_id, visitante_id,
-      goles_local, goles_visitante, penales_local, penales_visitante, resultado_informado, cancha, arbitro, estado, completitud,
+      goles_local, goles_visitante, penales_local, penales_visitante, resultado_informado, cancha, arbitro_id, estado, completitud,
       fuente_ids, observaciones, publicado)
     values (
       v_id, v_torneo, v_fase, nullif(payload ->> 'zona', ''), v_serie, v_fecha_nro,
@@ -329,7 +345,10 @@ begin
       case when v_local then (v_cat ->> 'penales_favor')::int else (v_cat ->> 'penales_contra')::int end,
       case when v_local then (v_cat ->> 'penales_contra')::int else (v_cat ->> 'penales_favor')::int end,
       v_inf,
-      nullif(payload ->> 'cancha', ''), nullif(v_cat ->> 'arbitro', ''), v_estado, 'Sin dato',
+      nullif(payload ->> 'cancha', ''),
+      coalesce(nullif(v_cat ->> 'arbitro_id', ''),
+               case when public.nombre_arbitro(v_cat ->> 'arbitro') is not null then public.crear_arbitro(v_cat ->> 'arbitro') end),
+      v_estado, 'Sin dato',
       case when v_fuente is null then '{}' else array[v_fuente] end,
       nullif(payload ->> 'observaciones', ''), v_publicado)
     on conflict (partido_id) do update set
@@ -338,7 +357,7 @@ begin
       categoria = excluded.categoria, local_id = excluded.local_id, visitante_id = excluded.visitante_id,
       goles_local = excluded.goles_local, goles_visitante = excluded.goles_visitante,
       penales_local = excluded.penales_local, penales_visitante = excluded.penales_visitante,
-      resultado_informado = excluded.resultado_informado, cancha = excluded.cancha, arbitro = excluded.arbitro, estado = excluded.estado,
+      resultado_informado = excluded.resultado_informado, cancha = excluded.cancha, arbitro_id = excluded.arbitro_id, estado = excluded.estado,
       fuente_ids = case when v_fuente is null or v_fuente = any(p.fuente_ids) then p.fuente_ids
                         else p.fuente_ids || v_fuente end,
       observaciones = excluded.observaciones, publicado = excluded.publicado;

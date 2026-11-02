@@ -57,7 +57,8 @@ CDM.admin = (function () {
     ['resultados', 'Resultados', '#/admin/resultados'],
     ['planteles', 'Planteles', '#/admin/planteles'],
     ['jugadores', 'Jugadores', '#/admin/jugadores'],
-    ['equipos', 'Equipos', '#/admin/equipos']
+    ['equipos', 'Equipos', '#/admin/equipos'],
+    ['arbitros', 'Árbitros', '#/admin/arbitros']
   ];
 
   function menu(actual) {
@@ -348,6 +349,11 @@ CDM.pantallas.admin = (function () {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (c.plantel_jugador_nombre || 'un jugador') + (c.accion === 'sumó a' ? ' al ' : ' del ') +
           (t ? t.nombre : 'torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
+      } else if (c.accion === 'unió árbitros') {
+        const baja = (c.arbitros || []).find((a) => a.accion === 'baja');
+        que = 'unió al árbitro ' + (baja ? baja.nombre : '') + (c.arbitro_destino_nombre ? ' con ' + c.arbitro_destino_nombre : '');
+      } else if (c.accion === 'agregó al árbitro' || c.accion === 'corrigió al árbitro') {
+        que = c.accion + ' ' + ((c.arbitros || [])[0] ? c.arbitros[0].nombre : '');
       } else if (c.accion === 'actualizó el cuerpo técnico de') {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
