@@ -10,6 +10,8 @@
 --   planteles.posicion), se suma a jugadores.puestos. Nunca se quita uno.
 -- - planteles.posicion solo acepta los 4 puestos (los datos de hoy ya lo cumplen).
 -- - v_puestos_jugador: por cada puesto, en cuántos torneos lo jugó y el último.
+-- - (6.8.3) Un puesto se puede sumar o quitar a mano desde la pantalla del
+--   jugador, pero no se puede quitar uno que algún plantel usa.
 -- Qué se rompería y cómo se evita:
 -- - v_jugadores_resumen (07) leía jugadores.posicion: se borra acá y 07 la
 --   vuelve a crear con puestos y ultimo_puesto. Hasta correr 07, la pantalla
@@ -89,6 +91,43 @@ $$;
 drop trigger if exists planteles_sumar_puesto on planteles;
 create trigger planteles_sumar_puesto after insert or update of posicion on planteles
   for each row execute function sumar_puesto();
+
+-- ---------------------------------------------------------------------
+-- No se puede quitar un puesto que algún plantel usa (6.8.3): primero se
+-- cambia en esos planteles. Los puestos quedan siempre en el mismo orden.
+-- ---------------------------------------------------------------------
+create or replace function controlar_puestos()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_puesto text;
+  v_torneos text;
+  v_cuantos int;
+begin
+  select x.posicion, regexp_replace(string_agg(x.nombre, ', ' order by x.orden), ', ([^,]*)$', ' y \1'), count(*)
+  into v_puesto, v_torneos, v_cuantos
+  from (select distinct l.posicion, t.nombre, t.orden
+        from public.planteles l
+        join public.torneos t on t.torneo_id = l.torneo_id
+        where l.jugador_id = new.jugador_id
+          and l.posicion = any (old.puestos) and not (l.posicion = any (new.puestos))) x
+  group by x.posicion
+  order by x.posicion
+  limit 1;
+  if v_puesto is not null then
+    raise exception 'CDM: No se puede quitar %: lo usa en %. Cambialo primero en %.', v_puesto, v_torneos,
+      case when v_cuantos = 1 then 'ese plantel' else 'esos planteles' end;
+  end if;
+  new.puestos := public.ordenar_puestos(new.puestos);
+  return new;
+end;
+$$;
+drop trigger if exists jugadores_controlar_puestos on jugadores;
+create trigger jugadores_controlar_puestos before update of puestos on jugadores
+  for each row execute function controlar_puestos();
 
 -- ---------------------------------------------------------------------
 -- Uso de cada puesto: en cuántos torneos y cuál fue el último.

@@ -31,7 +31,12 @@ CDM.pantallas.planteles = (function () {
     });
     // Por puesto (el del torneo o, si no hay, el último puesto conocido del jugador) y dentro de cada puesto por apellido
     const lista = [...porJugador.values()].sort((a, b) => a.jugador.localeCompare(b.jugador, 'es'));
-    lista.forEach((j) => { j.puesto = j.posicion || ui.ultimoPuesto(puestos[j.jugador_id]); });
+    lista.forEach((j) => {
+      j.puesto = j.posicion || ui.ultimoPuesto(puestos[j.jugador_id]);
+      // 6.8.3: sus otros puestos, el más reciente primero
+      j.otros = (puestos[j.jugador_id] || []).map((x) => x.puesto).filter((p) => p !== j.puesto);
+    });
+    const tambien = (j) => (j.otros.length ? 'también ' + ui.unir(j.otros) : '');
     const grupos = ui.porPuesto(lista, (j) => j.puesto);
     const hayMinutos = lista.some((j) => j.conMinutos);
     const hayCamisetas = lista.some((j) => j.camiseta != null);
@@ -47,7 +52,8 @@ CDM.pantallas.planteles = (function () {
 
     const titulo = (sel.torneo ? sel.torneo.nombre : 'Año ' + sel.anio) + ' · ' + categoria;
     const filaPc = (j) => '<tr><th scope="row">' + (hayCamisetas ? '<span class="lista__camiseta">' + (j.camiseta ?? '') + '</span>' : '') +
-      '<a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' + e(j.jugador) + '</a></th>' +
+      '<a href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">' + e(j.jugador) + '</a>' +
+      (j.otros.length ? ' <span class="texto-2 lista__tambien">· ' + e(tambien(j)) + '</span>' : '') + '</th>' +
       '<td class="centro">' + j.partidos + '</td><td class="centro">' + j.titular + '</td><td class="centro">' + j.entro + '</td>' +
       '<td class="centro">' + j.convocado + '</td>' + (hayMinutos ? '<td class="centro">' + (j.conMinutos ? j.minutos : '–') + '</td>' : '') +
       '<td class="total centro">' + j.goles + '</td><td class="centro">' + j.amarillas + '</td><td class="centro">' + j.rojas + '</td></tr>';
@@ -60,6 +66,7 @@ CDM.pantallas.planteles = (function () {
       arriba: '<span class="fila__nombre fila__nombre--corto">' + e(j.jugador) + '</span>' +
         (j.capitan ? '<span class="fila__capitan" title="Capitán">C</span>' : ''),
       abajo: CDM.filas.chips([
+        tambien(j),
         j.partidos ? ui.plural(j.partidos, 'jugado', 'jugados') : '',
         j.titular ? j.titular + ' de titular' : '',
         j.entro ? 'entró ' + ui.plural(j.entro, 'vez', 'veces') : '',

@@ -15,7 +15,7 @@ CDM.exportar = (function () {
     ['Incidencias', 'incidencias', 'id', [['partido_id'], ['equipo_id'], ['jugador_id'], ['nombre_en_fuente'], ['tipo'], ['minuto'], ['tiempo'], ['descripcion']]],
     ['Formaciones', 'formaciones', 'partido_id', [['partido_id'], ['jugador_id'], ['rol'], ['nro_lista'], ['camiseta'], ['minuto_entra'], ['minuto_sale'], ['capitan'], ['observaciones']]],
     ['Sanciones', 'sanciones', 'id', [['jugador_id'], ['nombre_en_fuente'], ['torneo_id'], ['fecha_resolucion'], ['fechas_suspension'], ['motivo'], ['boletin_nro'], ['fuente_id', 'fuente_ids']]],
-    ['Jugadores', 'jugadores', 'jugador_id', [['jugador_id'], ['apellido'], ['nombre'], ['apodo'], ['puestos'], ['division'], ['fuente_id', 'fuente_ids'], ['notas']]],
+    ['Jugadores', 'jugadores', 'jugador_id', [['jugador_id'], ['apellido'], ['nombre'], ['apodo'], ['puestos', '@puestos'], ['division'], ['fuente_id', 'fuente_ids'], ['notas']]],
     ['Equipos', 'equipos', 'equipo_id', [['equipo_id'], ['nombre'], ['nombre_corto'], ['localidad'], ['cancha'], ['notas'], ['escudo']]],
     ['Torneos', 'torneos', 'torneo_id', [['torneo_id'], ['anio'], ['nombre'], ['formato'], ['campeon'], ['notas'], ['fuente_id', 'fuente_ids'], ['tipo'], ['competicion'], ['fechas_regular']]],
     ['Planteles', 'planteles', 'torneo_id', [['torneo_id'], ['categoria'], ['jugador_id'], ['camiseta'], ['posicion'], ['notas']]],
@@ -63,7 +63,12 @@ CDM.exportar = (function () {
     } catch (err) {
       throw new Error('Sin conexión. No se pudo armar el Excel; probá de nuevo.');
     }
-    const calculadas = { '@arbitro': (f) => arbitros[f.arbitro_id] || null };
+    // y la hoja Jugadores, los puestos con el más reciente primero
+    const puestos = await CDM.api.puestosJugadores().catch(() => ({}));
+    const calculadas = {
+      '@arbitro': (f) => arbitros[f.arbitro_id] || null,
+      '@puestos': (f) => (puestos[f.jugador_id] ? puestos[f.jugador_id].map((x) => x.puesto) : f.puestos || []).join(',') || null
+    };
     for (const [hoja, tabla, orden, columnas] of HOJAS) {
       if (avance) avance(hoja);
       let filas;

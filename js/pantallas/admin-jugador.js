@@ -1,5 +1,5 @@
 // Jugador en modo administrador (#/admin/jugadores/J060?cat=P) — PLAN 6.6.4, mockup 17.
-// A la izquierda, los datos del jugador (con el puesto habitual); a la derecha, "Torneos que jugó":
+// A la izquierda, los datos del jugador (con sus puestos, 6.8.3); a la derecha, "Torneos que jugó":
 // cada casillero suma o saca al jugador de la lista de ese torneo (tabla planteles), la misma que usa
 // Administrar → Planteles. Lo que tiene goles, tarjetas o formación siempre cuenta y no se quita desde acá.
 window.CDM = window.CDM || {};
@@ -107,6 +107,52 @@ CDM.pantallas.adminJugador = (function () {
       '<span>' + e(otros) + '</span><a class="enlace" href="#/jugador/' + encodeURIComponent(j.jugador_id) + '">Ver ficha pública</a></div>';
   }
 
+  // Puestos (6.8.3): los cuatro como chips; marcados los del jugador, con su uso. Tocar uno lo suma o lo quita.
+  function puestosHtml() {
+    const de = Object.fromEntries(ctx.puestos.map((x) => [x.puesto, x]));
+    return '<span class="campo__etiqueta" id="ja-puestos-titulo">Puestos</span>' +
+      '<div class="jugador-admin__puestos" role="group" aria-labelledby="ja-puestos-titulo">' + ui.PUESTOS.map((p) => {
+        const x = de[p];
+        const uso = x ? (x.torneos ? ui.plural(x.torneos, 'torneo', 'torneos') : 'sin torneos') : '';
+        return '<button type="button" class="chip-puesto" data-puesto="' + e(p) + '" aria-pressed="' + !!x + '"' +
+          (x ? ' aria-label="' + e(p + ', ' + uso + '. Tocá para quitarlo') + '"' : ' aria-label="' + e('Sumar ' + p) + '"') + '>' +
+          (x ? '<span aria-hidden="true">✓</span> ' : '<span aria-hidden="true">+</span> ') + e(p) +
+          (x ? ' <span class="chip-puesto__uso">· ' + e(uso) + '</span>' : '') + '</button>';
+      }).join('') + '</div>' +
+      '<p class="nota">Se suman solos cuando un plantel le pone un puesto. Tocá uno para sumarlo o quitarlo.</p>';
+  }
+
+  // Torneos donde un plantel le pone ese puesto ("Apertura 2018 y Clausura 2019")
+  function torneosConPuesto(puesto) {
+    const t = ctx.filas.filter((x) => x.posicion === puesto).sort((a, b) => a.torneo_orden - b.torneo_orden).map((x) => x.torneo);
+    return [...new Set(t)];
+  }
+
+  async function tocarPuesto(boton) {
+    const p = boton.dataset.puesto;
+    const tiene = ctx.puestos.some((x) => x.puesto === p);
+    if (tiene) {
+      const usado = torneosConPuesto(p);
+      if (usado.length) {
+        return error('No se puede quitar ' + p + ': lo usa en ' + ui.unir(usado) + '. Cambialo primero en ' + (usado.length === 1 ? 'ese plantel.' : 'esos planteles.'));
+      }
+    }
+    const nuevos = ui.PUESTOS.filter((x) => (x === p ? !tiene : ctx.puestos.some((y) => y.puesto === x)));
+    boton.disabled = true;
+    try {
+      await CDM.api.admin.editarJugador(ctx.jugador.jugador_id, { puestos: nuevos });
+      ctx.puestos = (await CDM.api.puestosJugadores())[ctx.jugador.jugador_id] || [];
+      error('');
+      vistaActual.querySelector('#ja-puestos').innerHTML = puestosHtml();
+      const b = vistaActual.querySelector('[data-puesto="' + CSS.escape(p) + '"]');
+      if (b) b.focus();
+      estado('ja-estado', (tiene ? 'Quitado ' : 'Sumado ') + p + '.');
+    } catch (err) {
+      boton.disabled = false;
+      error(err.message);
+    }
+  }
+
   function datosHtml() {
     const j = ctx.jugador;
     const campo = (k, etiqueta, extra) => '<div class="campo"><label for="ja-' + k + '">' + etiqueta + '</label>' +
@@ -115,10 +161,7 @@ CDM.pantallas.adminJugador = (function () {
       '<nav class="migas" aria-label="Ruta"><a href="' + e(ctx.volver || '#/admin/jugadores') + '">' + (ctx.volver ? 'Volver' : 'Jugadores') + '</a> › ' + e(nombre(j)) + '</nav>' +
       '<h1 class="jugador-admin__nombre" id="ja-titulo">' + e(nombre(j)) + '</h1>' +
       '<div class="fila-2">' + campo('apellido', 'Apellido') + campo('nombre', 'Nombre') + '</div>' +
-      '<div class="campo"><span class="campo__etiqueta">Puestos</span><p class="jugador-admin__puestos">' +
-      (ctx.puestos.length ? ctx.puestos.map((x) => '<span class="etiqueta etiqueta--info">' + e(x.puesto) +
-        (x.torneos ? ' · ' + ui.plural(x.torneos, 'torneo', 'torneos') : '') + '</span>').join(' ') : '<span class="texto-2">Sin puesto cargado</span>') + '</p></div>' +
-      '<p class="nota">Se suman solos cuando un plantel le pone un puesto.</p>' +
+      '<div class="campo" id="ja-puestos">' + puestosHtml() + '</div>' +
       campo('apodo', 'Apodo', ' placeholder="Opcional"') +
       '<div class="campo"><label for="ja-notas">Notas</label><textarea id="ja-notas" name="notas" rows="2">' + e(j.notas || '') + '</textarea></div>' +
       '<p class="plantel-estado" id="ja-estado" role="status"></p>' + resumenHtml() + '</section>';
@@ -255,6 +298,8 @@ CDM.pantallas.adminJugador = (function () {
       if (seg) return CDM.router.cambiarFiltros('/admin/jugadores/' + encodeURIComponent(ctx.jugador.jugador_id), { cat: seg.dataset.valor, volver: ctx.volver || undefined });
       const b = ev.target.closest('[data-torneo]');
       if (b) return tocar(b);
+      const p = ev.target.closest('[data-puesto]');
+      if (p) return tocarPuesto(p);
       const m = ev.target.closest('[data-accion="marcar-jugo"]');
       if (m) marcarJugo(m);
     });

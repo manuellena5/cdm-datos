@@ -3,7 +3,7 @@ Plan de desarrollo por fases para trabajar con Claude Code.
 
 > Cómo usar este documento: pedile a Claude Code **una fase por vez** ("Hacé la Fase 1 de docs/PLAN.md").
 > Cada fase tiene alcance, entregables y criterios de aceptación. No avanzar a la siguiente sin cerrar los criterios de la anterior.
-> **Estado (02/11/2026):** Fases 0 a 6.7 hechas. Sigue la **Fase 6.8**; después, la 7.
+> **Estado (02/11/2026):** Fases 0 a 6.8 hechas. Sigue la **Fase 7**.
 
 ---
 

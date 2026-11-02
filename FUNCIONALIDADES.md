@@ -2,6 +2,13 @@
 
 Registro de lo que hace la app. Se actualiza con cada funcionalidad nueva o cambiada.
 
+## v0.24.0 — Fase 6.8.3 (puestos editables)
+- Administrar → jugador: **Puestos** son cuatro chips. Los del jugador están marcados, con su uso ("Volante · 6 torneos"). Tocar uno sin marcar lo suma; tocar uno marcado lo quita.
+- Un puesto que algún plantel usa **no se puede quitar**: avisa en cuáles ("No se puede quitar Volante: lo usa en Apertura 2018 y Clausura 2019. Cambialo primero en esos planteles."). La base también lo impide. Uno sin uso se quita directo.
+- Registro de cambios: "sumó Volante a Pérez, Juan desde el plantel del Clausura 2024 · Primera", "puso a Pérez, Juan como Defensor en el …", "sumó a Pérez, Juan al … , y Volante a sus puestos", "sumó Arquero a los puestos de …" y "quitó Delantero de los puestos de …".
+- Planteles (consulta): al lado del nombre, los otros puestos del jugador ("también Delantero"), el más reciente primero.
+- Exportar a Excel: la columna puestos de la hoja Jugadores va con el más reciente primero.
+
 ## v0.23.0 — Fase 6.8.2 (precarga del puesto en los planteles)
 - Al sumar a un plantel un jugador que ya existe, entra con su puesto **precargado**: el del último torneo que jugó o, si nunca tuvo uno en un plantel, el primero de sus puestos. Vale para la fila nueva, los sugeridos, "Pegar lista" (si la línea no trae puesto) y la grilla de torneos del jugador. Si se elige otro puesto, queda el elegido.
 - "Copiar plantel de…" copia el puesto que tenía en ese torneo; si allá no tenía, usa el precargado.

@@ -348,7 +348,20 @@ CDM.pantallas.admin = (function () {
       } else if (c.accion === 'sumó a' || c.accion === 'sacó a') {
         const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
         que = c.accion + ' ' + (c.plantel_jugador_nombre || 'un jugador') + (c.accion === 'sumó a' ? ' al ' : ' del ') +
-          (t ? t.nombre : 'torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
+          (t ? t.nombre : 'torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '') +
+          (c.accion === 'sumó a' && c.puestos_sumados ? ', y ' + c.puestos_sumados + ' a sus puestos' : '');
+      } else if (c.accion === 'cambió el puesto de') {
+        // 6.8.3: "sumó Volante a Pérez, Juan desde el plantel del Clausura 2024"
+        const t = c.plantel ? torneosPorId[c.plantel.torneo_id] : null;
+        const quien = c.plantel_jugador_nombre || 'un jugador';
+        const donde = (t ? t.nombre : 'un torneo') + (c.plantel ? ' · ' + c.plantel.categoria : '');
+        que = c.puestos_sumados ? 'sumó ' + c.puestos_sumados + ' a ' + quien + ' desde el plantel del ' + donde
+          : c.plantel_puesto ? 'puso a ' + quien + ' como ' + c.plantel_puesto + ' en el ' + donde
+            : 'le sacó el puesto a ' + quien + ' en el ' + donde;
+      } else if (c.accion === 'cambió los puestos de') {
+        const quien = jugadores[0] ? jugadores[0].texto : 'un jugador';
+        que = [c.puestos_sumados ? 'sumó ' + c.puestos_sumados + ' a los puestos de ' + quien : '',
+          c.puestos_quitados ? 'quitó ' + c.puestos_quitados + ' de los puestos de ' + quien : ''].filter(Boolean).join(' y ') || 'cambió los puestos de ' + quien;
       } else if (c.accion === 'unió árbitros') {
         const baja = (c.arbitros || []).find((a) => a.accion === 'baja');
         que = 'unió al árbitro ' + (baja ? baja.nombre : '') + (c.arbitro_destino_nombre ? ' con ' + c.arbitro_destino_nombre : '');

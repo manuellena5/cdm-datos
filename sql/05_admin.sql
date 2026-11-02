@@ -168,6 +168,16 @@ select
   count(*) filter (where a.tabla = 'planteles') as plantel_filas,
   -- un solo jugador sumado o sacado de una lista (desde la pantalla del jugador o el plantel)
   (array_agg(coalesce(a.despues, a.antes) ->> 'jugador_id') filter (where a.tabla = 'planteles'))[1] as plantel_jugador,
+  (array_agg(a.despues ->> 'posicion') filter (where a.tabla = 'planteles'))[1] as plantel_puesto,
+  -- puestos del jugador que se sumaron o quitaron (15_puestos.sql), separados por coma
+  (array_agg((select string_agg(p, ', ') from jsonb_array_elements_text(a.despues -> 'puestos') p
+              where not coalesce(a.antes -> 'puestos', '[]'::jsonb) ? p))
+    filter (where a.tabla = 'jugadores' and a.accion = 'cambio'
+            and (a.antes -> 'puestos') is distinct from (a.despues -> 'puestos')))[1] as puestos_sumados,
+  (array_agg((select string_agg(p, ', ') from jsonb_array_elements_text(a.antes -> 'puestos') p
+              where not coalesce(a.despues -> 'puestos', '[]'::jsonb) ? p))
+    filter (where a.tabla = 'jugadores' and a.accion = 'cambio'
+            and (a.antes -> 'puestos') is distinct from (a.despues -> 'puestos')))[1] as puestos_quitados,
   case
     when bool_and(a.tabla = 'cuerpos_tecnicos') then 'actualizó el cuerpo técnico de'
     -- un solo jugador en una lista (el mismo guardado puede sumarle un puesto: 15_puestos.sql)
@@ -175,7 +185,13 @@ select
          and bool_or(a.tabla = 'planteles' and a.accion = 'alta') then 'sumó a'
     when bool_and(a.tabla in ('planteles', 'jugadores')) and count(*) filter (where a.tabla = 'planteles') = 1
          and bool_or(a.tabla = 'planteles' and a.accion = 'baja') then 'sacó a'
+    -- el puesto de un jugador en un plantel (6.8.3)
+    when bool_and(a.tabla in ('planteles', 'jugadores')) and count(*) filter (where a.tabla = 'planteles') = 1
+         and bool_or(a.tabla = 'planteles' and (a.antes ->> 'posicion') is distinct from (a.despues ->> 'posicion')) then 'cambió el puesto de'
     when max(a.usuario) = 'Importación' then 'importó'
+    -- puestos sumados o quitados a mano en la pantalla del jugador (6.8.3)
+    when bool_and(a.tabla = 'jugadores' and a.accion = 'cambio'
+                  and (a.antes -> 'puestos') is distinct from (a.despues -> 'puestos')) then 'cambió los puestos de'
     when bool_or(a.tabla = 'arbitros' and a.accion = 'baja') then 'unió árbitros'
     when bool_and(a.tabla = 'arbitros') and bool_and(a.accion = 'alta') then 'agregó al árbitro'
     when bool_and(a.tabla = 'arbitros') then 'corrigió al árbitro'
